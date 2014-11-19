@@ -7,7 +7,7 @@
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>org.personalaiz.api.pserver</param-value>
+            <param-value>gr.demokritos.iit.personalaiz.api.pserver</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -16,7 +16,7 @@
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>org.personalaiz.api.datasources</param-value>
+            <param-value>gr.demokritos.iit.personalaiz.api.datasources</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
