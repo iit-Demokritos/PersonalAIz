@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.personalaiz.offlineComputations;
+package gr.demokritos.iit.personalaiz.offlinecomputations;
 
 /**
  *

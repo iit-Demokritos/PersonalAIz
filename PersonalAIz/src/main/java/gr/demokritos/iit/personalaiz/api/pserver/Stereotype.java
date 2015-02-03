@@ -24,7 +24,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * Root resource (exposed at "pserver/:credentials/stereotype" path)
  */
-@Path("{ClientKey}/stereotype")
+@Path("{clientKey}/stereotype")
 @Produces(MediaType.APPLICATION_JSON)
 public class Stereotype {
 
@@ -37,12 +37,12 @@ public class Stereotype {
   
 
 // TODO: Implement Add Stereotypes
-// POST /:SteretoypeName | Add new stereotype on the platform
-    @Path("/{SteretoypeName}")
+// POST /:steretoypeName | Add new stereotype on the platform
+    @Path("/{steretoypeName}")
     @POST
-    public String AddStereotype(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("SteretoypeName") String SteretoypeName,
+    public String addStereotype(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("steretoypeName") String steretoypeName,
             @DefaultValue("null") @QueryParam("rule") String rule
     ) {
 
@@ -52,8 +52,8 @@ public class Stereotype {
 // TODO: Implement Get stereotypes
 // GET /  | Get a list with all stereotype names in the platform
     @GET
-    public String GetStereotypes(
-            @PathParam("ClientKey") String ClientKey,
+    public String getStereotypes(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -64,8 +64,8 @@ public class Stereotype {
 // TODO: Implement Delete stereotypes
 // DELETE /  | Delete stereotype from the platform. If no pattern remove all the stereotypes
     @DELETE
-    public String DeleteStereotypes(
-            @PathParam("ClientKey") String ClientKey,
+    public String deleteStereotypes(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
@@ -74,12 +74,12 @@ public class Stereotype {
 
 
 // TODO: Implement Remake stereotype
-// PUT /:StereotypeName  | Remake stereotype of the given stereotype Name
-    @Path("{StereotypeName}")
+// PUT /:stereotypeName  | Remake stereotype of the given stereotype Name
+    @Path("{stereotypeName}")
     @PUT
-    public String RemakeStereotype(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName
+    public String remakeStereotype(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName
     ) {
 
      return null;
@@ -87,12 +87,12 @@ public class Stereotype {
 
 
 // TODO: Implement Get stereotype users
-// GET /:StereotypeName/users  | Get a list with users that belongs to the given stereotype name
-    @Path("{StereotypeName}/users")
+// GET /:stereotypeName/users  | Get a list with users that belongs to the given stereotype name
+    @Path("{stereotypeName}/users")
     @GET
-    public String GetStereotypeUsers(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName,
+    public String getStereotypeUsers(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -101,12 +101,12 @@ public class Stereotype {
     }
     
 // TODO: Implement Get stereotype profile
-// GET /:StereotypeName/profile  | Get stereotype profile for the given stereotype name
-    @Path("{StereotypeName}/profile")
+// GET /:stereotypeName/profile  | Get stereotype profile for the given stereotype name
+    @Path("{stereotypeName}/profile")
     @GET
-    public String GetStereotypeProfile(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName,
+    public String getStereotypeProfile(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -118,25 +118,25 @@ public class Stereotype {
 
 // ===========================================   
 // TODO: Implement Add user on stereotype
-// POST /users/:Username/:StereotypeNameObject | Add a user on a stereotype with association degree
-    @Path("users/{Username}/{StereotypeNameObject}")
+// POST /users/:username/:stereotypeNameObject | Add a user on a stereotype with association degree
+    @Path("users/{username}/{stereotypeNameObject}")
     @POST
-    public String AddUserStereotype(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("Username") String Username,
-            @PathParam("StereotypeNameObject") String StereotypeNameObject
+    public String addUserStereotype(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("username") String username,
+            @PathParam("stereotypeNameObject") String stereotypeNameObject
     ) {
 
      return null;
     }
 
 // TODO: Implement Get user’s stereotypes
-// GET /users/:Username | Get a list with stereotypes that user belongs
-    @Path("users/{Username}")
+// GET /users/:username | Get a list with stereotypes that user belongs
+    @Path("users/{username}")
     @GET
-    public String GetUserStereotypes(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("Username") String Username,
+    public String getUserStereotypes(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("username") String username,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -145,75 +145,75 @@ public class Stereotype {
     }
 
 // TODO: Implement Set user’s stereotype degrees
-// PUT /users/:UserName/:StereotypeNameObject | Set new association degree for a stereotype
-    @Path("users/{UserName}/{StereotypeNameObject}")
+// PUT /users/:userName/:stereotypeNameObject | Set new association degree for a stereotype
+    @Path("users/{userName}/{stereotypeNameObject}")
     @PUT
-    public String SetUserStereotypes(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("UserName") String UserName,
-            @PathParam("StereotypeNameObject") String StereotypeNameObject
+    public String setUserStereotypes(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("userName") String userName,
+            @PathParam("stereotypeNameObject") String stereotypeNameObject
     ) {
 
      return null;
     }
     
 // TODO: Implement Modify user’s stereotype degrees
-// PUT /users/:UserName/modify/:StereotypeNameObject | Modify association degree (increase/decrease) for a stereotype
-    @Path("users/{UserName}/modify/{StereotypeNameObject}")
+// PUT /users/:userName/modify/:stereotypeNameObject | Modify association degree (increase/decrease) for a stereotype
+    @Path("users/{userName}/modify/{stereotypeNameObject}")
     @PUT
-    public String ModifyUserStereotypes(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("UserName") String UserName,
-            @PathParam("StereotypeNameObject") String StereotypeNameObject
+    public String modifyUserStereotypes(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("userName") String userName,
+            @PathParam("stereotypeNameObject") String stereotypeNameObject
     ) {
 
      return null;
     }
 
 // TODO: Implement Delete user from stereotype
-// DELETE /users/:Username/:StereotypeNameObject | Delete user from stereotypes
-    @Path("users/{Username}/{StereotypeNameObject}")
+// DELETE /users/:username/:stereotypeNameObject | Delete user from stereotypes
+    @Path("users/{username}/{stereotypeNameObject}")
     @DELETE
-    public String DeleteUserStereotype(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("Username") String Username,
-            @PathParam("StereotypeNameObject") String StereotypeNameObject
+    public String deleteUserStereotype(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("username") String username,
+            @PathParam("stereotypeNameObject") String stereotypeNameObject
     ) {
 
      return null;
     }
     
 // TODO: Implement Update stereotype users
-// PUT /users/:StereotypeName/update | Removes all users not matching the stereotypes rule and inserts any new users that do match
-    @Path("users/{StereotypeName}/update")
+// PUT /users/:stereotypeName/update | Removes all users not matching the stereotypes rule and inserts any new users that do match
+    @Path("users/{stereotypeName}/update")
     @PUT
-    public String UpdateStereotypeUsers(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName
+    public String updateStereotypeUsers(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName
     ) {
 
      return null;
     }
     
 // TODO: Implement Check stereotype users
-// PUT /users/:StereotypeName/check | Removes any current users that do not match the stereotypes rule
-    @Path("users/{StereotypeName}/check")
+// PUT /users/:stereotypeName/check | Removes any current users that do not match the stereotypes rule
+    @Path("users/{stereotypeName}/check")
     @PUT
-    public String CheckStereotypeUsers(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName
+    public String checkStereotypeUsers(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName
     ) {
 
      return null;
     }
     
 // TODO: Implement Find stereotype users
-// PUT /users/:StereotypeName/find | Finds and adds to the stereotype all users matching its rule
-    @Path("users/{StereotypeName}/find")
+// PUT /users/:stereotypeName/find | Finds and adds to the stereotype all users matching its rule
+    @Path("users/{stereotypeName}/find")
     @PUT
-    public String FindStereotypeUsers(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName
+    public String findStereotypeUsers(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName
     ) {
 
      return null;
@@ -223,65 +223,65 @@ public class Stereotype {
     
 // ===========================================   
 // TODO: Implement Add features on stereotype
-// POST /features/:StereotypeName/:FeatureNameObject | Add a list of feature names and value on a stereotype
-    @Path("features/{StereotypeName}/{FeatureNameObject}")
+// POST /features/:stereotypeName/:featureNameObject | Add a list of feature names and value on a stereotype
+    @Path("features/{stereotypeName}/{featureNameObject}")
     @POST
-    public String AddFeatureStereotype(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName,
-            @PathParam("FeatureNameObject") String FeatureNameObject
+    public String addFeatureStereotype(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName,
+            @PathParam("featureNameObject") String featureNameObject
     ) {
 
      return null;
     }
     
 // TODO: Implement Delete feature from stereotypes
-// DELETE /features/:FeatureName/:StereotypeNameObject | Delete feature from stereotypes
-    @Path("features/{FeatureName}/{StereotypeNameObject}")
+// DELETE /features/:featureName/:stereotypeNameObject | Delete feature from stereotypes
+    @Path("features/{featureName}/{stereotypeNameObject}")
     @DELETE
-    public String DeleteFeatureStereotype(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("FeatureName") String FeatureName,
-            @PathParam("StereotypeNameObject") String StereotypeNameObject
+    public String deleteFeatureStereotype(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("featureName") String featureName,
+            @PathParam("stereotypeNameObject") String stereotypeNameObject
     ) {
 
      return null;
     }
     
 // TODO: Implement Set features on stereotype
-// PUT /features/:StereotypeName/:FeatureNameObject | set a list of feature names and value on a stereotype
-    @Path("features/{StereotypeName}/{FeatureNameObject}")
+// PUT /features/:stereotypeName/:featureNameObject | set a list of feature names and value on a stereotype
+    @Path("features/{stereotypeName}/{featureNameObject}")
     @PUT
-    public String SetFeatureStereotypes(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName,
-            @PathParam("FeatureNameObject") String FeatureNameObject
+    public String setFeatureStereotypes(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName,
+            @PathParam("featureNameObject") String featureNameObject
     ) {
 
      return null;
     }
     
 // TODO: Implement Modify features on stereotype
-// PUT /features/:StereotypeName/modify/:FeatureNameObject | Modify a list of feature names and value on a stereotype
-    @Path("features/{StereotypeName}/modify/{FeatureNameObject}")
+// PUT /features/:stereotypeName/modify/:featureNameObject | Modify a list of feature names and value on a stereotype
+    @Path("features/{stereotypeName}/modify/{featureNameObject}")
     @PUT
-    public String ModifyFeatureStereotypes(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName,
-            @PathParam("FeatureNameObject") String FeatureNameObject
+    public String modifyFeatureStereotypes(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName,
+            @PathParam("featureNameObject") String featureNameObject
     ) {
 
      return null;
     }
     
 // TODO: Implement Update stereotype features
-// PUT /features/:StereotypeName/update | Removes all features from the stereotype 
+// PUT /features/:stereotypeName/update | Removes all features from the stereotype 
 //    and then adds and sets all features as needed based on the stereotypes current users and their degrees
-    @Path("features/{StereotypeName}/update")
+    @Path("features/{stereotypeName}/update")
     @PUT
-    public String UpdateStereotypeFeatures(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("StereotypeName") String StereotypeName
+    public String updateStereotypeFeatures(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("stereotypeName") String stereotypeName
     ) {
 
      return null;

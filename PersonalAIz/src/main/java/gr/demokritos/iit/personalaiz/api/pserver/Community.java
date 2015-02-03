@@ -24,7 +24,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * Root resource (exposed at ":credentials/Community" path)
  */
-@Path("{ClientKey}/community")
+@Path("{clientKey}/community")
 @Produces(MediaType.APPLICATION_JSON)
 public class Community {
 
@@ -39,39 +39,39 @@ public class Community {
 
     
 // TODO: Implement Add new user community
-// POST /user/:CommunityName/:CommunityUsersObject | Add new user custom community on the platform
-    @Path("user/{CommunityName}/{CommunityUsersObject}")
+// POST /user/:communityName/:communityUsersObject | Add new user custom community on the platform
+    @Path("user/{communityName}/{communityUsersObject}")
     @POST
-    public String AddUserCommunity(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("CommunityName") String CommunityName,
-            @PathParam("CommunityUsersObject") String CommunityUsersObject
+    public String addUserCommunity(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("communityName") String communityName,
+            @PathParam("communityUsersObject") String communityUsersObject
     ) {
 
      return null;
     }
     
 // TODO: Implement  Add user association
-// POST /user/:User1/and/:User2/associate/:Weight | Add the weight of user’s association between two users
-    @Path("user/{User1}/and/{User2}/associate/{Weight}")
+// POST /user/:user1/and/:user2/associate/:weight | Add the weight of user’s association between two users
+    @Path("user/{user1}/and/{user2}/associate/{weight}")
     @POST
-    public String AddUserAssociation(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("User1") String User1,
-            @PathParam("User2") String User2,
-            @PathParam("Weight") String Weight
+    public String addUserAssociation(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("user1") String user1,
+            @PathParam("user2") String user2,
+            @PathParam("weight") String weight
     ) {
 
      return null;
     }
     
 // TODO: Implement  Calculate User association
-// POST /user/:MetricAlgorithm/association | Calculates the association distance for all users in the platform
-    @Path("user/{MetricAlgorithm}/association")
+// POST /user/:metricAlgorithm/association | Calculates the association distance for all users in the platform
+    @Path("user/{metricAlgorithm}/association")
     @POST
-    public String CalculateUserAssociation(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("MetricAlgorithm") String MetricAlgorithm,
+    public String calculateUserAssociation(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("metricAlgorithm") String metricAlgorithm,
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
@@ -79,13 +79,13 @@ public class Community {
     }
     
 // TODO: Implement  Make user communities
-// POST /user/:ClusterAlgorithm/with/:AssociationType | Make clustering to users and find user communities
-    @Path("user/{ClusterAlgorithm}/with/{AssociationType}")
+// POST /user/:clusterAlgorithm/with/:associationType | Make clustering to users and find user communities
+    @Path("user/{clusterAlgorithm}/with/{associationType}")
     @POST
-    public String MakeUserCommunities(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("ClusterAlgorithm") String ClusterAlgorithm,
-            @PathParam("AssociationType") String AssociationType,
+    public String makeUserCommunities(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("clusterAlgorithm") String clusterAlgorithm,
+            @PathParam("associationType") String associationType,
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
@@ -96,8 +96,8 @@ public class Community {
 // DELETE /user | Make clustering to users and find user communities
     @Path("user")
     @DELETE
-    public String DeleteUserCommunities(
-            @PathParam("ClientKey") String ClientKey,
+    public String deleteUserCommunities(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
@@ -108,8 +108,8 @@ public class Community {
 // GET /user | Get a list with user communities on the platform
     @Path("user")
     @GET
-    public String GetUserCommunities(
-            @PathParam("ClientKey") String ClientKey,
+    public String getUserCommunities(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -118,12 +118,12 @@ public class Community {
     }
     
 // TODO: Implement  Get user community profile
-// GET /user/:CommunityName | Get user’s community profile
-    @Path("user/{CommunityName}")
+// GET /user/:communityName | Get user’s community profile
+    @Path("user/{communityName}")
     @GET
-    public String GetUserCommunityProfile(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("CommunityName") String CommunityName,
+    public String getUserCommunityProfile(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("communityName") String communityName,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -132,12 +132,12 @@ public class Community {
     }
     
 // TODO: Implement  Get user community users
-// GET /user/:CommunityName/users | Get users that belongs to  given community user
-    @Path("user/{CommunityName}/users")
+// GET /user/:communityName/users | Get users that belongs to  given community user
+    @Path("user/{communityName}/users")
     @GET
-    public String GetUserCommunityUsers(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("CommunityName") String CommunityName,
+    public String getUserCommunityUsers(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("communityName") String communityName,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -146,12 +146,12 @@ public class Community {
     }
     
 // TODO: Implement  Get users communities
-// GET /user/:Username/communities | Get the communities that user contained
-    @Path("user/{Username}/communities")
+// GET /user/:username/communities | Get the communities that user contained
+    @Path("user/{username}/communities")
     @GET
-    public String GetUserUserCommunities(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("Username") String Username,
+    public String getUserUserCommunities(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("username") String username,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -164,25 +164,25 @@ public class Community {
     
 // ===========================================   
 // TODO: Implement  Add new feature community
-// POST /feature/:CommunityName/:CommunityFeatureObject | Add new custom feature community on the platform
-    @Path("feature/{CommunityName}/{CommunityFeatureObject}")
+// POST /feature/:communityName/:communityFeatureObject | Add new custom feature community on the platform
+    @Path("feature/{communityName}/{communityFeatureObject}")
     @POST
-    public String AddFeatureCommunity(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("CommunityName") String CommunityName,
-            @PathParam("CommunityFeatureObject") String CommunityFeatureObject
+    public String addFeatureCommunity(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("communityName") String communityName,
+            @PathParam("communityFeatureObject") String communityFeatureObject
     ) {
 
      return null;
     }
     
 // TODO: Implement  Calculate Feature association
-// POST /feature/:MetricAlgorithm/association | Calculates the association distance for all features in the platform
-    @Path("feature/{MetricAlgorithm}/association")
+// POST /feature/:metricAlgorithm/association | Calculates the association distance for all features in the platform
+    @Path("feature/{metricAlgorithm}/association")
     @POST
-    public String CalulateFeatureAssociation(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("MetricAlgorithm") String MetricAlgorithm,
+    public String calulateFeatureAssociation(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("metricAlgorithm") String metricAlgorithm,
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
@@ -190,13 +190,13 @@ public class Community {
     }
     
 // TODO: Implement  Make feature communities
-// POST /feature/:ClusterAlgorithm/with/:AssociationType | Make clustering to features and find feature communities
-    @Path("feature/{ClusterAlgorithm}/with/{AssociationType}")
+// POST /feature/:clusterAlgorithm/with/:associationType | Make clustering to features and find feature communities
+    @Path("feature/{clusterAlgorithm}/with/{associationType}")
     @POST
-    public String MakeFeatureCommunities(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("ClusterAlgorithm") String ClusterAlgorithm,
-            @PathParam("AssociationType") String AssociationType,
+    public String makeFeatureCommunities(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("clusterAlgorithm") String clusterAlgorithm,
+            @PathParam("associationType") String associationType,
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
@@ -207,8 +207,8 @@ public class Community {
 // DELETE /feature | Delete feature communities from the platform
     @Path("feature")
     @DELETE
-    public String DeleteFeatureCommunities(
-            @PathParam("ClientKey") String ClientKey,
+    public String deleteFeatureCommunities(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
@@ -219,8 +219,8 @@ public class Community {
 // GET /feature | Get a list with feature communities on the platform
     @Path("feature")
     @GET
-    public String GetFeatureCommunities(
-            @PathParam("ClientKey") String ClientKey,
+    public String getFeatureCommunities(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -229,12 +229,12 @@ public class Community {
     }
     
 // TODO: Implement  Get feature community features
-// GET /feature/:CommunityName/features | Get features that belongs to  given feature community
-    @Path("feature/{CommunityName}/features")
+// GET /feature/:communityName/features | Get features that belongs to  given feature community
+    @Path("feature/{communityName}/features")
     @GET
-    public String GetFeatureCommunityFeatures(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("CommunityName") String CommunityName,
+    public String getFeatureCommunityFeatures(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("communityName") String communityName,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -243,12 +243,12 @@ public class Community {
     }
     
 // TODO: Implement  Get feature’s  feature communities
-// GET /feature/:Featurename/communities | Get the communities that feature contained
-    @Path("feature/{Featurename}/communities")
+// GET /feature/:featurename/communities | Get the communities that feature contained
+    @Path("feature/{featurename}/communities")
     @GET
-    public String GetFeatureFeatureCommunities(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("Featurename") String Featurename,
+    public String getFeatureFeatureCommunities(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("featurename") String featurename,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -264,8 +264,8 @@ public class Community {
 // GET /metrics | Get list with metric algorithms and their parameter description
     @Path("metrics")
     @GET
-    public String GetMetricAlgorithms(
-            @PathParam("ClientKey") String ClientKey
+    public String getMetricAlgorithms(
+            @PathParam("clientKey") String clientKey
     ) {
 
      return null;
@@ -275,8 +275,8 @@ public class Community {
 // GET /clusters | Get list with cluster algorithms and their parameter description
     @Path("clusters")
     @GET
-    public String GetClustersAlgorithms(
-            @PathParam("ClientKey") String ClientKey
+    public String getClustersAlgorithms(
+            @PathParam("clientKey") String clientKey
     ) {
 
      return null;

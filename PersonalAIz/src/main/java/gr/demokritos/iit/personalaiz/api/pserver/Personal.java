@@ -29,7 +29,7 @@ import javax.ws.rs.core.MultivaluedMap;
 /**
  * Root resource (exposed at "pserver/:credentials/personal" path)
  */
-@Path("{ClientKey}/personal")
+@Path("{clientKey}/personal")
 @Produces(MediaType.APPLICATION_JSON)
 public class Personal {
 
@@ -67,8 +67,8 @@ public class Personal {
 //POST users/:JSONUsers | Add new users
     @Path("users/{JSONUsers}")
     @POST
-    public String AddUsers(
-            @PathParam("ClientKey") String ClientKey,
+    public String addUsers(
+            @PathParam("clientKey") String clientKey,
             @PathParam("JSONUsers") String JSONUsers
     ) {
 
@@ -79,8 +79,8 @@ public class Personal {
 //DELETE users | Delete users
     @Path("users")
     @DELETE
-    public String DeleteUsers(
-            @PathParam("ClientKey") String ClientKey,
+    public String deleteUsers(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
@@ -91,8 +91,8 @@ public class Personal {
 //GET users | Get list with users
     @Path("users")
     @GET
-    public String GetUsers(
-            @PathParam("ClientKey") String ClientKey,
+    public String getUsers(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -104,9 +104,9 @@ public class Personal {
 //PUT users/:User/attributes/:JSONUserAttributes | Set user’s attributes
     @Path("users/{User}/attributes/{JSONUserAttributes}")
     @PUT
-    public String SetUserAttributes(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("User") String User,
+    public String setUserAttributes(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("user") String user,
             @PathParam("JSONUserAttributes") String JSONUserAttributes
     ) {
 
@@ -117,9 +117,9 @@ public class Personal {
 //PUT users/:User/features/:JSONUserFeatures | Set user’s features
     @Path("users/{User}/features/{JSONUserFeatures}")
     @PUT
-    public String SetUserFeatures(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("User") String User,
+    public String setUserFeatures(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("user") String user,
             @PathParam("JSONUserFeatures") String JSONUserFeatures
     ) {
 
@@ -130,9 +130,9 @@ public class Personal {
 //PUT users/:User/features/modify/:JSONUserFeatures | Modify (increase/decrease) user’s feature
     @Path("users/{User}/features/modify/{JSONUserFeatures}")
     @PUT
-    public String ModifyUserFeatures(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("User") String User,
+    public String modifyUserFeatures(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("user") String user,
             @PathParam("JSONUserFeatures") String JSONUserFeatures
     ) {
 
@@ -143,9 +143,9 @@ public class Personal {
 //GET users/:User/features | Get user’s profile
     @Path("users/{User}/features")
     @GET
-    public String GetUserProfile(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("User") String User,
+    public String getUserProfile(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("user") String user,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -157,9 +157,9 @@ public class Personal {
 //GET users/:User/attributes | Get user’s attributes
     @Path("users/{User}/attributes")
     @GET
-    public String GetUserAttributes(
-            @PathParam("ClientKey") String ClientKey,
-            @PathParam("User") String User,
+    public String getUserAttributes(
+            @PathParam("clientKey") String clientKey,
+            @PathParam("user") String user,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -172,8 +172,8 @@ public class Personal {
 //POST attributes/:JSONAttributes | Add New Attributes
     @Path("attributes/{JSONAttributes}")
     @POST
-    public String AddAttributes(
-            @PathParam("ClientKey") String ClientKey,
+    public String addAttributes(
+            @PathParam("clientKey") String clientKey,
             @PathParam("JSONAttributes") String JSONAttributes
     ) {
 
@@ -184,8 +184,8 @@ public class Personal {
 //DELETE attributes | Delete Attributes from platform
     @Path("attributes")
     @DELETE
-    public String DeleteAttributes(
-            @PathParam("ClientKey") String ClientKey,
+    public String deleteAttributes(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
@@ -196,8 +196,8 @@ public class Personal {
 //GET attributes | Get platform’s Attributes
     @Path("attributes")
     @GET
-    public String GetAttributes(
-            @PathParam("ClientKey") String ClientKey,
+    public String getAttributes(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -209,8 +209,8 @@ public class Personal {
 //PUT attributes/:JSONAttributes | Update Attributes Default value
     @Path("attributes/{JSONAttributes}")
     @PUT
-    public String UpdateAttributes(
-            @PathParam("ClientKey") String ClientKey,
+    public String updateAttributes(
+            @PathParam("clientKey") String clientKey,
             @PathParam("JSONAttributes") String JSONAttributes
     ) {
 
@@ -222,8 +222,8 @@ public class Personal {
 //POST features/:JSONFeatures | Add New Features
     @Path("features/{JSONFeatures}")
     @POST
-    public String AddFeatures(
-            @PathParam("ClientKey") String ClientKey,
+    public String addFeatures(
+            @PathParam("clientKey") String clientKey,
             @PathParam("JSONFeatures") String JSONFeatures
     ) {
 
@@ -234,8 +234,8 @@ public class Personal {
 //DELETE features | Delete Features from platform
     @Path("features")
     @DELETE
-    public String DeleteFeatures(
-            @PathParam("ClientKey") String ClientKey,
+    public String deleteFeatures(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
@@ -246,8 +246,8 @@ public class Personal {
 //GET features | Get platform’s Features
     @Path("features")
     @GET
-    public String GetFeatures(
-            @PathParam("ClientKey") String ClientKey,
+    public String getFeatures(
+            @PathParam("clientKey") String clientKey,
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
@@ -259,8 +259,8 @@ public class Personal {
 //PUT features/:JSONFeatures | Update Features Default value
     @Path("features/{JSONFeatures}")
     @PUT
-    public String UpdateFeatures(
-            @PathParam("ClientKey") String ClientKey,
+    public String updateFeatures(
+            @PathParam("clientKey") String clientKey,
             @PathParam("JSONFeatures") String JSONFeatures
     ) {
 
