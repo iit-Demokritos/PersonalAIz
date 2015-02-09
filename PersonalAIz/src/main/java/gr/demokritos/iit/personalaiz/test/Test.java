@@ -5,6 +5,9 @@
  */
 package gr.demokritos.iit.personalaiz.test;
 
+import static gr.demokritos.iit.personalaiz.storage.HBase.getRow;
+import java.io.IOException;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,13 +21,21 @@ public class Test {
 
     public static void main(String[] args) {
 
-        System.out.println(logger.isDebugEnabled());
-        if (logger.isDebugEnabled()) {
-
-            logger.debug("debug");
+        try {
+            getRow();
+            
+            
+            
+//        System.out.println(logger.isDebugEnabled());
+//        if (logger.isDebugEnabled()) {
+//
+//            logger.debug("debug");
+//        }
+//        logger.info("info");
+//        logger.error("error");
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
         }
-        logger.info("info");
-        logger.error("error");
 
     }
 
