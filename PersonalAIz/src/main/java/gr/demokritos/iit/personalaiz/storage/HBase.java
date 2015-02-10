@@ -7,7 +7,9 @@ package gr.demokritos.iit.personalaiz.storage;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.viewfs.Constants;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
@@ -21,19 +23,28 @@ import org.apache.hadoop.hbase.util.Bytes;
  */
 public class HBase {
 
-    public static void getRow() throws IOException {
+    public static void getRow() {
 
         Configuration config = HBaseConfiguration.create();
-        config.set("hbase.master", "83.212.124.145:60010");
-        HTable table = new HTable(config, "Users");
-        Scan scan = new Scan();
-        ResultScanner scanner = table.getScanner(scan);
-        for (Result result : scanner) {
-        // ...
+        try {
+            HTable table = new HTable(config, "Clients");
+            Scan s = new Scan();
+            ResultScanner ss = table.getScanner(s);
+            for (Result r : ss) {
+                for (KeyValue kv : r.raw()) {
+                    System.out.print(new String(kv.getRow()) + " ");
+                    System.out.print(new String(kv.getFamily()) + ":");
+                    System.out.print(new String(kv.getQualifier()) + " ");
+                    System.out.print(kv.getTimestamp() + " ");
+                    System.out.println(new String(kv.getValue()));
+
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        
-        
-        
+
     }
 
 }

@@ -15,13 +15,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class Test {
+public class CustomTest {
 
-    final static private Logger logger = LoggerFactory.getLogger(Test.class);
+    final static private Logger logger = LoggerFactory.getLogger(CustomTest.class);
 
     public static void main(String[] args) {
 
-        try {
+     
             getRow();
             
             
@@ -33,10 +33,7 @@ public class Test {
 //        }
 //        logger.info("info");
 //        logger.error("error");
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+       
     }
 
 }

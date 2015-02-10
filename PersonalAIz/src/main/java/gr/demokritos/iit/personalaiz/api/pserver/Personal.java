@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.personalaiz.api.pserver;
 
+import static gr.demokritos.iit.personalaiz.storage.HBase.getRow;
 import java.util.Map;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -96,7 +97,7 @@ public class Personal {
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
-
+        getRow();
         return null;
     }
 
