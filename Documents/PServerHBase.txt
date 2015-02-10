@@ -1,0 +1,41 @@
+create 'Clients', 'Info', 'Keys'
+
+put 'Clients', 'newsumUID', 'Info:name', 'NewSum'
+put 'Clients', 'newsumUID', 'Info:password', 'newsumpass'
+put 'Clients', 'newsumUID', 'Keys:key', 'key1'
+put 'Clients', 'newsumUID', 'Keys:expiration', 'exp1'
+
+put 'Clients', 'PSUID', 'Info:name', 'PServer'
+put 'Clients', 'PSUID', 'Info:password', 'pserverpass'
+put 'Clients', 'PSUID', 'Keys:key', 'key2'
+put 'Clients', 'PSUID', 'Keys:expiration', 'exp2'
+
+
+create 'Users', 'Info', 'Features', 'Attributes'
+
+put 'Users', 'user1', 'Info:Client', 'newsumUID'
+put 'Users', 'user1', 'Features:ftr1', '50'
+put 'Users', 'user1', 'Features:ftr4', '0'
+put 'Users', 'user1', 'Features:ftr3', '1'
+put 'Users', 'user1', 'Features:ftr55', '6'
+put 'Users', 'user1', 'Features:ftr17', '19'
+put 'Users', 'user1', 'Attributes:age', '18'
+put 'Users', 'user1', 'Attributes:gender', 'male'
+
+put 'Users', 'user2', 'Info:Client', 'newsumUID'
+put 'Users', 'user2', 'Features:ftr1', '0'
+put 'Users', 'user2', 'Features:ftr4', '0'
+put 'Users', 'user2', 'Features:ftr3', '21'
+put 'Users', 'user2', 'Features:ftr55', '56'
+put 'Users', 'user2', 'Features:ftr17', '9'
+put 'Users', 'user2', 'Attributes:age', '2'
+put 'Users', 'user2', 'Attributes:gender', 'male'
+
+put 'Users', 'user3', 'Info:Client', 'newsumUID'
+put 'Users', 'user3', 'Features:ftr1', '5'
+put 'Users', 'user3', 'Features:ftr4', '9'
+put 'Users', 'user3', 'Features:ftr3', '3'
+put 'Users', 'user3', 'Features:ftr55', '8'
+put 'Users', 'user3', 'Features:ftr17', '1'
+put 'Users', 'user3', 'Attributes:age', '25'
+put 'Users', 'user3', 'Attributes:gender', 'fmale'
