@@ -5,7 +5,6 @@
  */
 package gr.demokritos.iit.personalaiz.api.pserver;
 
-import static gr.demokritos.iit.personalaiz.storage.HBase.getRow;
 import java.util.Map;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -97,7 +96,6 @@ public class Personal {
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
-        getRow();
         return null;
     }
 
@@ -169,103 +167,103 @@ public class Personal {
     }
 
 // ===========================================   
-// TODO: Implement add attributes
-//POST attributes/:JSONAttributes | Add New Attributes
-    @Path("attributes/{JSONAttributes}")
-    @POST
-    public String addAttributes(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("JSONAttributes") String JSONAttributes
-    ) {
-
-        return null;
-    }
-
-// TODO: Implement delete attributes
-//DELETE attributes | Delete Attributes from platform
-    @Path("attributes")
-    @DELETE
-    public String deleteAttributes(
-            @PathParam("clientKey") String clientKey,
-            @DefaultValue("*") @QueryParam("pattern") String pattern
-    ) {
-
-        return null;
-    }
-
-// TODO: Implement get attributes
-//GET attributes | Get platform’s Attributes
-    @Path("attributes")
-    @GET
-    public String getAttributes(
-            @PathParam("clientKey") String clientKey,
-            @DefaultValue("*") @QueryParam("pattern") String pattern,
-            @DefaultValue("*") @QueryParam("page") String page
-    ) {
-
-        return null;
-    }
-
-// TODO: Implement update attributes
-//PUT attributes/:JSONAttributes | Update Attributes Default value
-    @Path("attributes/{JSONAttributes}")
-    @PUT
-    public String updateAttributes(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("JSONAttributes") String JSONAttributes
-    ) {
-
-        return null;
-    }
+//// TODO: Implement add attributes
+////POST attributes/:JSONAttributes | Add New Attributes
+//    @Path("attributes/{JSONAttributes}")
+//    @POST
+//    public String addAttributes(
+//            @PathParam("clientKey") String clientKey,
+//            @PathParam("JSONAttributes") String JSONAttributes
+//    ) {
+//
+//        return null;
+//    }
+//
+//// TODO: Implement delete attributes
+////DELETE attributes | Delete Attributes from platform
+//    @Path("attributes")
+//    @DELETE
+//    public String deleteAttributes(
+//            @PathParam("clientKey") String clientKey,
+//            @DefaultValue("*") @QueryParam("pattern") String pattern
+//    ) {
+//
+//        return null;
+//    }
+//
+//// TODO: Implement get attributes
+////GET attributes | Get platform’s Attributes
+//    @Path("attributes")
+//    @GET
+//    public String getAttributes(
+//            @PathParam("clientKey") String clientKey,
+//            @DefaultValue("*") @QueryParam("pattern") String pattern,
+//            @DefaultValue("*") @QueryParam("page") String page
+//    ) {
+//
+//        return null;
+//    }
+//
+//// TODO: Implement update attributes
+////PUT attributes/:JSONAttributes | Update Attributes Default value
+//    @Path("attributes/{JSONAttributes}")
+//    @PUT
+//    public String updateAttributes(
+//            @PathParam("clientKey") String clientKey,
+//            @PathParam("JSONAttributes") String JSONAttributes
+//    ) {
+//
+//        return null;
+//    }
 
 // ===========================================   
-// TODO: Implement add Features
-//POST features/:JSONFeatures | Add New Features
-    @Path("features/{JSONFeatures}")
-    @POST
-    public String addFeatures(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("JSONFeatures") String JSONFeatures
-    ) {
-
-        return null;
-    }
-
-// TODO: Implement delete Features
-//DELETE features | Delete Features from platform
-    @Path("features")
-    @DELETE
-    public String deleteFeatures(
-            @PathParam("clientKey") String clientKey,
-            @DefaultValue("*") @QueryParam("pattern") String pattern
-    ) {
-
-        return null;
-    }
-
-// TODO: Implement get Features
-//GET features | Get platform’s Features
-    @Path("features")
-    @GET
-    public String getFeatures(
-            @PathParam("clientKey") String clientKey,
-            @DefaultValue("*") @QueryParam("pattern") String pattern,
-            @DefaultValue("*") @QueryParam("page") String page
-    ) {
-
-        return null;
-    }
-
-// TODO: Implement update Features
-//PUT features/:JSONFeatures | Update Features Default value
-    @Path("features/{JSONFeatures}")
-    @PUT
-    public String updateFeatures(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("JSONFeatures") String JSONFeatures
-    ) {
-
-        return null;
-    }
+//// TODO: Implement add Features
+////POST features/:JSONFeatures | Add New Features
+//    @Path("features/{JSONFeatures}")
+//    @POST
+//    public String addFeatures(
+//            @PathParam("clientKey") String clientKey,
+//            @PathParam("JSONFeatures") String JSONFeatures
+//    ) {
+//
+//        return null;
+//    }
+//
+//// TODO: Implement delete Features
+////DELETE features | Delete Features from platform
+//    @Path("features")
+//    @DELETE
+//    public String deleteFeatures(
+//            @PathParam("clientKey") String clientKey,
+//            @DefaultValue("*") @QueryParam("pattern") String pattern
+//    ) {
+//
+//        return null;
+//    }
+//
+//// TODO: Implement get Features
+////GET features | Get platform’s Features
+//    @Path("features")
+//    @GET
+//    public String getFeatures(
+//            @PathParam("clientKey") String clientKey,
+//            @DefaultValue("*") @QueryParam("pattern") String pattern,
+//            @DefaultValue("*") @QueryParam("page") String page
+//    ) {
+//
+//        return null;
+//    }
+//
+//// TODO: Implement update Features
+////PUT features/:JSONFeatures | Update Features Default value
+//    @Path("features/{JSONFeatures}")
+//    @PUT
+//    public String updateFeatures(
+//            @PathParam("clientKey") String clientKey,
+//            @PathParam("JSONFeatures") String JSONFeatures
+//    ) {
+//
+//        return null;
+//    }
 
 }
