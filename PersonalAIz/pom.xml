@@ -29,18 +29,13 @@
         </dependency>
         <dependency>
             <groupId>gr.demokritos.iit</groupId>
-            <artifactId>Security</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>gr.demokritos.iit</groupId>
             <artifactId>RecommendationEngine</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>gr.demokritos.iit</groupId>
             <artifactId>DataSource</artifactId>
-            <version>1.0</version>
+            <version>1</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
