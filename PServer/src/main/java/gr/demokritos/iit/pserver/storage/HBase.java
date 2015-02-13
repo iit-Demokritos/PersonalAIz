@@ -80,11 +80,10 @@ public class HBase {
     
     
     /**
-     * 
+     * Get users from HBase Storage
      * @param pattern
      * @param range
      * @return
-     * @throws IOException 
      */
     public ArrayList<String> getUsers(String pattern, String range) throws IOException {
         //Initialize variables
