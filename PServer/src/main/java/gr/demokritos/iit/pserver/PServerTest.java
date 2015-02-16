@@ -13,19 +13,18 @@ import java.io.IOException;
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
 public class PServerTest {
-    
+
     public static void main(String[] args) throws IOException {
 
         System.out.println("===============================================");
-        
-        Personal ps = new Personal("Zadsds");
-        ps.addUsers("[\"testuser1\",\"testuser2\",\"testuser3\",\"testuser4\"]");
-        System.out.println(ps.getUsers(null, null));
+
+//        Personal ps = new Personal("testUID");
+        Personal ps = new Personal("testUID2");
+        System.out.println(ps.addUsers("{\"test1\":{\"attributes\":{\"gender\": \"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr3\": \"3\",\"ftr5\": \"4\"}}}"));
+        System.out.println(ps.addUsers("{\"testko\":{},\"testko2\":{},\"testko3\":{}}"));
+//        System.out.println(ps.getUsers(null, null));
+//        System.out.println(ps.deleteUsers(null));
         System.out.println("===============================================");
     }
-    
-    
-    
-    
-    
+
 }
