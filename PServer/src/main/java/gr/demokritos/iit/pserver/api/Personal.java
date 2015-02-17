@@ -45,16 +45,16 @@ public class Personal {
      * Add a list of users on PServer Storage. This function help us to add
      * massive, users on PServer. Features or Attributes is optional.
      *
-     * @param JSONUsers A JSON string with the users 
-     * e.g. {"test1":{"attributes":{"gender": "male","age": "18"},"features": {"ftr1": "34","ftr3": "3","ftr5": "4"}}}
+     * @param JSONUsers A JSON string with the users e.g.
+     * {"test1":{"attributes":{"gender": "male","age": "18"},"features":
+     * {"ftr1": "34","ftr3": "3","ftr5": "4"}}}
      * @return A JSON response with method status
      * @throws java.io.IOException
      */
     public String addUsers(String JSONUsers) throws IOException {
         //Initialize variables
         output = new Output();
-        //convert JSON with users as a ArrayList
-        //["user1","user2",...]
+        //convert JSON with users as a HashMap
         HashMap<String, Object> users = new HashMap<String, Object>(
                 JSon.unjsonize(JSONUsers, HashMap.class));
 
@@ -139,7 +139,8 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null or page<1 then return all elements in a single page. @return A JSON
-     * response with the user s list @throws java.io.IOException
+     * response with the user s list @throws java.io.IOException @return @throws
+     * java.io.IOException
      */
     public String getUsers(String pattern, Integer page) throws IOException {
         //Initialize variables
@@ -170,26 +171,34 @@ public class Personal {
      * ...},"user2":{"gender":"fmale", "age":"28", ...}}
      * @return A JSON response with method succeed
      */
-    public String setUsersAttributes(String JSONUsersAttributes) {
+    public String setUsersAttributes(String JSONUsersAttributes) throws IOException {
         //Initialize variables
         output = new Output();
+        //convert JSON with users as a HashMap
+        HashMap<String, HashMap<String, String>> users
+                = new HashMap<String, HashMap<String, String>>(
+                        JSon.unjsonize(JSONUsersAttributes, HashMap.class));
 
-        return JSon.jsonize(output, Output.class);
-    }
+        ArrayList<User> usersList = new ArrayList<User>();
 
-    /**
-     * Set for specifically user the attributes. If username not exists then
-     * will be added on PServer
-     *
-     * @param user The user name that we want to set the attributes
-     * @param JSONUserAttributes A JSON string with key-value pairs. Key is the
-     * attribute name and value is the attributes value. e.g. {"gender":"male",
-     * "age":"18", ...}
-     * @return A JSON response with method succeed
-     */
-    public String setUserAttributes(String user, String JSONUserAttributes) {
-        //Initialize variables
-        output = new Output();
+        //for each username create User object and add it on the list
+        for (String cUser : users.keySet()) {
+            User user = new User();
+            user.setRowKey(clientUID + "-" + cUser);
+
+            HashMap<String, String> attributes = new HashMap<String, String>();
+            attributes.putAll(users.get(cUser));
+
+            //set attributes on user
+            user.setAttributes(attributes);
+
+            //add user on the users lsit
+            usersList.add(user);
+        }
+
+        // call HBase setUsersAttributes to set the users Attributes in HBase Storage
+        output.setOutputCode(db.setUsersAttributes(usersList));
+//        output.setCustomOutputMessage("custom message");
 
         return JSon.jsonize(output, Output.class);
     }
@@ -207,12 +216,22 @@ public class Personal {
      * null then return all elements in a single page.
      * @return A JSON response with the attribute list
      */
-    public String getUserAttributes(String user, String pattern, String page) {
+    public String getUserAttributes(String user, String pattern, String page) throws IOException {
         //Initialize variables
         output = new Output();
+        HashMap<String, String> attributes = new HashMap<String, String>();
 
-        //TODO: set @DefaultValue("*") @QueryParam("pattern") if pattern is null 
-        //TODO: set @DefaultValue("*") @QueryParam("page") if pattern is null
+//        //Check if page is null
+//        if (page == null || page<1) {
+//            //set page to return single page
+//            page = 0;
+//        }
+        //Call HBase to get User attributes
+        attributes.putAll(db.getUserAttributes(user, pattern, null));
+        output.setOutputCode(100);
+//        output.setCustomOutputMessage("test");
+        output.setOutput(attributes);
+
         return JSon.jsonize(output, Output.class);
     }
 
@@ -226,26 +245,34 @@ public class Personal {
      * "user2":{"category.sport":"12", "category.economics":"82", ...},...}
      * @return A JSON response with method succeed
      */
-    public String setUsersFeatures(String JSONUsersFeatures) {
+    public String setUsersFeatures(String JSONUsersFeatures) throws IOException {
         //Initialize variables
         output = new Output();
+        //convert JSON with users as a HashMap
+        HashMap<String, HashMap<String, String>> users
+                = new HashMap<String, HashMap<String, String>>(
+                        JSon.unjsonize(JSONUsersFeatures, HashMap.class));
 
-        return JSon.jsonize(output, Output.class);
-    }
+        ArrayList<User> usersList = new ArrayList<User>();
 
-    /**
-     * Set for specifically user the features. If username not exists then will
-     * be added on PServer.
-     *
-     * @param user The username that we want to set the features
-     * @param JSONUserFeatures A JSON string with key-value pairs. Key is the
-     * feature name and value. e.g. {"category.sport":"1",
-     * "category.economics":"8", ...}
-     * @return A JSON response with method succeed
-     */
-    public String setUserFeatures(String user, String JSONUserFeatures) {
-        //Initialize variables
-        output = new Output();
+        //for each username create User object and add it on the list
+        for (String cUser : users.keySet()) {
+            User user = new User();
+            user.setRowKey(clientUID + "-" + cUser);
+
+            HashMap<String, String> features = new HashMap<String, String>();
+            features.putAll(users.get(cUser));
+
+            //set features on user
+            user.setFeatures(features);
+
+            //add user on the users lsit
+            usersList.add(user);
+        }
+
+        // call HBase setUsersFeatures to set the users Features in HBase Storage
+        output.setOutputCode(db.setUsersFeatures(usersList));
+//        output.setCustomOutputMessage("custom message");
 
         return JSon.jsonize(output, Output.class);
     }
@@ -298,13 +325,24 @@ public class Personal {
      * null then return all elements in a single page.
      * @return A JSON response with the user's profile. A list of key-value
      * pairs for user's features.
+     * @throws java.io.IOException
      */
-    public String getUserProfile(String user, String pattern, String page) {
+    public String getUserProfile(String user, String pattern, String page) throws IOException {
         //Initialize variables
         output = new Output();
+        HashMap<String, String> features = new HashMap<String, String>();
 
-        //TODO: set @DefaultValue("*") @QueryParam("pattern") if pattern is null 
-        //TODO: set @DefaultValue("*") @QueryParam("page") if pattern is null
+//        //Check if page is null
+//        if (page == null || page<1) {
+//            //set page to return single page
+//            page = 0;
+//        }
+        //Call HBase to get User features
+        features.putAll(db.getUserFeatures(user, null, null));
+        output.setOutputCode(100);
+//        output.setCustomOutputMessage("test");
+        output.setOutput(features);
+
         return JSon.jsonize(output, Output.class);
     }
 
