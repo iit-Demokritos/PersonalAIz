@@ -6,9 +6,49 @@
 package gr.demokritos.iit.pserver.api;
 
 /**
- *
+ * This class implement the administration functionality of PServer.
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
 public class Admin {
+
+    public Admin(String adminKey) {
+    
+    
+    }
+    
+    public String getSettings(){
+        
+        
+        return null;
+    }
+    
+    public String setSettings(){
+        
+        return null;
+    }
+    
+    public String registerClient(){
+        
+        
+        
+        return null;
+    }
+    
+    public String deleteClient(){
+        
+        
+        
+        return null;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 }
