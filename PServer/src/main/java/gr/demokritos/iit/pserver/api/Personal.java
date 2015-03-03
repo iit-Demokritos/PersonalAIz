@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.hadoop.hbase.exceptions.DeserializationException;
 
 /**
  * This class implement the Personal mode of PServer. It supports the personal
@@ -139,10 +140,11 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null or page<1 then return all elements in a single page. @return A JSON
-     * response with the user s list @throws java.io.IOException @return @throws
-     * java.io.IOException
+     * response with the user
+     * s list
+     * @throws java.io.IOException
      */
-    public String getUsers(String pattern, Integer page) throws IOException {
+    public String getUsers(String pattern, Integer page) throws IOException, DeserializationException {
         //Initialize variables
         output = new Output();
         ArrayList<String> users = new ArrayList<String>();
@@ -153,7 +155,7 @@ public class Personal {
 //            page = 0;
 //        }
         //Call HBase to get Users
-        users.addAll(db.getUsers(pattern, null));
+        users.addAll(db.getUsers(pattern, page));
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
         output.setOutput(users);
@@ -327,20 +329,23 @@ public class Personal {
      * pairs for user's features.
      * @throws java.io.IOException
      */
-    public String getUserProfile(String user, String pattern, String page) throws IOException {
+    public String getUserProfile(String user, String pattern, Integer page) throws IOException, DeserializationException {
         //Initialize variables
         output = new Output();
         HashMap<String, String> features = new HashMap<String, String>();
 
-//        //Check if page is null
-//        if (page == null || page<1) {
-//            //set page to return single page
-//            page = 0;
-//        }
+        //Check if page is null or page <1
+        if (page == null || page < 1) {
+            //set page null to return single page
+            page = null;
+        }
         //Call HBase to get User features
-        features.putAll(db.getUserFeatures(user, null, null));
+        features.putAll(db.getUserFeatures(user, pattern, page));
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
+        if (page != null) {
+            output.setCustomOutputMessage("page "+db.paging);
+        }
         output.setOutput(features);
 
         return JSon.jsonize(output, Output.class);
