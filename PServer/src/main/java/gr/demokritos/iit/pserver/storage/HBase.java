@@ -8,6 +8,7 @@ package gr.demokritos.iit.pserver.storage;
 import gr.demokritos.iit.pserver.ontologies.User;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NavigableMap;
@@ -32,6 +33,7 @@ import org.apache.hadoop.hbase.filter.MultipleColumnPrefixFilter;
 import org.apache.hadoop.hbase.filter.PageFilter;
 import org.apache.hadoop.hbase.filter.PrefixFilter;
 import org.apache.hadoop.hbase.filter.QualifierFilter;
+import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.filter.ValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -52,6 +54,7 @@ public class HBase {
     private static byte[] family_Info = Bytes.toBytes("Info");
     private static byte[] family_Attributes = Bytes.toBytes("Attributes");
     private static byte[] family_Features = Bytes.toBytes("Features");
+    private static final byte[] family_ClientUsers = Bytes.toBytes("ClientUsers");
 
     //=================== HBase Families ======================================
     //=================== HBase Qualifiers ====================================
@@ -135,7 +138,7 @@ public class HBase {
     public int deleteUsers(
             String pattern) throws IOException {
 
-        ArrayList<String> usersRowKey = new ArrayList<String>();
+        ArrayList<String> usersRowKey = new ArrayList<>();
         //create new HTable
         HTable table = new HTable(config, table_Users);
         //Create scan object to read users from the storage
@@ -177,68 +180,65 @@ public class HBase {
      * Get users from HBase Storage
      *
      * @param pattern
-     * @param range
+     * @param page
      * @return
      * @throws java.io.IOException
+     * @throws DeserializationException
      */
     public ArrayList<String> getUsers(
             String pattern,
             Integer page) throws IOException, DeserializationException {
 
         //Initialize variables
-        ArrayList<String> users = new ArrayList<String>();
-        Scan scan = new Scan();
-        HTable table = new HTable(config, table_Users);
+        ArrayList<String> users = new ArrayList<>();
 
-//        scan.addColumn(Bytes.toBytes("personal"), Bytes.toBytes("givenName"));
-//        scan.addColumn(Bytes.toBytes("contactinfo"), Bytes.toBytes("email"));
-//        scan.setFilter(new PageFilter(25));
-        ArrayList<Filter> filters = new ArrayList<Filter>();
+        HTable table = new HTable(config, table_Clients);
+        Get get = new Get(Bytes.toBytes(clientUID));
+        get.addFamily(family_ClientUsers);
 
-        //Set filter to get users for specific client UID
-        filters.add(new SingleColumnValueFilter(
-                family_Info,
-                qualifier_Client,
-                CompareFilter.CompareOp.EQUAL,
-                Bytes.toBytes(clientUID)));
+        ArrayList<Filter> filters = new ArrayList<>();
 
-        //if pattern != null then add patten filter
+        //if pattern is not null then add the filter pattern
         if (pattern != null) {
-
-//        filters.add(new SingleColumnValueFilter(
-//                Family_Info,
-//                Qualifier_Client,
-//                CompareFilter.CompareOp.EQUAL,
-//                Bytes.toBytes(pattern)));
+            //set feature pattern as filter 
+            filters.add(new ColumnPrefixFilter(Bytes.toBytes(pattern)));
         }
 
-        //if pageing != null then add page filter
+        //if pattern and page is null then not add extra filters
+        if (!filters.isEmpty()) {
+            //Set the filter list on get 
+            get.setFilter(
+                    new FilterList(filters)
+            );
+        }
+        //if page not null then set the offset of the page 
         if (page != null) {
 
-            filters.add(new PageFilter(page));
+            int totalItems = table.get(get).size();
+            if ((totalItems % pageSize) != 0) {
+                paging = page + "/" + (totalItems / pageSize + 1);
+            } else {
+                paging = page + "/" + (totalItems / pageSize);
+            }
+
+            //add page filter of the result
+            get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
+        }
+        Result result = table.get(get);
+        NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_ClientUsers);
+
+        if (result.isEmpty()) {
+            return users;
         }
 
-        //Set the filter list on scan 
-        scan.setFilter(
-                new FilterList(filters)
-        );
-        //Create the result scanner
-        ResultScanner scanner = table.getScanner(scan);
-        //Get the RowKey for each result and add the username on the list 
-        for (Result result : scanner) {
-//      //debug line
-//            System.out.println("in-- "+Bytes.toString(result.getRow()));
-            String username = Bytes.toString(
-                    result.getValue(
-                            family_Info,
-                            qualifier_Username)
-            );
-            users.add(username);
+        for (byte[] cQ : familyMap.descendingKeySet()) {
+            users.add(Bytes.toString(cQ));
         }
 
         return users;
     }
 
+    
     /**
      * Set the User's Attributes
      *
@@ -259,35 +259,60 @@ public class HBase {
      * @param username The username that i want the attributes
      * @param pattern The attribute pattern to filter the list If pattern is
      * null then return the whole attribute types.
-     * @param range The range of the data that we want. If range is null then
-     * all the attribute list
+     * @param page The page number of the data that we want. If page is null
+     * then return all the attribute list
      * @return A map with key-value pairs (attribute name-value)
      * @throws java.io.IOException
      */
     public HashMap<String, String> getUserAttributes(
             String username,
             String pattern,
-            String range) throws IOException {
+            Integer page) throws IOException {
 
         //Initialize variables
-        HashMap<String, String> attMap = new HashMap<String, String>();
+        HashMap<String, String> attMap = new HashMap<>();
+        //TODO: get User UID from table Clients
+        String userUID = username;
 
         HTable table = new HTable(config, table_Users);
-        Get get = new Get(Bytes.toBytes(clientUID + "-" + username));
+        Get get = new Get(Bytes.toBytes(userUID));
         get.addFamily(family_Attributes);
 
-        if (pattern == null) {
-            //set the filter
-            //TODO: Add filter for the pagination
-        } else if (range == null) {
-            //set the filter
-            //TODO: Add filter for the pattern
+        ArrayList<Filter> filters = new ArrayList<>();
+
+        //if pattern is not null then add the filter pattern
+        if (pattern != null) {
+            //set attribute pattern as filter 
+            filters.add(new ColumnPrefixFilter(Bytes.toBytes(pattern)));
         }
 
-        Result result = table.get(get);
+        //if pattern and page is null then not add extra filters
+        if (!filters.isEmpty()) {
+            //Set the filter list on get 
+            get.setFilter(
+                    new FilterList(filters)
+            );
+        }
+        //if page not null then set the offset of the page 
+        if (page != null) {
 
+            int totalItems = table.get(get).size();
+            if ((totalItems % pageSize) != 0) {
+                paging = page + "/" + (totalItems / pageSize + 1);
+            } else {
+                paging = page + "/" + (totalItems / pageSize);
+            }
+
+            //add page filter of the result
+            get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
+        }
+        Result result = table.get(get);
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Attributes);
 
+        if (result.isEmpty()) {
+            return attMap;
+
+        }
         for (byte[] cQ : familyMap.descendingKeySet()) {
             attMap.put(
                     Bytes.toString(cQ),
@@ -326,20 +351,23 @@ public class HBase {
     public HashMap<String, String> getUserFeatures(
             String username,
             String pattern,
-            Integer page) throws IOException, DeserializationException {
+            Integer page) throws IOException {
 
         //Initialize variables
-        HashMap<String, String> ftrMap = new HashMap<String, String>();
+        HashMap<String, String> ftrMap = new HashMap<>();
+
+        //TODO: get User UID from table Clients
+        String userUID = username;
 
         HTable table = new HTable(config, table_Users);
-        Get get = new Get(Bytes.toBytes(clientUID + "-" + username));
+        Get get = new Get(Bytes.toBytes(userUID));
         get.addFamily(family_Features);
 
-        ArrayList<Filter> filters = new ArrayList<Filter>();
+        ArrayList<Filter> filters = new ArrayList<>();
 
         //if pattern is not null then add the filter pattern
         if (pattern != null) {
-            //se feature pattern as filter 
+            //set feature pattern as filter 
             filters.add(new ColumnPrefixFilter(Bytes.toBytes(pattern)));
         }
 
@@ -368,8 +396,8 @@ public class HBase {
 
         if (result.isEmpty()) {
             return ftrMap;
-
         }
+
         for (byte[] cQ : familyMap.descendingKeySet()) {
             ftrMap.put(
                     Bytes.toString(cQ),
@@ -379,31 +407,8 @@ public class HBase {
         return ftrMap;
     }
 
-    public void getRow() {
-
-        try {
-            HTable table = new HTable(config, "Users");
-            Scan s = new Scan();
-            ResultScanner ss = table.getScanner(s);
-            for (Result r : ss) {
-                for (KeyValue kv : r.raw()) {
-                    System.out.print(new String(kv.getRow()) + " ");
-                    System.out.print(new String(kv.getFamily()) + ":");
-                    System.out.print(new String(kv.getQualifier()) + " ");
-                    System.out.print(kv.getTimestamp() + " ");
-                    System.out.println(new String(kv.getValue()));
-
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
     //=================== Personal Mode =======================================
     //=================== Stereotype Mode =====================================
-
     //=================== Stereotype Mode =====================================
     //=================== Community Mode ======================================
     //=================== Community Mode ======================================

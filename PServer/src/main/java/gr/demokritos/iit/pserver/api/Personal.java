@@ -140,24 +140,25 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null or page<1 then return all elements in a single page. @return A JSON
-     * response with the user
-     * s list
-     * @throws java.io.IOException
+     * response with the user s list @throws java.io.IOException
      */
     public String getUsers(String pattern, Integer page) throws IOException, DeserializationException {
         //Initialize variables
         output = new Output();
         ArrayList<String> users = new ArrayList<String>();
 
-//        //Check if page is null
-//        if (page == null || page<1) {
-//            //set page to return single page
-//            page = 0;
-//        }
+        //Check if page is null or page <1
+        if (page == null || page < 1) {
+            //set page null to return single page
+            page = null;
+        }
         //Call HBase to get Users
         users.addAll(db.getUsers(pattern, page));
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
+        if (page != null) {
+            output.setCustomOutputMessage("page " + HBase.paging);
+        }
         output.setOutput(users);
 
         return JSon.jsonize(output, Output.class);
@@ -217,21 +218,26 @@ public class Personal {
      * parameter you can ask for the first page, the second page... If page is
      * null then return all elements in a single page.
      * @return A JSON response with the attribute list
+     * @throws java.io.IOException
      */
-    public String getUserAttributes(String user, String pattern, String page) throws IOException {
+    public String getUserAttributes(String user, String pattern, Integer page) throws IOException {
         //Initialize variables
         output = new Output();
-        HashMap<String, String> attributes = new HashMap<String, String>();
+        HashMap<String, String> attributes = new HashMap<>();
 
-//        //Check if page is null
-//        if (page == null || page<1) {
-//            //set page to return single page
-//            page = 0;
-//        }
+        //Check if page is null or page <1
+        if (page == null || page < 1) {
+            //set page null to return single page
+            page = null;
+        }
+
         //Call HBase to get User attributes
-        attributes.putAll(db.getUserAttributes(user, pattern, null));
+        attributes.putAll(db.getUserAttributes(user, pattern, page));
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
+        if (page != null) {
+            output.setCustomOutputMessage("page " + HBase.paging);
+        }
         output.setOutput(attributes);
 
         return JSon.jsonize(output, Output.class);
@@ -246,23 +252,23 @@ public class Personal {
      * {"user1":{"category.sport":"1", "category.economics":"8", ...},
      * "user2":{"category.sport":"12", "category.economics":"82", ...},...}
      * @return A JSON response with method succeed
+     * @throws java.io.IOException
      */
     public String setUsersFeatures(String JSONUsersFeatures) throws IOException {
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
         HashMap<String, HashMap<String, String>> users
-                = new HashMap<String, HashMap<String, String>>(
-                        JSon.unjsonize(JSONUsersFeatures, HashMap.class));
+                = new HashMap<>(JSon.unjsonize(JSONUsersFeatures, HashMap.class));
 
-        ArrayList<User> usersList = new ArrayList<User>();
+        ArrayList<User> usersList = new ArrayList<>();
 
         //for each username create User object and add it on the list
         for (String cUser : users.keySet()) {
             User user = new User();
             user.setRowKey(clientUID + "-" + cUser);
 
-            HashMap<String, String> features = new HashMap<String, String>();
+            HashMap<String, String> features = new HashMap<>();
             features.putAll(users.get(cUser));
 
             //set features on user
@@ -329,10 +335,10 @@ public class Personal {
      * pairs for user's features.
      * @throws java.io.IOException
      */
-    public String getUserProfile(String user, String pattern, Integer page) throws IOException, DeserializationException {
+    public String getUserProfile(String user, String pattern, Integer page) throws IOException {
         //Initialize variables
         output = new Output();
-        HashMap<String, String> features = new HashMap<String, String>();
+        HashMap<String, String> features = new HashMap<>();
 
         //Check if page is null or page <1
         if (page == null || page < 1) {
@@ -344,7 +350,7 @@ public class Personal {
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
         if (page != null) {
-            output.setCustomOutputMessage("page "+db.paging);
+            output.setCustomOutputMessage("page " + HBase.paging);
         }
         output.setOutput(features);
 

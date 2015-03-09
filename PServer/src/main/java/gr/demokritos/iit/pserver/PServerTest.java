@@ -20,13 +20,15 @@ public class PServerTest {
         System.out.println("===============================================");
 
 //        Personal ps = new Personal("testUID");
-        Personal ps = new Personal("testUID2");
+//        Personal ps = new Personal("testUID2");
+        Personal ps = new Personal("PSUID");
 //        System.out.println(ps.addUsers("{\"test1\":{\"attributes\":{\"gender\": \"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr33\": \"3\",\"ftr5\": \"4\"}}}"));
 //        System.out.println(ps.addUsers("{\"testko\":{},\"testko2\":{},\"testko3\":{}}"));
-//        System.out.println(ps.getUsers(null,2));
+        System.out.println(ps.getUsers(null,null));
 //        System.out.println(ps.getUsers("*ko*", null));
-//        System.out.println(ps.getUserAttributes("test1",null, null));
-        System.out.println(ps.getUserProfile("test1",null, 2));
+        System.out.println(ps.getUserAttributes("user1UIDps",null, null));
+        System.out.println(ps.getUserProfile("user1UIDps",null, null));
+//        System.out.println(ps.getUserProfile("test1",null, 2));
 //        System.ouZt.println(ps.deleteUsers(null));
         System.out.println("===============================================");
     }
