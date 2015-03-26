@@ -6,36 +6,31 @@
 package gr.demokritos.iit.pserver.storage;
 
 import gr.demokritos.iit.pserver.ontologies.User;
+import gr.demokritos.iit.pserver.utils.Utilities;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
-import org.apache.hadoop.hbase.filter.ByteArrayComparable;
 import org.apache.hadoop.hbase.filter.ColumnPaginationFilter;
 import org.apache.hadoop.hbase.filter.ColumnPrefixFilter;
-import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.apache.hadoop.hbase.filter.MultipleColumnPrefixFilter;
-import org.apache.hadoop.hbase.filter.PageFilter;
 import org.apache.hadoop.hbase.filter.PrefixFilter;
-import org.apache.hadoop.hbase.filter.QualifierFilter;
-import org.apache.hadoop.hbase.filter.RowFilter;
-import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
-import org.apache.hadoop.hbase.filter.ValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
 /**
@@ -46,33 +41,35 @@ import org.apache.hadoop.hbase.util.Bytes;
 public class HBase {
 
     //=================== HBase tables ========================================
-    private static String table_Users = "Users";
-    private static String table_Clients = "Clients";
+    private static final String table_Users = "Users";
+    private static final String table_Clients = "Clients";
 
     //=================== HBase tables ========================================
     //=================== HBase Families ======================================
-    private static byte[] family_Info = Bytes.toBytes("Info");
-    private static byte[] family_Attributes = Bytes.toBytes("Attributes");
-    private static byte[] family_Features = Bytes.toBytes("Features");
+    private static final byte[] family_Info = Bytes.toBytes("Info");
+    private static final byte[] family_Attributes = Bytes.toBytes("Attributes");
+    private static final byte[] family_Features = Bytes.toBytes("Features");
     private static final byte[] family_ClientUsers = Bytes.toBytes("ClientUsers");
 
     //=================== HBase Families ======================================
     //=================== HBase Qualifiers ====================================
-    private static byte[] qualifier_Client = Bytes.toBytes("Client");
-    private static byte[] qualifier_Username = Bytes.toBytes("Username");
+    private static final byte[] qualifier_Client = Bytes.toBytes("Client");
+    private static final byte[] qualifier_Username = Bytes.toBytes("Username");
 
     //=================== HBase Qualifiers ====================================
     private static Configuration config;
     private static String clientUID;
-    private static Integer pageSize = 20;
+    private static final Integer pageSize = 20;
     public static String paging;
 
     /**
      * The constructor of HBase storage system.
+     *
+     * @param clientUID
      */
     public HBase(String clientUID) {
         //Set client UID on a global private variable
-        this.clientUID = clientUID;
+        HBase.clientUID = clientUID;
 
         //Create new HBase configuration
         config = HBaseConfiguration.create();
@@ -88,16 +85,25 @@ public class HBase {
      * @throws java.io.IOException
      */
     public int addUsers(
-            ArrayList<User> users) throws IOException {
+            List<User> users) throws IOException {
 
-        //create new HTable
-        HTable table = new HTable(config, table_Users);
+        //create new Users HTable
+        HTable usersTable = new HTable(config, table_Users);
+        //create new Clients HTable
+        HTable clientsTable = new HTable(config, table_Clients);
+        //Create put method with clients row key
+        Put putClientUsers = new Put(Bytes.toBytes(clientUID));
 
         //for each user
         for (User user : users) {
 
             //Create put method with row key
-            Put put = new Put(Bytes.toBytes(user.getRowKey()));
+            Put put = new Put(Bytes.toBytes(user.getUserUID()));
+
+            //-----------------------------------------------
+            Increment inc = new Increment(Bytes.toBytes(user.getUserUID()));
+
+            //------------------------------------------------
             //add current user info
             for (String cInfo : user.getInfo().keySet()) {
                 put.add(family_Info,
@@ -113,23 +119,54 @@ public class HBase {
 
             //add current user features
             for (String cFeature : user.getFeatures().keySet()) {
-                put.add(family_Features,
-                        Bytes.toBytes(cFeature),
-                        Bytes.toBytes(user.getFeatures().get(cFeature)));
+                //add feature as element for increase
+                try {
+                    inc.addColumn(family_Features,
+                            Bytes.toBytes(cFeature),
+                            Long.parseLong(user.getFeatures().get(cFeature)));
+
+                } catch (Exception e) {
+
+                    //if feature is not integer then add it as not increasement feature 
+                    put.add(family_Features,
+                            Bytes.toBytes(cFeature),
+                            Bytes.toBytes(user.getFeatures().get(cFeature)));
+
+                }
+
             }
-            table.put(put);
+
+            //add user record on users table
+            usersTable.put(put);
+
+            //if increment is not null then add to user table
+            if (!inc.isEmpty()) {
+                usersTable.increment(inc);
+            }
+
+            //put username and UUID on clients user PUT
+            putClientUsers.add(family_ClientUsers,
+                    Bytes.toBytes(user.getUsername()),
+                    Bytes.toBytes(user.getUserUID()));
         }
 
-        //Flush Commits
-        table.flushCommits();
-        table.close();
+        //put users on Clients table
+        clientsTable.put(putClientUsers);
 
+        //Flush Commits
+        usersTable.flushCommits();
+        clientsTable.flushCommits();
+        //close tables
+        usersTable.close();
+        clientsTable.close();
+
+        //TODO: return the code
         return 100;
 
     }
 
     /**
-     * DElete users from HBase storage
+     * Delete users from HBase storage
      *
      * @param pattern the pattern of the users that i want to delete
      * @return the Output code
@@ -137,7 +174,7 @@ public class HBase {
      */
     public int deleteUsers(
             String pattern) throws IOException {
-
+//TODO: fix delete users
         ArrayList<String> usersRowKey = new ArrayList<>();
         //create new HTable
         HTable table = new HTable(config, table_Users);
@@ -185,7 +222,7 @@ public class HBase {
      * @throws java.io.IOException
      * @throws DeserializationException
      */
-    public ArrayList<String> getUsers(
+    public List<String> getUsers(
             String pattern,
             Integer page) throws IOException, DeserializationException {
 
@@ -238,7 +275,6 @@ public class HBase {
         return users;
     }
 
-    
     /**
      * Set the User's Attributes
      *
@@ -248,7 +284,7 @@ public class HBase {
      * @throws IOException
      */
     public int setUsersAttributes(
-            ArrayList<User> users) throws IOException {
+            List<User> users) throws IOException {
 
         return addUsers(users);
     }
@@ -261,18 +297,23 @@ public class HBase {
      * null then return the whole attribute types.
      * @param page The page number of the data that we want. If page is null
      * then return all the attribute list
-     * @return A map with key-value pairs (attribute name-value)
+     * @return A map with key-value pairs (attribute name-value). If user not
+     * exist then return null
      * @throws java.io.IOException
      */
-    public HashMap<String, String> getUserAttributes(
+    public Map<String, String> getUserAttributes(
             String username,
             String pattern,
             Integer page) throws IOException {
 
         //Initialize variables
         HashMap<String, String> attMap = new HashMap<>();
-        //TODO: get User UID from table Clients
-        String userUID = username;
+        //get User UID from table Clients
+        String userUID = getUserUID(username);
+
+        if (userUID == null) {
+            return null;
+        }
 
         HTable table = new HTable(config, table_Users);
         Get get = new Get(Bytes.toBytes(userUID));
@@ -345,10 +386,11 @@ public class HBase {
      * then return the whole feature types.
      * @param page The range of the data that we want. If range is null then all
      * the feature list
-     * @return A map with key-value pairs (feature name-value)
+     * @return A map with key-value pairs (feature name-value). If user not
+     * exist return null
      * @throws java.io.IOException
      */
-    public HashMap<String, String> getUserFeatures(
+    public Map<String, String> getUserFeatures(
             String username,
             String pattern,
             Integer page) throws IOException {
@@ -356,8 +398,12 @@ public class HBase {
         //Initialize variables
         HashMap<String, String> ftrMap = new HashMap<>();
 
-        //TODO: get User UID from table Clients
-        String userUID = username;
+        //get User UID from table Clients
+        String userUID = getUserUID(username);
+
+        if (userUID == null) {
+            return null;
+        }
 
         HTable table = new HTable(config, table_Users);
         Get get = new Get(Bytes.toBytes(userUID));
@@ -399,12 +445,57 @@ public class HBase {
         }
 
         for (byte[] cQ : familyMap.descendingKeySet()) {
-            ftrMap.put(
-                    Bytes.toString(cQ),
-                    Bytes.toString(familyMap.descendingMap().get(cQ)));
+
+            try {
+                //if feature value is long
+                ftrMap.put(
+                        Bytes.toString(cQ),
+                        Long.toString(Bytes.toLong(familyMap.descendingMap().get(cQ))));
+            } catch (Exception e) {
+                //if feature is not long
+                ftrMap.put(
+                        Bytes.toString(cQ),
+                        Bytes.toString(familyMap.descendingMap().get(cQ)));
+            }
+
+        }
+        return ftrMap;
+    }
+
+    
+    /**
+     * Increase or decrease Users features
+     * @param usersList 
+     * @return
+     * @throws InterruptedIOException
+     * @throws RetriesExhaustedWithDetailsException
+     * @throws IOException 
+     */
+    public int modifyUsersFeatures(List<User> usersList) throws InterruptedIOException, RetriesExhaustedWithDetailsException, IOException {
+
+        //create new Users HTable
+        HTable usersTable = new HTable(config, table_Users);
+
+        //for each user
+        for (User user : usersList) {
+
+            Increment inc = new Increment(Bytes.toBytes(user.getUserUID()));
+            //add current user features
+            for (String cFeature : user.getFeatures().keySet()) {
+                inc.addColumn(family_Features,
+                        Bytes.toBytes(cFeature),
+                        Long.parseLong(user.getFeatures().get(cFeature)));
+            }
+            usersTable.increment(inc);
         }
 
-        return ftrMap;
+        //Flush Commits
+        usersTable.flushCommits();
+        //close tables
+        usersTable.close();
+
+        //TODO: return the code
+        return 100;
     }
 
     //=================== Personal Mode =======================================
@@ -413,5 +504,31 @@ public class HBase {
     //=================== Community Mode ======================================
     //=================== Community Mode ======================================
     //=================== Administration ======================================
+    public int addClient() {
+
+        return 0;
+    }
+
+    /**
+     * Get the UUID for the given username
+     *
+     * @param username The username tha i want the UUID
+     * @return the UUID if username exists and null if not exists.
+     * @throws IOException
+     */
+    public String getUserUID(String username)
+            throws IOException {
+
+        HTable table = new HTable(config, table_Clients);
+        Get get = new Get(Bytes.toBytes(clientUID));
+        get.setFilter((new ColumnPrefixFilter(Bytes.toBytes(username))));
+        Result result = table.get(get);
+
+        return Bytes.toString(
+                result.getValue(family_ClientUsers, Bytes.toBytes(username))
+        );
+
+    }
+
     //=================== Administration ======================================
 }
