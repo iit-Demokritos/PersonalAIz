@@ -9,7 +9,6 @@ import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.HBase;
 import gr.demokritos.iit.pserver.utils.JSon;
 import gr.demokritos.iit.pserver.utils.Output;
-import gr.demokritos.iit.security.authentication.Authentication;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +35,7 @@ public class Personal {
      */
     public Personal(String clientUID) {
 
+        //TODO: ADD here security check?????
         Personal.clientUID = clientUID;
         //Create HBase stroge object
         db = new HBase(clientUID);
@@ -119,7 +119,7 @@ public class Personal {
      * @return A JSON response with method status
      * @throws java.io.IOException
      */
-    public String deleteUsers(String pattern) throws IOException {
+    public String deleteUsers(String pattern) throws IOException, DeserializationException {
         //Initialize variables
         output = new Output();
         //call storage delete Users function with the pattern and add the return 
@@ -140,7 +140,9 @@ public class Personal {
      * null or page<1 then return all elements in a single page. @return A JSON
      * response with the user s list @throws java.io.IOException @return @throws
      * java.io.IOException @throws
-     * org.apache.hadoop.hbase.exceptions.DeserializationExcepti o n
+     * org.apache.hadoop.hbase.exceptions.DeserializationExcepti o n @return
+     * @throws java.io.IOException @throws
+     * org.apache.hadoop.hbase.exceptions.DeserializationException
      */
     public String getUsers(String pattern, Integer page) throws IOException, DeserializationException {
         //Initialize variables
@@ -153,7 +155,8 @@ public class Personal {
             page = null;
         }
         //Call HBase to get Users
-        users.addAll(db.getUsers(pattern, page));
+//        users.addAll(db.getUsers(pattern, page).keySet());
+        users.addAll(db.getUsers(pattern, page).keySet());
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
         if (page != null) {
@@ -360,7 +363,6 @@ public class Personal {
 
         return JSon.jsonize(output, Output.class);
     }
-
 
     /**
      * Get the user profile. User profile is a list with user's features and

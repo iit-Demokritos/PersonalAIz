@@ -6,7 +6,6 @@
 package gr.demokritos.iit.pserver.storage;
 
 import gr.demokritos.iit.pserver.ontologies.User;
-import gr.demokritos.iit.pserver.utils.Utilities;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
@@ -22,15 +21,12 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
-import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 import org.apache.hadoop.hbase.filter.ColumnPaginationFilter;
 import org.apache.hadoop.hbase.filter.ColumnPrefixFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.apache.hadoop.hbase.filter.PrefixFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
 /**
@@ -171,43 +167,44 @@ public class HBase {
      * @param pattern the pattern of the users that i want to delete
      * @return the Output code
      * @throws java.io.IOException
+     * @throws org.apache.hadoop.hbase.exceptions.DeserializationException
      */
     public int deleteUsers(
-            String pattern) throws IOException {
-//TODO: fix delete users
-        ArrayList<String> usersRowKey = new ArrayList<>();
-        //create new HTable
-        HTable table = new HTable(config, table_Users);
-        //Create scan object to read users from the storage
-        Scan scan = new Scan();
+            String pattern) throws IOException, DeserializationException {
 
-        //TODO: Get users via pattern
-        //if pattern is null then get all users
-        if (pattern == null) {
-            //set a filter to get only the current client's users
-            scan.setFilter(
-                    new PrefixFilter(Bytes.toBytes(clientUID + "-"))
-            );
-            ResultScanner scanner = table.getScanner(scan);
-            //for each result set get the row key
-            for (Result result : scanner) {
-//      //debug line
-//            System.out.println("in-- "+Bytes.toString(result.getRow()));
-                usersRowKey.add(Bytes.toString(result.getRow()));
-            }
-        } else {
-            //TODO: add code for the get with filter the pattern
+        HTable usersTable;
+        HTable clientsTable;
+        HashMap<String, String> usersForDelete;
 
-        }
+        // Create an hbase users table object
+        usersTable = new HTable(config, table_Users);
+        // Create an hbase clients table object
+        clientsTable = new HTable(config, table_Clients);
+
+        //get all users basic on pattern
+        usersForDelete = new HashMap<>(getUsers(pattern, null));
+
+        // Delete users form the client table
+        Delete clientUsersDelete = new Delete(Bytes.toBytes(clientUID));
 
         //For eash user delete them from the table
-        for (String cUserRowKey : usersRowKey) {
-            Delete delete = new Delete(Bytes.toBytes(cUserRowKey));
-            table.delete(delete);
+        for (String cUserName : usersForDelete.keySet()) {
+            Delete deleteUser = new Delete(Bytes.toBytes(usersForDelete.get(cUserName)));
+            //delete user record from the table users
+            usersTable.delete(deleteUser);
+            //add delete column record for the current user
+            clientUsersDelete.deleteColumn(family_ClientUsers, Bytes.toBytes(cUserName));
         }
 
-        //close the table
-        table.close();
+        // delete user column from the table client
+        clientsTable.delete(clientUsersDelete);
+
+        // flush the Commits
+        usersTable.flushCommits();
+        clientsTable.flushCommits();
+        // close the table
+        usersTable.close();
+        clientsTable.close();
 
         //TODO: change 100 with the status code number
         return 100;
@@ -222,12 +219,12 @@ public class HBase {
      * @throws java.io.IOException
      * @throws DeserializationException
      */
-    public List<String> getUsers(
+    public Map<String, String> getUsers(
             String pattern,
             Integer page) throws IOException, DeserializationException {
 
         //Initialize variables
-        ArrayList<String> users = new ArrayList<>();
+        HashMap<String, String> users = new HashMap<>();
 
         HTable table = new HTable(config, table_Clients);
         Get get = new Get(Bytes.toBytes(clientUID));
@@ -269,7 +266,7 @@ public class HBase {
         }
 
         for (byte[] cQ : familyMap.descendingKeySet()) {
-            users.add(Bytes.toString(cQ));
+            users.put(Bytes.toString(cQ), Bytes.toString(familyMap.descendingMap().get(cQ)));
         }
 
         return users;
@@ -462,14 +459,14 @@ public class HBase {
         return ftrMap;
     }
 
-    
     /**
      * Increase or decrease Users features
-     * @param usersList 
+     *
+     * @param usersList
      * @return
      * @throws InterruptedIOException
      * @throws RetriesExhaustedWithDetailsException
-     * @throws IOException 
+     * @throws IOException
      */
     public int modifyUsersFeatures(List<User> usersList) throws InterruptedIOException, RetriesExhaustedWithDetailsException, IOException {
 

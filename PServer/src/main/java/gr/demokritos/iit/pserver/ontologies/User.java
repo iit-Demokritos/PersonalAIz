@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * This class represents a User object
+ *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class User {
@@ -34,6 +35,7 @@ public class User {
 
     /**
      * Constructor for exist user
+     *
      * @param userUUID The user UUID
      */
     public User(String userUUID) {
@@ -48,7 +50,6 @@ public class User {
     public String getUsername() {
         return username;
     }
-    
 
     public String getUserUID() {
         return userUID;
