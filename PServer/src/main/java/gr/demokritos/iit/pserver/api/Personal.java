@@ -7,13 +7,13 @@ package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.HBase;
+import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
+import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
 import gr.demokritos.iit.pserver.utils.JSon;
 import gr.demokritos.iit.pserver.utils.Output;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.hadoop.hbase.exceptions.DeserializationException;
 
 /**
  * This class implement the Personal mode of PServer. It supports the personal
@@ -24,21 +24,19 @@ import org.apache.hadoop.hbase.exceptions.DeserializationException;
  */
 public class Personal {
 
-    private static String clientUID;
-    private static HBase db;
-    private static Output output;
+    private IPersonalStorage dbPersonal;
+    private IAdminStorage dbAdmin;
+    private Output output;
 
     /**
      * The constructor of personal mode.
      *
-     * @param clientUID
+     * @param dbPersonal
+     * @param dbAdmin
      */
-    public Personal(String clientUID) {
-
-        //TODO: ADD here security check?????
-        Personal.clientUID = clientUID;
-        //Create HBase stroge object
-        db = new HBase(clientUID);
+    public Personal(IPersonalStorage dbPersonal, IAdminStorage dbAdmin) {
+        this.dbPersonal = dbPersonal;
+        this.dbAdmin = dbAdmin;
     }
 
     /**
@@ -49,9 +47,8 @@ public class Personal {
      * {"test1":{"attributes":{"gender": "male","age": "18"},"features":
      * {"ftr1": "34","ftr3": "3","ftr5": "4"}}}
      * @return A JSON response with method status
-     * @throws java.io.IOException
      */
-    public String addUsers(String JSONUsers) throws IOException {
+    public String addUsers(String JSONUsers){
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
@@ -63,12 +60,14 @@ public class Personal {
         //for each username create User object and add it on the list
         for (String cUser : users.keySet()) {
 
+            // Get user UUID
+            String UUID = dbPersonal.getUserUID(cUser);
+
             //Create new user object
-            User user = new User(clientUID, cUser);
+            User user = new User(UUID);
 
             //add info on user
             HashMap<String, String> info = new HashMap<>();
-            info.put("Client", clientUID);
 
             //set the user info
             user.setInfo(info);
@@ -105,7 +104,7 @@ public class Personal {
 
         // call HBase AddUsers to add the users in HBase Storage 
         // and set the output code
-        output.setOutputCode(db.addUsers(usersList));
+        output.setOutputCode(dbPersonal.addUsers(usersList));
 //        output.setCustomOutputMessage("custom message");
 
         return JSon.jsonize(output, Output.class);
@@ -117,14 +116,13 @@ public class Personal {
      *
      * @param pattern The user pattern that we want to delete
      * @return A JSON response with method status
-     * @throws java.io.IOException
      */
-    public String deleteUsers(String pattern) throws IOException, DeserializationException {
+    public String deleteUsers(String pattern){
         //Initialize variables
         output = new Output();
         //call storage delete Users function with the pattern and add the return 
         //code on setOutputCode
-        output.setOutputCode(db.deleteUsers(pattern));
+        output.setOutputCode(dbPersonal.deleteUsers(pattern));
 //        output.setCustomOutputMessage("test");
         return JSon.jsonize(output, Output.class);
     }
@@ -137,14 +135,10 @@ public class Personal {
      * @param page The page number. Page number will be greater or equal than 1
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
-     * null or page<1 then return all elements in a single page. @return A JSON
-     * response with the user s list @throws java.io.IOException @return @throws
-     * java.io.IOException @throws
-     * org.apache.hadoop.hbase.exceptions.DeserializationExcepti o n @return
-     * @throws java.io.IOException @throws
-     * org.apache.hadoop.hbase.exceptions.DeserializationException
+     * null or page<1 then return all elements in a single page. 
+     * @return A JSON response with the user s list 
      */
-    public String getUsers(String pattern, Integer page) throws IOException, DeserializationException {
+    public String getUsers(String pattern, Integer page){
         //Initialize variables
         output = new Output();
         ArrayList<String> users = new ArrayList<>();
@@ -156,7 +150,7 @@ public class Personal {
         }
         //Call HBase to get Users
 //        users.addAll(db.getUsers(pattern, page).keySet());
-        users.addAll(db.getUsers(pattern, page).keySet());
+        users.addAll(dbPersonal.getUsers(pattern, page).keySet());
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
         if (page != null) {
@@ -176,9 +170,8 @@ public class Personal {
      * attributes value. e.g. {"user1":{"gender":"male", "age":"18",
      * ...},"user2":{"gender":"fmale", "age":"28", ...}}
      * @return A JSON response with method succeed
-     * @throws java.io.IOException
      */
-    public String setUsersAttributes(String JSONUsersAttributes) throws IOException {
+    public String setUsersAttributes(String JSONUsersAttributes) {
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
@@ -190,19 +183,13 @@ public class Personal {
 
         //for each username create User object and add it on the list
         for (String cUser : users.keySet()) {
+            
             //get current user UID
-            String cUUID = db.getUserUID(cUser);
-            User user;
-            //If UUID is null the user is not exist and crete new 
-            if (cUUID == null) {
-                //Create user object
-                user = new User(clientUID, cUser);
-            } else {
-                //else set the user with pre exist UID
-                //Create user object
-                user = new User(cUUID);
-                user.setUsername(cUser);
-            }
+            String cUUID = dbPersonal.getUserUID(cUser);
+
+            // Create new User object
+            User user = new User(cUUID);
+            user.setUsername(cUser);
 
             HashMap<String, String> attributes = new HashMap<>();
             attributes.putAll(users.get(cUser));
@@ -215,7 +202,7 @@ public class Personal {
         }
 
         // call HBase setUsersAttributes to set the users Attributes in HBase Storage
-        output.setOutputCode(db.setUsersAttributes(usersList));
+        output.setOutputCode(dbPersonal.setUsersAttributes(usersList));
 //        output.setCustomOutputMessage("custom message");
 
         return JSon.jsonize(output, Output.class);
@@ -233,9 +220,8 @@ public class Personal {
      * parameter you can ask for the first page, the second page... If page is
      * null then return all elements in a single page.
      * @return A JSON response with the attribute list
-     * @throws java.io.IOException
      */
-    public String getUserAttributes(String user, String pattern, Integer page) throws IOException {
+    public String getUserAttributes(String user, String pattern, Integer page){
         //Initialize variables
         output = new Output();
         HashMap<String, String> attributes = new HashMap<>();
@@ -247,7 +233,7 @@ public class Personal {
         }
 
         //Call HBase to get User attributes
-        attributes.putAll(db.getUserAttributes(user, pattern, page));
+        attributes.putAll(dbPersonal.getUserAttributes(user, pattern, page));
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
         if (page != null) {
@@ -267,9 +253,8 @@ public class Personal {
      * {"user1":{"category.sport":"1", "category.economics":"8", ...},
      * "user2":{"category.sport":"12", "category.economics":"82", ...},...}
      * @return A JSON response with method succeed
-     * @throws java.io.IOException
      */
-    public String setUsersFeatures(String JSONUsersFeatures) throws IOException {
+    public String setUsersFeatures(String JSONUsersFeatures){
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
@@ -281,19 +266,11 @@ public class Personal {
         //for each username create User object and add it on the list
         for (String cUser : users.keySet()) {
             //get current user UID
-            String cUUID = db.getUserUID(cUser);
+            String cUUID = dbPersonal.getUserUID(cUser);
 
-            User user;
-            //If UUID is null the user is not exist and crete new 
-            if (cUUID == null) {
-                //Create user object
-                user = new User(clientUID, cUser);
-            } else {
-                //else set the user with pre exist UID
-                //Create user object
-                user = new User(cUUID);
-                user.setUsername(cUser);
-            }
+            //Create user object
+            User user =new User(cUUID);
+            user.setUsername(cUser);
 
             HashMap<String, String> features = new HashMap<>();
             features.putAll(users.get(cUser));
@@ -306,7 +283,7 @@ public class Personal {
         }
 
         // call HBase setUsersFeatures to set the users Features in HBase Storage
-        output.setOutputCode(db.setUsersFeatures(usersList));
+        output.setOutputCode(dbPersonal.setUsersFeatures(usersList));
 
         return JSon.jsonize(output, Output.class);
     }
@@ -322,7 +299,7 @@ public class Personal {
      * "category.economics":"-2", ...},...}
      * @return A JSON response with method succeed
      */
-    public String modifyUsersFeatures(String JSONUsersFeatures) throws IOException {
+    public String modifyUsersFeatures(String JSONUsersFeatures){
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
@@ -334,19 +311,10 @@ public class Personal {
         //for each username create User object and add it on the list
         for (String cUser : users.keySet()) {
             //get current user UID
-            String cUUID = db.getUserUID(cUser);
+            String cUUID = dbPersonal.getUserUID(cUser);
 
-            User user;
-            //If UUID is null the user is not exist and crete new 
-            if (cUUID == null) {
-                //Create user object
-                user = new User(clientUID, cUser);
-            } else {
-                //else set the user with pre exist UID
-                //Create user object
-                user = new User(cUUID);
-                user.setUsername(cUser);
-            }
+            User user = new User(cUUID);
+            user.setUsername(cUser);
 
             HashMap<String, String> features = new HashMap<>();
             features.putAll(users.get(cUser));
@@ -359,7 +327,7 @@ public class Personal {
         }
 
         // call HBase setUsersFeatures to set the users Features in HBase Storage
-        output.setOutputCode(db.modifyUsersFeatures(usersList));
+        output.setOutputCode(dbPersonal.modifyUsersFeatures(usersList));
 
         return JSon.jsonize(output, Output.class);
     }
@@ -377,9 +345,8 @@ public class Personal {
      * null then return all elements in a single page.
      * @return A JSON response with the user's profile. A list of key-value
      * pairs for user's features.
-     * @throws java.io.IOException
      */
-    public String getUserProfile(String user, String pattern, Integer page) throws IOException {
+    public String getUserProfile(String user, String pattern, Integer page){
         //Initialize variables
         output = new Output();
         HashMap<String, String> features = new HashMap<>();
@@ -390,7 +357,7 @@ public class Personal {
             page = null;
         }
         //Call HBase to get User features
-        features.putAll(db.getUserFeatures(user, pattern, page));
+        features.putAll(dbPersonal.getUserFeatures(user, pattern, page));
         output.setOutputCode(100);
 
         if (page != null) {

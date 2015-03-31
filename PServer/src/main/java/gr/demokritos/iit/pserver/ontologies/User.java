@@ -5,7 +5,6 @@
  */
 package gr.demokritos.iit.pserver.ontologies;
 
-import gr.demokritos.iit.pserver.utils.Utilities;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,18 +22,7 @@ public class User {
     private HashMap<String, String> features = new HashMap<>();
 
     /**
-     * Constructor for new user
-     *
-     * @param clientUUID The client UUID
-     * @param username The username
-     */
-    public User(String clientUUID, String username) {
-        this.userUID = Utilities.getUUID(clientUUID + "-" + username).toString();
-        this.username = username;
-    }
-
-    /**
-     * Constructor for exist user
+     * User Constructor
      *
      * @param userUUID The user UUID
      */

@@ -6,6 +6,11 @@
 package gr.demokritos.iit.pserver.storage;
 
 import gr.demokritos.iit.pserver.ontologies.User;
+import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
+import gr.demokritos.iit.pserver.storage.interfaces.ICommunityStorage;
+import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
+import gr.demokritos.iit.pserver.storage.interfaces.IStereotypeStorage;
+import gr.demokritos.iit.pserver.utils.Utilities;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
@@ -13,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Delete;
@@ -22,7 +29,6 @@ import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
-import org.apache.hadoop.hbase.exceptions.DeserializationException;
 import org.apache.hadoop.hbase.filter.ColumnPaginationFilter;
 import org.apache.hadoop.hbase.filter.ColumnPrefixFilter;
 import org.apache.hadoop.hbase.filter.Filter;
@@ -34,7 +40,7 @@ import org.apache.hadoop.hbase.util.Bytes;
  *
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
-public class HBase {
+public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunityStorage, IAdminStorage {
 
     //=================== HBase tables ========================================
     private static final String table_Users = "Users";
@@ -78,15 +84,26 @@ public class HBase {
      *
      * @param users A list with all users that i want to add on
      * @return the Output code
-     * @throws java.io.IOException
      */
+    @Override
     public int addUsers(
-            List<User> users) throws IOException {
+            List<User> users) {
 
-        //create new Users HTable
-        HTable usersTable = new HTable(config, table_Users);
-        //create new Clients HTable
-        HTable clientsTable = new HTable(config, table_Clients);
+        HTable usersTable = null;
+        HTable clientsTable = null;
+
+        try {
+
+            //create new Users HTable
+            usersTable = new HTable(config, table_Users);
+
+            //create new Clients HTable
+            clientsTable = new HTable(config, table_Clients);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         //Create put method with clients row key
         Put putClientUsers = new Put(Bytes.toBytes(clientUID));
 
@@ -106,6 +123,12 @@ public class HBase {
                         Bytes.toBytes(cInfo),
                         Bytes.toBytes(user.getInfo().get(cInfo)));
             }
+
+            //add Client info on storage 
+            put.add(family_Info,
+                    Bytes.toBytes("Client"),
+                    Bytes.toBytes(clientUID));
+
             //add current user attributes
             for (String cAttribute : user.getAttributes().keySet()) {
                 put.add(family_Attributes,
@@ -115,8 +138,10 @@ public class HBase {
 
             //add current user features
             for (String cFeature : user.getFeatures().keySet()) {
-                //add feature as element for increase
+
                 try {
+
+                    //add feature as element for increase
                     inc.addColumn(family_Features,
                             Bytes.toBytes(cFeature),
                             Long.parseLong(user.getFeatures().get(cFeature)));
@@ -132,12 +157,25 @@ public class HBase {
 
             }
 
-            //add user record on users table
-            usersTable.put(put);
+            try {
+
+                //add user record on users table
+                usersTable.put(put);
+
+            } catch (RetriesExhaustedWithDetailsException | InterruptedIOException ex) {
+                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             //if increment is not null then add to user table
             if (!inc.isEmpty()) {
-                usersTable.increment(inc);
+
+                try {
+
+                    usersTable.increment(inc);
+
+                } catch (IOException ex) {
+                    Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
             //put username and UUID on clients user PUT
@@ -146,15 +184,30 @@ public class HBase {
                     Bytes.toBytes(user.getUserUID()));
         }
 
-        //put users on Clients table
-        clientsTable.put(putClientUsers);
+        try {
 
-        //Flush Commits
-        usersTable.flushCommits();
-        clientsTable.flushCommits();
-        //close tables
-        usersTable.close();
-        clientsTable.close();
+            //put users on Clients table
+            clientsTable.put(putClientUsers);
+
+            //Flush Commits
+            usersTable.flushCommits();
+            clientsTable.flushCommits();
+
+        } catch (InterruptedIOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (RetriesExhaustedWithDetailsException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+
+            //close tables
+            usersTable.close();
+            clientsTable.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //TODO: return the code
         return 100;
@@ -166,20 +219,24 @@ public class HBase {
      *
      * @param pattern the pattern of the users that i want to delete
      * @return the Output code
-     * @throws java.io.IOException
-     * @throws org.apache.hadoop.hbase.exceptions.DeserializationException
      */
-    public int deleteUsers(
-            String pattern) throws IOException, DeserializationException {
+    @Override
+    public int deleteUsers(String pattern) {
 
-        HTable usersTable;
-        HTable clientsTable;
+        HTable usersTable = null;
+        HTable clientsTable = null;
         HashMap<String, String> usersForDelete;
 
-        // Create an hbase users table object
-        usersTable = new HTable(config, table_Users);
-        // Create an hbase clients table object
-        clientsTable = new HTable(config, table_Clients);
+        try {
+
+            // Create an hbase users table object
+            usersTable = new HTable(config, table_Users);
+            // Create an hbase clients table object
+            clientsTable = new HTable(config, table_Clients);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //get all users basic on pattern
         usersForDelete = new HashMap<>(getUsers(pattern, null));
@@ -190,21 +247,42 @@ public class HBase {
         //For eash user delete them from the table
         for (String cUserName : usersForDelete.keySet()) {
             Delete deleteUser = new Delete(Bytes.toBytes(usersForDelete.get(cUserName)));
-            //delete user record from the table users
-            usersTable.delete(deleteUser);
+
+            try {
+
+                //delete user record from the table users
+                usersTable.delete(deleteUser);
+
+            } catch (IOException ex) {
+                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             //add delete column record for the current user
             clientUsersDelete.deleteColumn(family_ClientUsers, Bytes.toBytes(cUserName));
         }
 
-        // delete user column from the table client
-        clientsTable.delete(clientUsersDelete);
+        try {
 
-        // flush the Commits
-        usersTable.flushCommits();
-        clientsTable.flushCommits();
-        // close the table
-        usersTable.close();
-        clientsTable.close();
+            // delete user column from the table client
+            clientsTable.delete(clientUsersDelete);
+
+            // flush the Commits
+            usersTable.flushCommits();
+            clientsTable.flushCommits();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+
+            // close the table
+            usersTable.close();
+            clientsTable.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //TODO: change 100 with the status code number
         return 100;
@@ -216,17 +294,23 @@ public class HBase {
      * @param pattern
      * @param page
      * @return
-     * @throws java.io.IOException
-     * @throws DeserializationException
      */
-    public Map<String, String> getUsers(
-            String pattern,
-            Integer page) throws IOException, DeserializationException {
+    @Override
+    public Map<String, String> getUsers(String pattern, Integer page) {
 
         //Initialize variables
         HashMap<String, String> users = new HashMap<>();
 
-        HTable table = new HTable(config, table_Clients);
+        HTable table = null;
+        try {
+
+            //Create clients table
+            table = new HTable(config, table_Clients);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         Get get = new Get(Bytes.toBytes(clientUID));
         get.addFamily(family_ClientUsers);
 
@@ -248,7 +332,16 @@ public class HBase {
         //if page not null then set the offset of the page 
         if (page != null) {
 
-            int totalItems = table.get(get).size();
+            int totalItems = 0;
+
+            try {
+
+                totalItems = table.get(get).size();
+
+            } catch (IOException ex) {
+                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             if ((totalItems % pageSize) != 0) {
                 paging = page + "/" + (totalItems / pageSize + 1);
             } else {
@@ -258,7 +351,16 @@ public class HBase {
             //add page filter of the result
             get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
         }
-        Result result = table.get(get);
+        Result result = null;
+
+        try {
+
+            result = table.get(get);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_ClientUsers);
 
         if (result.isEmpty()) {
@@ -278,10 +380,9 @@ public class HBase {
      * @param users A list with user object and the the attributes that i want
      * to set
      * @return the Output code
-     * @throws IOException
      */
-    public int setUsersAttributes(
-            List<User> users) throws IOException {
+    @Override
+    public int setUsersAttributes(List<User> users) {
 
         return addUsers(users);
     }
@@ -296,12 +397,12 @@ public class HBase {
      * then return all the attribute list
      * @return A map with key-value pairs (attribute name-value). If user not
      * exist then return null
-     * @throws java.io.IOException
      */
+    @Override
     public Map<String, String> getUserAttributes(
             String username,
             String pattern,
-            Integer page) throws IOException {
+            Integer page) {
 
         //Initialize variables
         HashMap<String, String> attMap = new HashMap<>();
@@ -312,7 +413,16 @@ public class HBase {
             return null;
         }
 
-        HTable table = new HTable(config, table_Users);
+        HTable table = null;
+
+        try {
+
+            table = new HTable(config, table_Users);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         Get get = new Get(Bytes.toBytes(userUID));
         get.addFamily(family_Attributes);
 
@@ -334,7 +444,16 @@ public class HBase {
         //if page not null then set the offset of the page 
         if (page != null) {
 
-            int totalItems = table.get(get).size();
+            int totalItems = 0;
+
+            try {
+
+                totalItems = table.get(get).size();
+
+            } catch (IOException ex) {
+                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             if ((totalItems % pageSize) != 0) {
                 paging = page + "/" + (totalItems / pageSize + 1);
             } else {
@@ -344,13 +463,22 @@ public class HBase {
             //add page filter of the result
             get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
         }
-        Result result = table.get(get);
+        Result result = null;
+
+        try {
+
+            result = table.get(get);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Attributes);
 
         if (result.isEmpty()) {
             return attMap;
-
         }
+
         for (byte[] cQ : familyMap.descendingKeySet()) {
             attMap.put(
                     Bytes.toString(cQ),
@@ -367,10 +495,9 @@ public class HBase {
      * @param users A list with user object and the the attributes that i want
      * to set
      * @return the Output code
-     * @throws IOException
      */
-    public int setUsersFeatures(
-            ArrayList<User> users) throws IOException {
+    @Override
+    public int setUsersFeatures(ArrayList<User> users) {
 
         return addUsers(users);
     }
@@ -385,12 +512,12 @@ public class HBase {
      * the feature list
      * @return A map with key-value pairs (feature name-value). If user not
      * exist return null
-     * @throws java.io.IOException
      */
+    @Override
     public Map<String, String> getUserFeatures(
             String username,
             String pattern,
-            Integer page) throws IOException {
+            Integer page) {
 
         //Initialize variables
         HashMap<String, String> ftrMap = new HashMap<>();
@@ -402,7 +529,16 @@ public class HBase {
             return null;
         }
 
-        HTable table = new HTable(config, table_Users);
+        HTable table = null;
+
+        try {
+
+            table = new HTable(config, table_Users);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         Get get = new Get(Bytes.toBytes(userUID));
         get.addFamily(family_Features);
 
@@ -424,7 +560,16 @@ public class HBase {
         //if page not null then set the offset of the page 
         if (page != null) {
 
-            int totalItems = table.get(get).size();
+            int totalItems = 0;
+
+            try {
+
+                totalItems = table.get(get).size();
+
+            } catch (IOException ex) {
+                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             if ((totalItems % pageSize) != 0) {
                 paging = page + "/" + (totalItems / pageSize + 1);
             } else {
@@ -434,7 +579,17 @@ public class HBase {
             //add page filter of the result
             get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
         }
-        Result result = table.get(get);
+
+        Result result = null;
+
+        try {
+
+            result = table.get(get);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Features);
 
         if (result.isEmpty()) {
@@ -444,11 +599,14 @@ public class HBase {
         for (byte[] cQ : familyMap.descendingKeySet()) {
 
             try {
+
                 //if feature value is long
                 ftrMap.put(
                         Bytes.toString(cQ),
                         Long.toString(Bytes.toLong(familyMap.descendingMap().get(cQ))));
+
             } catch (Exception e) {
+
                 //if feature is not long
                 ftrMap.put(
                         Bytes.toString(cQ),
@@ -464,14 +622,20 @@ public class HBase {
      *
      * @param usersList
      * @return
-     * @throws InterruptedIOException
-     * @throws RetriesExhaustedWithDetailsException
-     * @throws IOException
      */
-    public int modifyUsersFeatures(List<User> usersList) throws InterruptedIOException, RetriesExhaustedWithDetailsException, IOException {
+    @Override
+    public int modifyUsersFeatures(List<User> usersList) {
 
         //create new Users HTable
-        HTable usersTable = new HTable(config, table_Users);
+        HTable usersTable = null;
+
+        try {
+
+            usersTable = new HTable(config, table_Users);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //for each user
         for (User user : usersList) {
@@ -483,48 +647,86 @@ public class HBase {
                         Bytes.toBytes(cFeature),
                         Long.parseLong(user.getFeatures().get(cFeature)));
             }
-            usersTable.increment(inc);
+
+            try {
+
+                usersTable.increment(inc);
+
+            } catch (IOException ex) {
+                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
-        //Flush Commits
-        usersTable.flushCommits();
-        //close tables
-        usersTable.close();
+        try {
+
+            //Flush Commits
+            usersTable.flushCommits();
+
+        } catch (InterruptedIOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (RetriesExhaustedWithDetailsException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+
+            //close tables
+            usersTable.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //TODO: return the code
         return 100;
     }
 
+    /**
+     * Get the UUID for the given username If not User exist on Storage create
+     * new UUID
+     *
+     * @param username The username that i want the UUID
+     * @return the UUID for the given username
+     */
+    @Override
+    public String getUserUID(String username) {
+        String UUID = null;
+        try {
+
+            HTable table = new HTable(config, table_Clients);
+            Get get = new Get(Bytes.toBytes(clientUID));
+            get.setFilter((new ColumnPrefixFilter(Bytes.toBytes(username))));
+            Result result = table.get(get);
+
+            UUID = Bytes.toString(
+                    result.getValue(family_ClientUsers, Bytes.toBytes(username))
+            );
+
+            if (UUID == null) {
+                //Create new UUID
+                UUID = Utilities.getUUID(clientUID + "-" + username).toString();
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return UUID;
+    }
+
     //=================== Personal Mode =======================================
     //=================== Stereotype Mode =====================================
+    @Override
+    public String addStereotype() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     //=================== Stereotype Mode =====================================
     //=================== Community Mode ======================================
     //=================== Community Mode ======================================
     //=================== Administration ======================================
-    public int addClient() {
 
-        return 0;
-    }
-
-    /**
-     * Get the UUID for the given username
-     *
-     * @param username The username tha i want the UUID
-     * @return the UUID if username exists and null if not exists.
-     * @throws IOException
-     */
-    public String getUserUID(String username)
-            throws IOException {
-
-        HTable table = new HTable(config, table_Clients);
-        Get get = new Get(Bytes.toBytes(clientUID));
-        get.setFilter((new ColumnPrefixFilter(Bytes.toBytes(username))));
-        Result result = table.get(get);
-
-        return Bytes.toString(
-                result.getValue(family_ClientUsers, Bytes.toBytes(username))
-        );
-
+    @Override
+    public String addClient() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     //=================== Administration ======================================
