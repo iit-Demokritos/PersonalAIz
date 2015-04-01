@@ -346,7 +346,7 @@ public class Personal {
      * @return A JSON response with the user's profile. A list of key-value
      * pairs for user's features.
      */
-    public String getUserProfile(String user, String pattern, Integer page){
+    public String getUserFeatures(String user, String pattern, Integer page){
         //Initialize variables
         output = new Output();
         HashMap<String, String> features = new HashMap<>();

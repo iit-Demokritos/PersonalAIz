@@ -7,8 +7,6 @@ package gr.demokritos.iit.pserver;
 
 import gr.demokritos.iit.pserver.api.Personal;
 import gr.demokritos.iit.pserver.storage.HBase;
-import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
-import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
 import java.io.IOException;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 
