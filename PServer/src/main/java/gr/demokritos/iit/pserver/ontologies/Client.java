@@ -5,7 +5,6 @@
  */
 package gr.demokritos.iit.pserver.ontologies;
 
-import gr.demokritos.iit.pserver.utils.Utilities;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +22,10 @@ public class Client {
     /**
      * Constructor for new client
      *
-     * @param clientName
+     * @param clientUID
      */
-    public Client(String clientName) {
-        this.clientUID = Utilities.getUUID(clientName).toString();
+    public Client(String clientUID) {
+        this.clientUID = clientUID;
     }
 
     /**

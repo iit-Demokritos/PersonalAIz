@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.pserver.storage;
 
+import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.ICommunityStorage;
@@ -28,11 +29,15 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.ColumnPaginationFilter;
 import org.apache.hadoop.hbase.filter.ColumnPrefixFilter;
+import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
 /**
@@ -52,11 +57,13 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     private static final byte[] family_Attributes = Bytes.toBytes("Attributes");
     private static final byte[] family_Features = Bytes.toBytes("Features");
     private static final byte[] family_ClientUsers = Bytes.toBytes("ClientUsers");
+    private static final byte[] family_Keys = Bytes.toBytes("Keys");
 
     //=================== HBase Families ======================================
     //=================== HBase Qualifiers ====================================
     private static final byte[] qualifier_Client = Bytes.toBytes("Client");
     private static final byte[] qualifier_Username = Bytes.toBytes("Username");
+    private static final byte[] qualifier_Password = Bytes.toBytes("Password");
 
     //=================== HBase Qualifiers ====================================
     private static Configuration config;
@@ -725,18 +732,141 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     //=================== Administration ======================================
 
     @Override
-    public int addClient(String clientUID, String clientInfo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int addClient(Client client) {
+        HTable clientsTable = null;
+
+        try {
+
+            //create new Clients HTable
+            clientsTable = new HTable(config, table_Clients);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //Create put method with row key
+        Put put = new Put(Bytes.toBytes(client.getClientUID()));
+
+        //add current client info
+        for (String cInfo : client.getInfo().keySet()) {
+            put.add(family_Info,
+                    Bytes.toBytes(cInfo),
+                    Bytes.toBytes(client.getInfo().get(cInfo)));
+        }
+
+        //add client keys
+        for (String cKey : client.getKeys().keySet()) {
+            put.add(family_Keys,
+                    Bytes.toBytes(cKey),
+                    Bytes.toBytes(client.getKeys().get(cKey)));
+        }
+
+        try {
+
+            //add client record on Clients table
+            clientsTable.put(put);
+            //Flush Commits
+            clientsTable.flushCommits();
+
+        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+
+            //close tables
+            clientsTable.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //TODO: return the code
+        return 100;
     }
 
     @Override
-    public int deleteClient(String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int deleteClient(String clientUIDForDelete) {
+        HTable clientsTable = null;
+
+        try {
+            // Create an hbase clients table object
+            clientsTable = new HTable(config, table_Clients);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //Add on delete the rowkey
+        Delete deleteClient = new Delete(Bytes.toBytes(clientUIDForDelete));
+
+        try {
+
+            //delete user record from the table Clients
+            clientsTable.delete(deleteClient);
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+
+            // flush the Commits
+            clientsTable.flushCommits();
+            // close the table
+            clientsTable.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //TODO: change 100 with the status code number
+        return 100;
     }
 
     @Override
     public Map<String, String> getClients() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        //Initialize variables
+        HashMap<String, String> clients = new HashMap<>();
+
+        HTable table = null;
+        try {
+
+            //Create clients table
+            table = new HTable(config, table_Clients);
+
+            Scan scan = new Scan();
+//            if (pattern != null) {
+//
+//                //if pattern is not null then add the filter pattern
+//                scan.setFilter(
+//                        new SingleColumnValueFilter(
+//                        family_Info,
+//                        qualifier_Username,
+//                        CompareFilter.CompareOp.EQUAL,
+//                        Bytes.toBytes(pattern)
+//                ));
+//            }
+            ResultScanner scanner = table.getScanner(scan);
+
+            for (Result cResult : scanner) {
+                String cName = Bytes.toString(
+                        cResult.getValue(family_Info, qualifier_Username)
+                );
+                String cUID = Bytes.toString(
+                        cResult.getRow()
+                );
+
+                clients.put(cName, cUID);
+
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return clients;
     }
 
     @Override
@@ -747,6 +877,39 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     @Override
     public String getClientRole(String clientName) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getClientUID(String clientName) {
+        String UID = null;
+        try {
+
+            HTable table = new HTable(config, table_Clients);
+            Scan scan = new Scan();
+
+            scan.setFilter((new SingleColumnValueFilter(
+                    family_Info,
+                    qualifier_Username,
+                    CompareFilter.CompareOp.EQUAL,
+                    Bytes.toBytes(clientName)
+            )));
+
+            ResultScanner scanner = table.getScanner(scan);
+            Result result = scanner.next();
+
+            if (result == null) {
+                //Create new UUID
+                UID = Utilities.getUUID(clientUID + "-" + clientName).toString();
+            } else {
+                UID = Bytes.toString(
+                        result.getRow()
+                );
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return UID;
     }
 
     @Override
@@ -773,10 +936,6 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     public int setSettings(Map<String, String> settings) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
-    
+
     //=================== Administration ======================================
-
-
 }
