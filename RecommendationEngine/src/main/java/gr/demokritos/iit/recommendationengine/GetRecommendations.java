@@ -9,6 +9,6 @@ package gr.demokritos.iit.recommendationengine;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class main {
+public class GetRecommendations {
     
 }
