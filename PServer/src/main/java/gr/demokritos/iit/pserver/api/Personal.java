@@ -9,11 +9,13 @@ import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.HBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
-import gr.demokritos.iit.pserver.utils.JSon;
-import gr.demokritos.iit.pserver.utils.Output;
+import gr.demokritos.iit.utilities.json.JSon;
+import gr.demokritos.iit.utilities.json.Output;
+import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  * This class implement the Personal mode of PServer. It supports the personal
@@ -27,6 +29,7 @@ public class Personal {
     private IPersonalStorage dbPersonal;
     private IAdminStorage dbAdmin;
     private Output output;
+    public static final Logger LOGGER = Logger.getLogger(Personal.class.getName());
 
     /**
      * The constructor of personal mode.
@@ -37,6 +40,7 @@ public class Personal {
     public Personal(IPersonalStorage dbPersonal, IAdminStorage dbAdmin) {
         this.dbPersonal = dbPersonal;
         this.dbAdmin = dbAdmin;
+        Logging.updateLoggerLevel(LOGGER, null);
     }
 
     /**
@@ -48,7 +52,7 @@ public class Personal {
      * {"ftr1": "34","ftr3": "3","ftr5": "4"}}}
      * @return A JSON response with method status
      */
-    public String addUsers(String JSONUsers){
+    public String addUsers(String JSONUsers) {
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
@@ -117,7 +121,7 @@ public class Personal {
      * @param pattern The user pattern that we want to delete
      * @return A JSON response with method status
      */
-    public String deleteUsers(String pattern){
+    public String deleteUsers(String pattern) {
         //Initialize variables
         output = new Output();
         //call storage delete Users function with the pattern and add the return 
@@ -135,10 +139,11 @@ public class Personal {
      * @param page The page number. Page number will be greater or equal than 1
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
-     * null or page<1 then return all elements in a single page. 
-     * @return A JSON response with the user s list 
+     * null or page<1 then return all elements in a single page. @return A JSON
+     * response with the user
+     * s list
      */
-    public String getUsers(String pattern, Integer page){
+    public String getUsers(String pattern, Integer page) {
         //Initialize variables
         output = new Output();
         ArrayList<String> users = new ArrayList<>();
@@ -183,7 +188,7 @@ public class Personal {
 
         //for each username create User object and add it on the list
         for (String cUser : users.keySet()) {
-            
+
             //get current user UID
             String cUUID = dbPersonal.getUserUID(cUser);
 
@@ -221,7 +226,7 @@ public class Personal {
      * null then return all elements in a single page.
      * @return A JSON response with the attribute list
      */
-    public String getUserAttributes(String user, String pattern, Integer page){
+    public String getUserAttributes(String user, String pattern, Integer page) {
         //Initialize variables
         output = new Output();
         HashMap<String, String> attributes = new HashMap<>();
@@ -254,7 +259,7 @@ public class Personal {
      * "user2":{"category.sport":"12", "category.economics":"82", ...},...}
      * @return A JSON response with method succeed
      */
-    public String setUsersFeatures(String JSONUsersFeatures){
+    public String setUsersFeatures(String JSONUsersFeatures) {
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
@@ -269,7 +274,7 @@ public class Personal {
             String cUUID = dbPersonal.getUserUID(cUser);
 
             //Create user object
-            User user =new User(cUUID);
+            User user = new User(cUUID);
             user.setUsername(cUser);
 
             HashMap<String, String> features = new HashMap<>();
@@ -299,7 +304,7 @@ public class Personal {
      * "category.economics":"-2", ...},...}
      * @return A JSON response with method succeed
      */
-    public String modifyUsersFeatures(String JSONUsersFeatures){
+    public String modifyUsersFeatures(String JSONUsersFeatures) {
         //Initialize variables
         output = new Output();
         //convert JSON with users as a HashMap
@@ -346,7 +351,7 @@ public class Personal {
      * @return A JSON response with the user's profile. A list of key-value
      * pairs for user's features.
      */
-    public String getUserFeatures(String user, String pattern, Integer page){
+    public String getUserFeatures(String user, String pattern, Integer page) {
         //Initialize variables
         output = new Output();
         HashMap<String, String> features = new HashMap<>();

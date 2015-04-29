@@ -11,7 +11,7 @@ import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.ICommunityStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IStereotypeStorage;
-import gr.demokritos.iit.pserver.utils.Utilities;
+import gr.demokritos.iit.utilities.utils.Util;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
@@ -711,7 +711,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
 
             if (UUID == null) {
                 //Create new UUID
-                UUID = Utilities.getUUID(clientUID + "-" + username).toString();
+                UUID = Util.getUUID(clientUID + "-" + username).toString();
             }
 
         } catch (IOException ex) {
@@ -899,7 +899,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
 
             if (result == null) {
                 //Create new UUID
-                UID = Utilities.getUUID(clientUID + "-" + clientName).toString();
+                UID = Util.getUUID(clientUID + "-" + clientName).toString();
             } else {
                 UID = Bytes.toString(
                         result.getRow()

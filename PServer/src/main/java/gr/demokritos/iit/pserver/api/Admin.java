@@ -7,8 +7,8 @@ package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
-import gr.demokritos.iit.pserver.utils.JSon;
-import gr.demokritos.iit.pserver.utils.Output;
+import gr.demokritos.iit.utilities.json.JSon;
+import gr.demokritos.iit.utilities.json.Output;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.commons.codec.digest.DigestUtils;
