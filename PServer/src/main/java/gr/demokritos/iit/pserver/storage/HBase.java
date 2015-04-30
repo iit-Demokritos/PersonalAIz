@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.pserver.storage;
 
+import gr.demokritos.iit.pserver.api.Personal;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
@@ -39,6 +40,7 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implement the PServer Apache HBase storage system.
@@ -70,6 +72,8 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     private static String clientUID;
     private static final Integer pageSize = 20;
     public static String paging;
+
+    public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(HBase.class);
 
     /**
      * The constructor of HBase storage system.
@@ -108,7 +112,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Add Users failed", ex);
         }
 
         //Create put method with clients row key
@@ -170,7 +174,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
                 usersTable.put(put);
 
             } catch (RetriesExhaustedWithDetailsException | InterruptedIOException ex) {
-                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Add Users failed", ex);
             }
 
             //if increment is not null then add to user table
@@ -181,7 +185,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
                     usersTable.increment(inc);
 
                 } catch (IOException ex) {
-                    Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Add Users failed", ex);
                 }
             }
 
@@ -201,9 +205,9 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.flushCommits();
 
         } catch (InterruptedIOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Add Users failed", ex);
         } catch (RetriesExhaustedWithDetailsException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Add Users failed", ex);
         }
 
         try {
@@ -213,7 +217,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.close();
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Add Users failed", ex);
         }
 
         //TODO: return the code

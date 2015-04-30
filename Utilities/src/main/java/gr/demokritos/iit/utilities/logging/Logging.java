@@ -5,31 +5,17 @@
  */
 package gr.demokritos.iit.utilities.logging;
 
-import java.io.File;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class Logging {
-
-    private static String LOG4J_PROPERTIES = "./res/log4j.properties";
-
-    public static void setLOG4J_PROPERTIES(String LOG4J_PROPERTIES) {
-        Logging.LOG4J_PROPERTIES = LOG4J_PROPERTIES;
-    }
     
-    public static void updateLoggerLevel(Logger LOGGER, String logLevel) {
-        File f = new File(LOG4J_PROPERTIES);
-        if (!f.exists()) {
-            BasicConfigurator.configure();
-        } else {
-            PropertyConfigurator.configure(LOG4J_PROPERTIES);
-        }
+    public static void updateLoggerLevel(Class className, String logLevel) {
+        Logger LOGGER = Logger.getLogger(className.getName());
         switch (logLevel.trim().toLowerCase()) {
             case "all":
                 LOGGER.setLevel(Level.ALL);
@@ -57,5 +43,4 @@ public class Logging {
                 break;
         }
     }
-
 }

@@ -9,13 +9,15 @@ import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.HBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
+import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implement the Personal mode of PServer. It supports the personal
@@ -26,10 +28,12 @@ import org.apache.log4j.Logger;
  */
 public class Personal {
 
-    private IPersonalStorage dbPersonal;
-    private IAdminStorage dbAdmin;
+    private final IPersonalStorage dbPersonal;
+    private final IAdminStorage dbAdmin;
+    private final PServerConfiguration psConfig;
     private Output output;
-    public static final Logger LOGGER = Logger.getLogger(Personal.class.getName());
+    public static final Logger LOGGER = LoggerFactory.getLogger(Personal.class);
+
 
     /**
      * The constructor of personal mode.
@@ -38,11 +42,14 @@ public class Personal {
      * @param dbAdmin
      */
     public Personal(IPersonalStorage dbPersonal, IAdminStorage dbAdmin) {
+        this.psConfig = new PServerConfiguration();
         this.dbPersonal = dbPersonal;
         this.dbAdmin = dbAdmin;
-        Logging.updateLoggerLevel(LOGGER, null);
+        //Update logging level 
+        Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
     }
 
+    
     /**
      * Add a list of users on PServer Storage. This function help us to add
      * massive, users on PServer. Features or Attributes is optional.
