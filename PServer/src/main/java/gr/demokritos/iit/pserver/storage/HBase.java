@@ -5,7 +5,6 @@
  */
 package gr.demokritos.iit.pserver.storage;
 
-import gr.demokritos.iit.pserver.api.Personal;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
@@ -50,27 +49,27 @@ import org.slf4j.LoggerFactory;
 public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunityStorage, IAdminStorage {
 
     //=================== HBase tables ========================================
-    private static final String table_Users = "Users";
-    private static final String table_Clients = "Clients";
+    private final String table_Users = "Users";
+    private final String table_Clients = "Clients";
 
     //=================== HBase tables ========================================
     //=================== HBase Families ======================================
-    private static final byte[] family_Info = Bytes.toBytes("Info");
-    private static final byte[] family_Attributes = Bytes.toBytes("Attributes");
-    private static final byte[] family_Features = Bytes.toBytes("Features");
-    private static final byte[] family_ClientUsers = Bytes.toBytes("ClientUsers");
-    private static final byte[] family_Keys = Bytes.toBytes("Keys");
+    private final byte[] family_Info = Bytes.toBytes("Info");
+    private final byte[] family_Attributes = Bytes.toBytes("Attributes");
+    private final byte[] family_Features = Bytes.toBytes("Features");
+    private final byte[] family_ClientUsers = Bytes.toBytes("ClientUsers");
+    private final byte[] family_Keys = Bytes.toBytes("Keys");
 
     //=================== HBase Families ======================================
     //=================== HBase Qualifiers ====================================
-    private static final byte[] qualifier_Client = Bytes.toBytes("Client");
-    private static final byte[] qualifier_Username = Bytes.toBytes("Username");
-    private static final byte[] qualifier_Password = Bytes.toBytes("Password");
+    private final byte[] qualifier_Client = Bytes.toBytes("Client");
+    private final byte[] qualifier_Username = Bytes.toBytes("Username");
+    private final byte[] qualifier_Password = Bytes.toBytes("Password");
 
     //=================== HBase Qualifiers ====================================
-    private static Configuration config;
-    private static String clientUID;
-    private static final Integer pageSize = 20;
+    private Configuration config;
+    private String clientUID;
+    private final Integer pageSize = 20;
     public static String paging;
 
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(HBase.class);
@@ -82,7 +81,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
      */
     public HBase(String clientUID) {
         //Set client UID on a global private variable
-        HBase.clientUID = clientUID;
+        this.clientUID = clientUID;
 
         //Create new HBase configuration
         config = HBaseConfiguration.create();
@@ -942,4 +941,11 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     }
 
     //=================== Administration ======================================
+    
+
+
+
+    //=================== Security ======================================
+    
+    //=================== Security ======================================
 }
