@@ -42,14 +42,14 @@ public class PersonalTest {
      */
     @Test
     public void testAddUsers() {
-        System.out.println("addUsers");
-        String JSONUsers = "";
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.addUsers(JSONUsers);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("addUsers");
+//        String JSONUsers = "";
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.addUsers(JSONUsers);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -57,14 +57,14 @@ public class PersonalTest {
      */
     @Test
     public void testDeleteUsers() {
-        System.out.println("deleteUsers");
-        String pattern = "";
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.deleteUsers(pattern);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("deleteUsers");
+//        String pattern = "";
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.deleteUsers(pattern);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -72,15 +72,15 @@ public class PersonalTest {
      */
     @Test
     public void testGetUsers() {
-        System.out.println("getUsers");
-        String pattern = "";
-        Integer page = null;
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.getUsers(pattern, page);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("getUsers");
+//        String pattern = "";
+//        Integer page = null;
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.getUsers(pattern, page);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -88,14 +88,14 @@ public class PersonalTest {
      */
     @Test
     public void testSetUsersAttributes() {
-        System.out.println("setUsersAttributes");
-        String JSONUsersAttributes = "";
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.setUsersAttributes(JSONUsersAttributes);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("setUsersAttributes");
+//        String JSONUsersAttributes = "";
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.setUsersAttributes(JSONUsersAttributes);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -103,16 +103,16 @@ public class PersonalTest {
      */
     @Test
     public void testGetUserAttributes() {
-        System.out.println("getUserAttributes");
-        String user = "";
-        String pattern = "";
-        Integer page = null;
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.getUserAttributes(user, pattern, page);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("getUserAttributes");
+//        String user = "";
+//        String pattern = "";
+//        Integer page = null;
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.getUserAttributes(user, pattern, page);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -120,14 +120,14 @@ public class PersonalTest {
      */
     @Test
     public void testSetUsersFeatures() {
-        System.out.println("setUsersFeatures");
-        String JSONUsersFeatures = "";
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.setUsersFeatures(JSONUsersFeatures);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("setUsersFeatures");
+//        String JSONUsersFeatures = "";
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.setUsersFeatures(JSONUsersFeatures);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -135,14 +135,14 @@ public class PersonalTest {
      */
     @Test
     public void testModifyUsersFeatures() {
-        System.out.println("modifyUsersFeatures");
-        String JSONUsersFeatures = "";
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.modifyUsersFeatures(JSONUsersFeatures);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("modifyUsersFeatures");
+//        String JSONUsersFeatures = "";
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.modifyUsersFeatures(JSONUsersFeatures);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -150,16 +150,16 @@ public class PersonalTest {
      */
     @Test
     public void testGetUserFeatures() {
-        System.out.println("getUserFeatures");
-        String user = "";
-        String pattern = "";
-        Integer page = null;
-        Personal instance = null;
-        String expResult = "";
-        String result = instance.getUserFeatures(user, pattern, page);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("getUserFeatures");
+//        String user = "";
+//        String pattern = "";
+//        Integer page = null;
+//        Personal instance = null;
+//        String expResult = "";
+//        String result = instance.getUserFeatures(user, pattern, page);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
     
 }

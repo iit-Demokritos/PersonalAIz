@@ -42,13 +42,13 @@ public class AdminTest {
      */
     @Test
     public void testGetSettings() {
-        System.out.println("getSettings");
-        Admin instance = null;
-        String expResult = "";
-        String result = instance.getSettings();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("getSettings");
+//        Admin instance = null;
+//        String expResult = "";
+//        String result = instance.getSettings();
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -56,13 +56,13 @@ public class AdminTest {
      */
     @Test
     public void testSetSettings() {
-        System.out.println("setSettings");
-        Admin instance = null;
-        String expResult = "";
-        String result = instance.setSettings();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("setSettings");
+//        Admin instance = null;
+//        String expResult = "";
+//        String result = instance.setSettings();
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -70,16 +70,16 @@ public class AdminTest {
      */
     @Test
     public void testAddClient() {
-        System.out.println("addClient");
-        String clientName = "";
-        String password = "";
-        String JSONClientInfo = "";
-        Admin instance = null;
-        String expResult = "";
-        String result = instance.addClient(clientName, password, JSONClientInfo);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("addClient");
+//        String clientName = "";
+//        String password = "";
+//        String JSONClientInfo = "";
+//        Admin instance = null;
+//        String expResult = "";
+//        String result = instance.addClient(clientName, password, JSONClientInfo);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -87,14 +87,14 @@ public class AdminTest {
      */
     @Test
     public void testDeleteClient() {
-        System.out.println("deleteClient");
-        String clientName = "";
-        Admin instance = null;
-        String expResult = "";
-        String result = instance.deleteClient(clientName);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("deleteClient");
+//        String clientName = "";
+//        Admin instance = null;
+//        String expResult = "";
+//        String result = instance.deleteClient(clientName);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -102,13 +102,13 @@ public class AdminTest {
      */
     @Test
     public void testGetClients() {
-        System.out.println("getClients");
-        Admin instance = null;
-        String expResult = "";
-        String result = instance.getClients();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("getClients");
+//        Admin instance = null;
+//        String expResult = "";
+//        String result = instance.getClients();
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -116,14 +116,14 @@ public class AdminTest {
      */
     @Test
     public void testGetClientUID() {
-        System.out.println("getClientUID");
-        String clientName = "";
-        Admin instance = null;
-        String expResult = "";
-        String result = instance.getClientUID(clientName);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("getClientUID");
+//        String clientName = "";
+//        Admin instance = null;
+//        String expResult = "";
+//        String result = instance.getClientUID(clientName);
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
 
     /**
@@ -131,13 +131,13 @@ public class AdminTest {
      */
     @Test
     public void testSetClientRoles() {
-        System.out.println("setClientRoles");
-        Admin instance = null;
-        String expResult = "";
-        String result = instance.setClientRoles();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+//        System.out.println("setClientRoles");
+//        Admin instance = null;
+//        String expResult = "";
+//        String result = instance.setClientRoles();
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
     }
     
 }
