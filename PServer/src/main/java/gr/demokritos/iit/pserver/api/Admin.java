@@ -28,10 +28,12 @@ public class Admin {
     private Output output;
     public static final Logger LOGGER = LoggerFactory.getLogger(Admin.class);
     private final PServerConfiguration psConfig;
+    private final Client adminClient;
 
-    public Admin(IAdminStorage dbAdmin) {
+    public Admin(IAdminStorage dbAdmin, Client adminClient) {
         this.psConfig = new PServerConfiguration();
         this.dbAdmin = dbAdmin;
+        this.adminClient = adminClient;
         //Update logging level 
         Logging.updateLoggerLevel(Admin.class, psConfig.getLogLevel());
     }
@@ -49,11 +51,12 @@ public class Admin {
         //Initialize variables
         output = new Output();
         //Get Client UID
-        String clientUID = dbAdmin.getClientUID(clientName);
+//        String clientUID = dbAdmin.getClientUID(clientName);
+        
         //encrypt password
         String clientPassword = DigestUtils.sha1Hex(password);
 
-        Client client = new Client(clientUID);
+        Client client = new Client(clientName, password);
         info.put("Username", clientName);
         info.put("Password", clientPassword);
 
@@ -69,11 +72,11 @@ public class Admin {
      * @param clientUID
      * @return 
      */
-    public String deleteClient(String clientUID) {
+    public String deleteClient(String clientName) {
         //Initialize variables
         output = new Output();
 
-        output.setOutputCode(dbAdmin.deleteClient(clientUID));
+        output.setOutputCode(dbAdmin.deleteClient(clientName));
         return JSon.jsonize(output, Output.class);
     }
 
@@ -121,4 +124,10 @@ public class Admin {
 
         return JSon.jsonize(output, Output.class);
     }
+    
+//    public Client getClient(String username, String password) {
+//        return new Client(username, password);
+//    }
+    
+    
 }

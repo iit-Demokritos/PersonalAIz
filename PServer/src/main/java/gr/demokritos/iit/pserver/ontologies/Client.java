@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.pserver.ontologies;
 
+import gr.demokritos.iit.security.ontologies.SystemUser;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,30 +14,38 @@ import java.util.Map;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class Client {
+public class Client extends SystemUser {
 
-    private String clientUID;
+//    private String clientUID;
     private HashMap<String, String> info = new HashMap<>();
     private HashMap<String, String> keys = new HashMap<>();
+    private String username;
+    private String password;
+    
 
+    public Client(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+    
     /**
      * Constructor for new client
      *
      * @param clientUID
      */
-    public Client(String clientUID) {
-        this.clientUID = clientUID;
-    }
+//    public Client(String clientUID) {
+//        this.clientUID = clientUID;
+//    }
 
     /**
      * Get the Clients UID
      *
      * @return A string with clients id
      */
-    public String getClientUID() {
-        return clientUID;
-    }
-
+//    public String getClientUID() {
+//        return clientUID;
+//    }
+//
     /**
      * Set clients info like name, password, mail
      *
@@ -71,6 +80,10 @@ public class Client {
      */
     public Map<String, String> getKeys() {
         return keys;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
 }

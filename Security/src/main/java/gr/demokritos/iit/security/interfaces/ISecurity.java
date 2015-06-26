@@ -5,22 +5,17 @@
  */
 package gr.demokritos.iit.security.interfaces;
 
-import java.util.List;
+import gr.demokritos.iit.security.authentication.IAuthentication;
+import gr.demokritos.iit.security.authorization.IAuthorization;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public interface ISecurity {
-    
-    
-        //check from DB the credentials
-        boolean checkClientCredentials(String username, String password);
-   
-        
-        
-    
-    
+public abstract class ISecurity implements IAuthentication, IAuthorization {
+
+    public ISecurity() {
+    }
     
     
 }

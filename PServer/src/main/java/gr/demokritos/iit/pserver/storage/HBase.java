@@ -14,6 +14,7 @@ import gr.demokritos.iit.pserver.storage.interfaces.IStereotypeStorage;
 import gr.demokritos.iit.utilities.utils.Util;
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -754,7 +755,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
         }
 
         //Create put method with row key
-        Put put = new Put(Bytes.toBytes(client.getClientUID()));
+        Put put = new Put(Bytes.toBytes(getClientUID(client.getUsername())));
 
         //add current client info
         for (String cInfo : client.getInfo().keySet()) {
@@ -795,7 +796,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     }
 
     @Override
-    public int deleteClient(String clientUIDForDelete) {
+    public int deleteClient(String clientName) {
         HTable clientsTable = null;
 
         try {
@@ -807,6 +808,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
         }
 
         //Add on delete the rowkey
+        String clientUIDForDelete = getClientUID(clientName);
         Delete deleteClient = new Delete(Bytes.toBytes(clientUIDForDelete));
 
         try {
@@ -949,4 +951,5 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     //=================== Administration ======================================
     //=================== Security ======================================
     //=================== Security ======================================
+
 }

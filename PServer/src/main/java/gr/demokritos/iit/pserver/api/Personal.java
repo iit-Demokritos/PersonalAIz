@@ -5,10 +5,12 @@
  */
 package gr.demokritos.iit.pserver.api;
 
+import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.HBase;
-import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
+import gr.demokritos.iit.security.authorization.Action;
+import gr.demokritos.iit.security.interfaces.ISecurity;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
@@ -29,25 +31,37 @@ import org.slf4j.LoggerFactory;
 public class Personal {
 
     private final IPersonalStorage dbPersonal;
-    private final IAdminStorage dbAdmin;
     private final PServerConfiguration psConfig;
     private Output output;
+    private Client client;
     public static final Logger LOGGER = LoggerFactory.getLogger(Personal.class);
-
+    public ISecurity security;
 
     /**
      * The constructor of personal mode.
      *
      * @param dbPersonal
-     * @param dbAdmin
      */
-    public Personal(IPersonalStorage dbPersonal, IAdminStorage dbAdmin) {
+    public Personal(IPersonalStorage dbPersonal, Client c) {
         this.psConfig = new PServerConfiguration();
         this.dbPersonal = dbPersonal;
-        this.dbAdmin = dbAdmin;
+        this.client = c;
+        security = null;
+        Action aAddUsers = new Action("Personal.AddUsers");
+        Action aRemoveUsers = new Action("Personal.RemoveUsers");
+        //...
+        // TODO: Make strings final
+        //TODO: Complete
+        
         //Update logging level 
         Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
     }
+
+    public void setSecurity(ISecurity security) {
+        this.security = security;
+    }
+    
+    
 
     
     /**
@@ -380,4 +394,8 @@ public class Personal {
         return JSon.jsonize(output, Output.class);
     }
 
+    public boolean getPermissionFor(Action a, String sAccessType) {
+        return ((security != null) && (security.getAccessRights(client, a).get(
+                sAccessType)));
+    }
 }
