@@ -88,6 +88,14 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
 
     }
 
+    /**
+     * The constructor of HBase storage system.
+     */
+    public HBase() {
+        //Create new HBase configuration
+        config = HBaseConfiguration.create();
+    }
+
     //=================== Personal Mode =======================================
     /**
      * Add a list of user objects on HBase
@@ -245,7 +253,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't create usersTable or clientsTable", ex);
         }
 
         //get all users basic on pattern
@@ -264,7 +272,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
                 usersTable.delete(deleteUser);
 
             } catch (IOException ex) {
-                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Can't delete user:" + cUserName + " from userTable", ex);
             }
 
             //add delete column record for the current user
@@ -281,7 +289,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.flushCommits();
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Can't delete client user from clientsTable", ex);
         }
 
         try {
@@ -291,7 +299,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.close();
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Error on close tables", ex);
         }
 
         //TODO: change 100 with the status code number
@@ -318,7 +326,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             table = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't create clientsTable", ex);
         }
 
         Get get = new Get(Bytes.toBytes(clientUID));
@@ -349,7 +357,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
                 totalItems = table.get(get).size();
 
             } catch (IOException ex) {
-                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Error on table get", ex);
             }
 
             if ((totalItems % pageSize) != 0) {
@@ -368,7 +376,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             result = table.get(get);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Error on table get", ex);
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_ClientUsers);
@@ -430,7 +438,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             table = new HTable(config, table_Users);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't load table "+table_Users , ex);
         }
 
         Get get = new Get(Bytes.toBytes(userUID));
@@ -461,7 +469,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
                 totalItems = table.get(get).size();
 
             } catch (IOException ex) {
-                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Error on get from table", ex);
             }
 
             if ((totalItems % pageSize) != 0) {
@@ -480,7 +488,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             result = table.get(get);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Error on get from table", ex);
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Attributes);
@@ -546,7 +554,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             table = new HTable(config, table_Users);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't load table "+table_Users, ex);
         }
 
         Get get = new Get(Bytes.toBytes(userUID));
@@ -577,7 +585,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
                 totalItems = table.get(get).size();
 
             } catch (IOException ex) {
-                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Error on get from table", ex);
             }
 
             if ((totalItems % pageSize) != 0) {
@@ -597,7 +605,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             result = table.get(get);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Error on get from table", ex);
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Features);
@@ -644,7 +652,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             usersTable = new HTable(config, table_Users);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't load table "+table_Users, ex);
         }
 
         //for each user
@@ -663,7 +671,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
                 usersTable.increment(inc);
 
             } catch (IOException ex) {
-                Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("Error on increment the values for the user "+user, ex);
             }
         }
 
@@ -672,10 +680,8 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             //Flush Commits
             usersTable.flushCommits();
 
-        } catch (InterruptedIOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RetriesExhaustedWithDetailsException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
+            LOGGER.error("Can't flush the commits", ex);
         }
 
         try {
@@ -684,7 +690,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             usersTable.close();
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't close table", ex);
         }
 
         //TODO: return the code
@@ -718,7 +724,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("IOException", ex);
         }
         return UUID;
     }
@@ -744,7 +750,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't load table "+table_Clients, ex);
         }
 
         //Create put method with row key
@@ -772,7 +778,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.flushCommits();
 
         } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+           LOGGER.error(null, ex);
         }
 
         try {
@@ -781,7 +787,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.close();
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't close table", ex);
         }
 
         //TODO: return the code
@@ -797,7 +803,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't load table "+table_Clients, ex);
         }
 
         //Add on delete the rowkey
@@ -809,7 +815,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.delete(deleteClient);
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't delete client", ex);
         }
 
         try {
@@ -820,7 +826,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             clientsTable.close();
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Can't flush commits or close table", ex);
         }
 
         //TODO: change 100 with the status code number
@@ -866,7 +872,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Error on get clients", ex);
         }
 
         return clients;
@@ -902,7 +908,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
 
             if (result == null) {
                 //Create new UUID
-                UID = Util.getUUID(clientUID + "-" + clientName).toString();
+                UID = Util.getUUID("admin" + "-" + clientName).toString();
             } else {
                 UID = Bytes.toString(
                         result.getRow()
@@ -910,7 +916,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(HBase.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Error on getClientUID", ex);
         }
         return UID;
     }
@@ -941,11 +947,6 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     }
 
     //=================== Administration ======================================
-    
-
-
-
     //=================== Security ======================================
-    
     //=================== Security ======================================
 }

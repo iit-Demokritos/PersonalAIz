@@ -19,21 +19,24 @@ public class PServerConfiguration extends Configuration {
 
     /**
      * Get logging level
+     *
      * @return Return the default level (Info) or (Debug) if debug mode is ON
      */
     public String getLogLevel() {
         //Default logging level is Info
-        String logLevel="info";
+        String logLevel;
         //If debug mode is true
-        if(Boolean.parseBoolean(properties.getProperty("DebugMode"))){
+        if (properties.getProperty("LogLevel").isEmpty()) {
             //set logging level as debug
-            logLevel="debug";
+            logLevel = "info";
+        } else {
+            logLevel = properties.getProperty("LogLevel");
         }
-        
+
         //Return the logging level
         return logLevel;
     }
-   
+
     public String getPropertyName() {
         return properties.getProperty("PropertyName");
     }

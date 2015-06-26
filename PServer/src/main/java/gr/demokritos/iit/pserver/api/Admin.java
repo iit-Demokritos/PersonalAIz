@@ -7,11 +7,15 @@ package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
+import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
+import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implement the administration functionality of PServer.
@@ -22,31 +26,28 @@ public class Admin {
 
     private IAdminStorage dbAdmin;
     private Output output;
+    public static final Logger LOGGER = LoggerFactory.getLogger(Admin.class);
+    private final PServerConfiguration psConfig;
 
     public Admin(IAdminStorage dbAdmin) {
+        this.psConfig = new PServerConfiguration();
         this.dbAdmin = dbAdmin;
+        //Update logging level 
+        Logging.updateLoggerLevel(Admin.class, psConfig.getLogLevel());
     }
 
-    public String getSettings() {
+
+    
+    /**
+     * Add a client in database
+     * @param clientName The clients Username
+     * @param password The clients password
+     * @param info A map with clients information. Key - value pairs (e.g. mail:info@mail.com)
+     * @return A JSon if add complete. {SuccessCode"",message:""}
+     */
+    public String addClient(String clientName, String password,  HashMap<String, String> info) {
         //Initialize variables
         output = new Output();
-
-        return JSon.jsonize(output, Output.class);
-    }
-
-    public String setSettings() {
-        //Initialize variables
-        output = new Output();
-
-        return JSon.jsonize(output, Output.class);
-    }
-
-    public String addClient(String clientName, String password, String JSONClientInfo) {
-        //Initialize variables
-        output = new Output();
-        //convert JSON with clients info as a HashMap
-        HashMap<String, String> info = new HashMap<>(
-                JSon.unjsonize(JSONClientInfo, HashMap.class));
         //Get Client UID
         String clientUID = dbAdmin.getClientUID(clientName);
         //encrypt password
@@ -63,16 +64,24 @@ public class Admin {
         return JSon.jsonize(output, Output.class);
     }
 
-    public String deleteClient(String clientName) {
+    /**
+     * Delete client with given UID
+     * @param clientUID
+     * @return 
+     */
+    public String deleteClient(String clientUID) {
         //Initialize variables
         output = new Output();
-        //Get Client UID
-        String clientUID = dbAdmin.getClientUID(clientName);
 
         output.setOutputCode(dbAdmin.deleteClient(clientUID));
         return JSon.jsonize(output, Output.class);
     }
 
+    
+    /**
+     * Get all client names with their UID
+     * @return A map with key - value pairs (ClinetName:UID)
+     */
     public String getClients() {
         //Initialize variables
         output = new Output();
@@ -84,19 +93,32 @@ public class Admin {
         return JSon.jsonize(output, Output.class);
     }
 
-    public String getClientUID(String clientName) {
-        //Initialize variables
-        output = new Output();
-        //Call HBase to get Clients
-        output.setOutput(dbAdmin.getClients().get(clientName));
-        return JSon.jsonize(output, Output.class);
-    }
 
+    
+    /**
+     * 
+     * @return 
+     */
     public String setClientRoles() {
+       //TODO: implement
         //Initialize variables
         output = new Output();
 
         return JSon.jsonize(output, Output.class);
     }
 
+    
+    public String getSettings() {
+        //Initialize variables
+        output = new Output();
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    public String setSettings() {
+        //Initialize variables
+        output = new Output();
+
+        return JSon.jsonize(output, Output.class);
+    }
 }
