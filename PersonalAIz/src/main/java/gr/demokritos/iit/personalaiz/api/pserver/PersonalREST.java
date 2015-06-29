@@ -5,7 +5,8 @@
  */
 package gr.demokritos.iit.personalaiz.api.pserver;
 
-import java.util.Map;
+import gr.demokritos.iit.utilities.json.JSon;
+import gr.demokritos.iit.utilities.json.Output;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -15,11 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * This class implements the Personal mode API
@@ -31,38 +28,16 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 @Path("{clientKey}/personal")
 @Produces(MediaType.APPLICATION_JSON)
-public class Personal {
+public class PersonalREST {
 
     /**
      * Method handling HTTP GET requests. The returned object will be sent to
      * the client as "text/plain" media type.
      *
+     * @param clientKey
+     * @param JSONUsers
      * @return String that will be returned as a text/plain response.
      */
-//    @GET
-//    public String getIt(@PathParam("cr") String cr,@Context HttpHeaders hh, 
-//            @DefaultValue("*") @QueryParam("c") String c) {
-//         MultivaluedMap<String, String> headerParams = hh.getRequestHeaders();
-//    Map<String, Cookie> pathParams = hh.getCookies();
-//        System.out.println(pathParams);
-//        return "{"
-//                + "\"credentials\":\"" + cr+"\","
-//                + "\"Pattern\":\"" + c+"\""
-//                + "}";
-//        
-//    }
-//    @Path("{c}")
-//    @GET
-//    public String convertCtoFfromInput(@PathParam("c") Double c) {
-//        Double fahrenheit;
-//        Double celsius = c;
-//        fahrenheit = ((celsius * 9) / 5) + 32;
-//
-//        String result = "@Produces(\"application/xml\") Output: \n\nC to F Converter Output: \n\n" + fahrenheit;
-//        return "<ctofservice>" + "<celsius>" + celsius + "</celsius>" + "<ctofoutput>" + result + "</ctofoutput>" + "</ctofservice>";
-//    }
-    
-    
 // TODO: Implement add users
 //POST users/:JSONUsers | Add new users
     @Path("users/{JSONUsers}")
@@ -71,7 +46,7 @@ public class Personal {
             @PathParam("clientKey") String clientKey,
             @PathParam("JSONUsers") String JSONUsers
     ) {
-
+        JSon.jsonize("", Output.class);
         return null;
     }
 

@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("{clientKey}/community")
 @Produces(MediaType.APPLICATION_JSON)
-public class Community {
+public class CommunityREST {
 
 
     /**

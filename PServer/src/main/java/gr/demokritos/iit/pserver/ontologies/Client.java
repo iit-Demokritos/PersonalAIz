@@ -27,6 +27,12 @@ public class Client extends SystemUser {
         this.username = username;
         this.password = password;
     }
+    public Client(String apiKey) {
+        
+        //TODO: get username pass
+        this.username = username;
+        this.password = password;
+    }
     
     /**
      * Constructor for new client

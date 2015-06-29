@@ -13,6 +13,7 @@ import gr.demokritos.iit.utilities.json.Output;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class Admin {
      * @param info A map with clients information. Key - value pairs (e.g. mail:info@mail.com)
      * @return A JSon if add complete. {SuccessCode"",message:""}
      */
-    public String addClient(String clientName, String password,  HashMap<String, String> info) {
+    public boolean addClient(String clientName, String password,  HashMap<String, String> info) {
         //Initialize variables
         output = new Output();
         //Get Client UID
@@ -64,20 +65,25 @@ public class Admin {
         client.setInfo(info);
 
         output.setOutputCode(dbAdmin.addClient(client));
-        return JSon.jsonize(output, Output.class);
+//        return JSon.jsonize(output, Output.class);
+        //TODO: change with true return
+        return true;
     }
 
     /**
      * Delete client with given UID
-     * @param clientUID
+     * @param clientName
      * @return 
      */
-    public String deleteClient(String clientName) {
+    public boolean deleteClient(String clientName) {
         //Initialize variables
         output = new Output();
 
         output.setOutputCode(dbAdmin.deleteClient(clientName));
-        return JSon.jsonize(output, Output.class);
+        
+        
+        //TODO: change with true return
+        return true;
     }
 
     
@@ -85,7 +91,7 @@ public class Admin {
      * Get all client names with their UID
      * @return A map with key - value pairs (ClinetName:UID)
      */
-    public String getClients() {
+    public String getClients(){
         //Initialize variables
         output = new Output();
         ArrayList<String> clients = new ArrayList<>();
@@ -102,27 +108,31 @@ public class Admin {
      * 
      * @return 
      */
-    public String setClientRoles() {
+    public boolean setClientRoles() {
        //TODO: implement
         //Initialize variables
         output = new Output();
 
-        return JSon.jsonize(output, Output.class);
+        
+        //TODO: change with true return
+        return true;
     }
 
     
-    public String getSettings() {
+    public Map<String,String>  getSettings() {
+        HashMap<String,String> settings = new HashMap<>();
         //Initialize variables
         output = new Output();
 
-        return JSon.jsonize(output, Output.class);
+        return settings;
     }
 
-    public String setSettings() {
+    public boolean setSettings(HashMap<String,String> settings) {
         //Initialize variables
         output = new Output();
 
-        return JSon.jsonize(output, Output.class);
+        //TODO: change with true return
+        return true;
     }
     
 //    public Client getClient(String username, String password) {

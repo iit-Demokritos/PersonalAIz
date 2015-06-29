@@ -38,6 +38,16 @@
             <version>1</version>
         </dependency>
         <dependency>
+            <groupId>gr.demokritos.iit</groupId>
+            <artifactId>Utilities</artifactId>
+            <version>1</version>
+        </dependency>
+        <dependency>
+            <groupId>gr.demokritos.iit</groupId>
+            <artifactId>Security</artifactId>
+            <version>1</version>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>6.0</version>

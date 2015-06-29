@@ -31,7 +31,7 @@ public class PServerTest {
 //        System.out.println(ad.getClients());
 //        System.out.println(ad.deleteClient("newClient"));
 
-        Personal ps = new Personal(db);
+//        Personal ps = new Personal(db);
 //        System.out.println(ps.addUsers("{\"test1\":{\"attributes\":{\"gender\": \"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr33\": \"3\",\"ftr5\": \"4\"}}}"));
 //        System.out.println(ps.addUsers("{\"testko\":{},\"testko2\":{}ZZ,\"testko3\":{}}"));
 //        System.out.println(ps.getUsers(null,null));

@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("{clientKey}/stereotype")
 @Produces(MediaType.APPLICATION_JSON)
-public class Stereotype {
+public class StereotypeREST {
 
     /**
      * Method handling HTTP GET requests. The returned object will be sent to
