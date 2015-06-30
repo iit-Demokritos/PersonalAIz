@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
-public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunityStorage, IAdminStorage {
+public class PServerHBase implements IPersonalStorage, IStereotypeStorage, ICommunityStorage, IAdminStorage {
 
     //=================== HBase tables ========================================
     private final String table_Users = "Users";
@@ -73,26 +73,26 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     private final Integer pageSize = 20;
     public static String paging;
 
-    public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(HBase.class);
+    public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PServerHBase.class);
+
+//    /**
+//     * The constructor of PServer HBase storage system.
+//     *
+//     * @param clientUID
+//     */
+//    public PServerHBase(String clientUID) {
+//        //Set client UID on a global private variable
+//        this.clientUID = clientUID;
+//
+//        //Create new HBase configuration
+//        config = HBaseConfiguration.create();
+//
+//    }
 
     /**
-     * The constructor of HBase storage system.
-     *
-     * @param clientUID
+     * The constructor of PServer HBase storage system.
      */
-    public HBase(String clientUID) {
-        //Set client UID on a global private variable
-        this.clientUID = clientUID;
-
-        //Create new HBase configuration
-        config = HBaseConfiguration.create();
-
-    }
-
-    /**
-     * The constructor of HBase storage system.
-     */
-    public HBase() {
+    public PServerHBase() {
         //Create new HBase configuration
         config = HBaseConfiguration.create();
     }
@@ -742,7 +742,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     //=================== Administration ======================================
 
     @Override
-    public int addClient(Client client) {
+    public boolean addClient(Client client) {
         HTable clientsTable = null;
 
         try {
@@ -791,12 +791,12 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             LOGGER.error("Can't close table", ex);
         }
 
-        //TODO: return the code
-        return 100;
+        //TODO: return the status
+        return true;
     }
 
     @Override
-    public int deleteClient(String clientName) {
+    public boolean deleteClient(String clientName) {
         HTable clientsTable = null;
 
         try {
@@ -831,12 +831,12 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
             LOGGER.error("Can't flush commits or close table", ex);
         }
 
-        //TODO: change 100 with the status code number
-        return 100;
+        //TODO: change TRUE with the status
+        return true;
     }
 
     @Override
-    public Map<String, String> getClients() {
+    public Map<String, String> getClients(){
 
         //Initialize variables
         HashMap<String, String> clients = new HashMap<>();
@@ -881,7 +881,7 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
     }
 
     @Override
-    public int setClientRoles(String clientName, String role) {
+    public boolean setClientRoles(String clientName, String role) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -923,28 +923,14 @@ public class HBase implements IPersonalStorage, IStereotypeStorage, ICommunitySt
         return UID;
     }
 
+
     @Override
-    public int addRole(String roleName, Map<String, Boolean> actions) {
+    public Map<String, String> getSettings(){
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public int setRoleActions(String roleName, Map<String, Boolean> actions) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Map<String, Boolean> getRoleActions(String roleName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Map<String, String> getSettings() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int setSettings(Map<String, String> settings) {
+    public boolean setSettings(Map<String, String> settings) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

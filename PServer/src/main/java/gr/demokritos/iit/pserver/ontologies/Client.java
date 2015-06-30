@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class represents a client object
+ * This class represents a PServer client object
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -34,24 +34,6 @@ public class Client extends SystemUser {
         this.password = password;
     }
     
-    /**
-     * Constructor for new client
-     *
-     * @param clientUID
-     */
-//    public Client(String clientUID) {
-//        this.clientUID = clientUID;
-//    }
-
-    /**
-     * Get the Clients UID
-     *
-     * @return A string with clients id
-     */
-//    public String getClientUID() {
-//        return clientUID;
-//    }
-//
     /**
      * Set clients info like name, password, mail
      *

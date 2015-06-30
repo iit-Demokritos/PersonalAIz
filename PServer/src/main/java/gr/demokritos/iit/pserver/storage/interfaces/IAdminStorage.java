@@ -15,31 +15,31 @@ import java.util.Map;
 public interface IAdminStorage {
 
     //========================== Client =======================================
-    int addClient(Client client);
+    boolean addClient(Client client);
 
-    int deleteClient(String clientName);
+    boolean deleteClient(String clientName);
 
     Map<String, String> getClients();
 
-    int setClientRoles(String clientName, String role);
+    boolean setClientRoles(String clientName, String role);
 
     String getClientRole(String clientName);
 
     String getClientUID(String clientName);
 
     //========================== Client =======================================
-    //=========================== Roles =======================================
-    int addRole(String roleName, Map<String, Boolean> actions);
-
-    int setRoleActions(String roleName, Map<String, Boolean> actions);
-
-    Map<String, Boolean> getRoleActions(String roleName);
-
-    //=========================== Roles =======================================
+//    //=========================== Roles =======================================
+//    boolean addRole(String roleName, Map<String, Boolean> actions);
+//
+//    boolean setRoleActions(String roleName, Map<String, Boolean> actions);
+//
+//    Map<String, Boolean> getRoleActions(String roleName);
+//
+//    //=========================== Roles =======================================
     //======================== Settings =======================================
     Map<String, String> getSettings();
 
-    int setSettings(Map<String, String> settings);
+    boolean setSettings(Map<String, String> settings);
 
     //======================== Settings =======================================
 }

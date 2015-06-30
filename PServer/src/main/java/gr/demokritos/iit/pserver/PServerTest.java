@@ -6,7 +6,7 @@
 package gr.demokritos.iit.pserver;
 
 import gr.demokritos.iit.pserver.api.Personal;
-import gr.demokritos.iit.pserver.storage.HBase;
+import gr.demokritos.iit.pserver.storage.PServerHBase;
 import java.io.IOException;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 
@@ -25,7 +25,7 @@ public class PServerTest {
 
         System.out.println("===============================================");
 //        HBase db = new HBase("Admin");
-        HBase db = new HBase("1ec1caa1-3fd9-3afb-8933-79a17f82e7a8");
+//        PServerHBase db = new PServerHBase("1ec1caa1-3fd9-3afb-8933-79a17f82e7a8");
 //        Admin ad =new Admin(db);
 //        System.out.println(ad.addClient("pnewDlient", "123", clientInfo));
 //        System.out.println(ad.getClients());

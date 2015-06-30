@@ -7,10 +7,10 @@ package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
-import gr.demokritos.iit.pserver.storage.HBase;
+import gr.demokritos.iit.pserver.storage.PServerHBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
+import gr.demokritos.iit.security.Security;
 import gr.demokritos.iit.security.authorization.Action;
-import gr.demokritos.iit.security.interfaces.ISecurity;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
@@ -35,7 +35,7 @@ public class Personal {
     private Output output;
     private Client client;
     public static final Logger LOGGER = LoggerFactory.getLogger(Personal.class);
-    public ISecurity security;
+    public Security security;
 
     /**
      * The constructor of personal mode.
@@ -57,7 +57,7 @@ public class Personal {
         Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
     }
 
-    public void setSecurity(ISecurity security) {
+    public void setSecurity(Security security) {
         this.security = security;
     }
     
@@ -180,7 +180,7 @@ public class Personal {
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
         if (page != null) {
-            output.setCustomOutputMessage("page " + HBase.paging);
+            output.setCustomOutputMessage("page " + PServerHBase.paging);
         }
         output.setOutput(users);
 
@@ -263,7 +263,7 @@ public class Personal {
         output.setOutputCode(100);
 //        output.setCustomOutputMessage("test");
         if (page != null) {
-            output.setCustomOutputMessage("page " + HBase.paging);
+            output.setCustomOutputMessage("page " + PServerHBase.paging);
         }
         output.setOutput(attributes);
 
@@ -387,7 +387,7 @@ public class Personal {
         output.setOutputCode(100);
 
         if (page != null) {
-            output.setCustomOutputMessage("page " + HBase.paging);
+            output.setCustomOutputMessage("page " + PServerHBase.paging);
         }
         output.setOutput(features);
 

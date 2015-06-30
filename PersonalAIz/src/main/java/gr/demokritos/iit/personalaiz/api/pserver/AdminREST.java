@@ -7,7 +7,7 @@ package gr.demokritos.iit.personalaiz.api.pserver;
 
 import gr.demokritos.iit.pserver.api.Admin;
 import gr.demokritos.iit.pserver.ontologies.Client;
-import gr.demokritos.iit.pserver.storage.HBase;
+import gr.demokritos.iit.pserver.storage.PServerHBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
@@ -30,7 +30,7 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class AdminREST {
 
-    private final HBase db = new HBase();
+    private final PServerHBase db = new PServerHBase();
     private Admin admin;
 
     /**

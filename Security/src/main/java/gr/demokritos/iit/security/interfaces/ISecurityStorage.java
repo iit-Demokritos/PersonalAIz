@@ -5,17 +5,15 @@
  */
 package gr.demokritos.iit.security.interfaces;
 
-import gr.demokritos.iit.security.authentication.IAuthentication;
-import gr.demokritos.iit.security.authorization.IAuthorization;
-
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public abstract class ISecurity implements IAuthentication, IAuthorization {
-
-    public ISecurity() {
-    }
+public interface ISecurityStorage {
+    
+    
+    
+    
     
     
 }

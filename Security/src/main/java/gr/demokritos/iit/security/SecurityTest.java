@@ -3,12 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.pserver.storage;
+package gr.demokritos.iit.security;
 
 /**
  *
- * @author Panagiotis Giotis <giotis.p@gmail.com>
+ * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class MySQL {
+public class SecurityTest {
+    
+    
+    public static void main(String[] args) {
+        
+    }
     
 }

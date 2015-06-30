@@ -5,28 +5,78 @@
  */
 package gr.demokritos.iit.security.authorization;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
+ * 
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class Actions {
 
-    public static final String adminPanel = "";
+    private final HashMap<String, Action> adminActions = new HashMap<>();
+    private final HashMap<String, Action> personalActions = new HashMap<>();
+    private final HashMap<String, Action> stereotypeActions = new HashMap<>();
+    private final HashMap<String, Action> communityActions = new HashMap<>();
+
+    public Actions() {
+
+        //PServer admin actions
+        adminActions.put("aAddClient", new Action("Admin.AddClient"));
+        adminActions.put("aDeleteClient", new Action("Admin.DeleteClient"));
+        adminActions.put("aGetClients", new Action("Admin.GetClients"));
+        adminActions.put("aSetClientRoles", new Action("Admin.setClientRoles"));
+        adminActions.put("aGetSettings", new Action("Admin.GetSettings"));
+        adminActions.put("aSetSettings", new Action("Admin.SetSettings"));
+
+    }
+
+    
+    /**
+     * Get PServer Admin actions
+     * @return A map with String:Action pairs
+     */
+    public Map<String, Action> getAdminActions() {
+        return adminActions;
+    }
+
+    /**
+     * Get PServer Personal actions
+     * @return A map with String:Action pairs
+     */
+    public Map<String, Action> getPersonalActions() {
+        return personalActions;
+    }
+
+    /**
+     * Get PServer Stereotype actions
+     * @return A map with String:Action pairs
+     */
+    public Map<String, Action> getStereotypeActions() {
+        return stereotypeActions;
+    }
+
+    /**
+     * Get PServer Community actions
+     * @return A map with String:Action pairs
+     */
+    public Map<String, Action> getCommunityActions() {
+        return communityActions;
+    }
+    
+    /**
+     * Get All PServer actions
+     * @return  A map with String:Action pairs
+     */
+    public Map<String, Action> getActions() {
+        HashMap<String, Action> actions = new HashMap<>();
+        actions.putAll(adminActions);
+        actions.putAll(personalActions);
+        actions.putAll(stereotypeActions);
+        actions.putAll(communityActions);
+        return actions;
+    }
     
     
-    public static final String createClients = "CreateClients";
-    public static final String readClients = "ReadClients";
-    public static final String updateClients = "UpdateClients";
-    public static final String deleteClients = "DeleteClients";
-    
-    public static final String createStereotypes = "CreateStereotypes";
-    public static final String readStereotypes = "ReadStereotypes";
-    public static final String updateStereotypes = "UpdateStereotypes";
-    public static final String deleteStereotypes = "DeleteStereotypes";
-    
-    public static final String createUsers = "CreateUsers";
-    public static final String readUsers = "ReadUsers";
-    public static final String updateUsers = "UpdateUsers";
-    public static final String deleteUsers = "DeleteUsers";
 
 }
