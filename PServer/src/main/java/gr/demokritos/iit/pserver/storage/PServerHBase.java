@@ -14,14 +14,11 @@ import gr.demokritos.iit.pserver.storage.interfaces.IStereotypeStorage;
 import gr.demokritos.iit.utilities.utils.Util;
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Delete;
@@ -88,7 +85,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 //        config = HBaseConfiguration.create();
 //
 //    }
-
     /**
      * The constructor of PServer HBase storage system.
      */
@@ -105,7 +101,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * @return the Output code
      */
     @Override
-    public int addUsers(
+    public boolean addUsers(
             List<User> users) {
 
         HTable usersTable = null;
@@ -228,8 +224,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             LOGGER.error("Add Users failed", ex);
         }
 
-        //TODO: return the code
-        return 100;
+        //TODO: change status
+        return true;
 
     }
 
@@ -240,7 +236,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * @return the Output code
      */
     @Override
-    public int deleteUsers(String pattern) {
+    public boolean deleteUsers(String pattern) {
 
         HTable usersTable = null;
         HTable clientsTable = null;
@@ -290,7 +286,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.flushCommits();
 
         } catch (IOException ex) {
-                LOGGER.error("Can't delete client user from clientsTable", ex);
+            LOGGER.error("Can't delete client user from clientsTable", ex);
         }
 
         try {
@@ -303,8 +299,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             LOGGER.error("Error on close tables", ex);
         }
 
-        //TODO: change 100 with the status code number
-        return 100;
+        //TODO: change real status code
+        return true;
     }
 
     /**
@@ -377,7 +373,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             result = table.get(get);
 
         } catch (IOException ex) {
-                LOGGER.error("Error on table get", ex);
+            LOGGER.error("Error on table get", ex);
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_ClientUsers);
@@ -401,7 +397,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * @return the Output code
      */
     @Override
-    public int setUsersAttributes(List<User> users) {
+    public boolean setUsersAttributes(List<User> users) {
 
         return addUsers(users);
     }
@@ -439,7 +435,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             table = new HTable(config, table_Users);
 
         } catch (IOException ex) {
-            LOGGER.error("Can't load table "+table_Users , ex);
+            LOGGER.error("Can't load table " + table_Users, ex);
         }
 
         Get get = new Get(Bytes.toBytes(userUID));
@@ -489,7 +485,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             result = table.get(get);
 
         } catch (IOException ex) {
-                LOGGER.error("Error on get from table", ex);
+            LOGGER.error("Error on get from table", ex);
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Attributes);
@@ -516,7 +512,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * @return the Output code
      */
     @Override
-    public int setUsersFeatures(ArrayList<User> users) {
+    public boolean setUsersFeatures(ArrayList<User> users) {
 
         return addUsers(users);
     }
@@ -555,7 +551,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             table = new HTable(config, table_Users);
 
         } catch (IOException ex) {
-            LOGGER.error("Can't load table "+table_Users, ex);
+            LOGGER.error("Can't load table " + table_Users, ex);
         }
 
         Get get = new Get(Bytes.toBytes(userUID));
@@ -606,7 +602,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             result = table.get(get);
 
         } catch (IOException ex) {
-                LOGGER.error("Error on get from table", ex);
+            LOGGER.error("Error on get from table", ex);
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Features);
@@ -643,7 +639,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * @return
      */
     @Override
-    public int modifyUsersFeatures(List<User> usersList) {
+    public boolean modifyUsersFeatures(List<User> usersList) {
 
         //create new Users HTable
         HTable usersTable = null;
@@ -653,7 +649,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             usersTable = new HTable(config, table_Users);
 
         } catch (IOException ex) {
-            LOGGER.error("Can't load table "+table_Users, ex);
+            LOGGER.error("Can't load table " + table_Users, ex);
         }
 
         //for each user
@@ -672,7 +668,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                 usersTable.increment(inc);
 
             } catch (IOException ex) {
-                LOGGER.error("Error on increment the values for the user "+user, ex);
+                LOGGER.error("Error on increment the values for the user " + user, ex);
             }
         }
 
@@ -694,8 +690,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             LOGGER.error("Can't close table", ex);
         }
 
-        //TODO: return the code
-        return 100;
+        //TODO: change with real status 
+        return true;
     }
 
     /**
@@ -741,8 +737,15 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     //=================== Community Mode ======================================
     //=================== Administration ======================================
 
+    /**
+     * Add the given client on HBase. If user exists update client.
+     *
+     * @param client A PServer Client
+     * @return The status of this action
+     */
     @Override
     public boolean addClient(Client client) {
+        boolean status = true;
         HTable clientsTable = null;
 
         try {
@@ -751,7 +754,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            LOGGER.error("Can't load table "+table_Clients, ex);
+            status=false;
+            LOGGER.error("Can't load table " + table_Clients, ex);
         }
 
         //Create put method with row key
@@ -779,7 +783,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.flushCommits();
 
         } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
-           LOGGER.error(null, ex);
+            status=false;
+            LOGGER.error(null, ex);
         }
 
         try {
@@ -788,15 +793,17 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.close();
 
         } catch (IOException ex) {
+            status=false;
             LOGGER.error("Can't close table", ex);
         }
 
-        //TODO: return the status
-        return true;
+        //return the status
+        return status;
     }
 
     @Override
     public boolean deleteClient(String clientName) {
+        boolean status = true;
         HTable clientsTable = null;
 
         try {
@@ -804,7 +811,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            LOGGER.error("Can't load table "+table_Clients, ex);
+            status=false;
+            LOGGER.error("Can't load table " + table_Clients, ex);
         }
 
         //Add on delete the rowkey
@@ -817,6 +825,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.delete(deleteClient);
 
         } catch (IOException ex) {
+            status=false;
             LOGGER.error("Can't delete client", ex);
         }
 
@@ -828,15 +837,16 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.close();
 
         } catch (IOException ex) {
+            status=false;
             LOGGER.error("Can't flush commits or close table", ex);
         }
 
-        //TODO: change TRUE with the status
-        return true;
+        //return the status
+        return status;
     }
 
     @Override
-    public Map<String, String> getClients(){
+    public Map<String, String> getClients() {
 
         //Initialize variables
         HashMap<String, String> clients = new HashMap<>();
@@ -886,7 +896,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
     @Override
-    public String getClientRole(String clientName) {
+    public List<String> getClientRoles(String clientName) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -924,18 +934,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
 
-    @Override
-    public Map<String, String> getSettings(){
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean setSettings(Map<String, String> settings) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     //=================== Administration ======================================
     //=================== Security ======================================
     //=================== Security ======================================
-
 }

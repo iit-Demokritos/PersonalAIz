@@ -13,9 +13,9 @@ import gr.demokritos.iit.security.authorization.Actions;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +44,10 @@ public class Admin {
         Logging.updateLoggerLevel(Admin.class, psConfig.getLogLevel());
     }
 
+    /**
+     * Set security control for user authorization 
+     * @param security 
+     */
     public void setSecurity(Security security) {
         this.security = security;
     }
@@ -56,7 +60,8 @@ public class Admin {
      * @param info A map with client information. Key - value pairs (e.g.mail:info@mail.com)
      * @return A boolean status true/false if add complete or not
      */
-    public boolean addClient(String clientName, String password, HashMap<String, String> info) {
+    public boolean addClient(String clientName, String password, HashMap<String,
+            String> info) {
         
         //Check permission
         if (!getPermissionFor(actions.get("aAddClient"), "W")) {
@@ -64,12 +69,11 @@ public class Admin {
             return false;
         }
         
-        //encrypt password
-        String clientPassword = DigestUtils.sha1Hex(password);
 
         Client client = new Client(clientName, password);
         info.put("Username", clientName);
-        info.put("Password", clientPassword);
+        //encrypt password before add it on the info map
+        info.put("Password", security.encryptPassword(password));
 
         //Add info on client object 
         client.setInfo(info);
@@ -130,6 +134,24 @@ public class Admin {
         //call set client roles and return the status
         return dbAdmin.setClientRoles(null, null);
     }
+    
+    
+    /**
+     * Get the roles for the specific client
+     * @param clientName
+     * @return Return a list with client's roles. If return is null then permission denied
+     */
+    public List<String> getClientRoles(String clientName) {
+        
+        //Check permission
+        if (!getPermissionFor(actions.get("aSetClientRoles"), "W")) {
+            //TODO:  throw exeption   
+            return null;
+        }
+
+        //call set client roles and return the status
+        return dbAdmin.getClientRoles(clientName);
+    }
 
     /**
      * Get PServer settings
@@ -143,9 +165,9 @@ public class Admin {
             //TODO:  throw exeption   
             return null;
         }
-
+        
         // Call get settings function and return the settings map
-        return dbAdmin.getSettings();
+        return psConfig.getProperties();
     }
 
     /**
@@ -162,7 +184,8 @@ public class Admin {
         }
 
         // Call set settings function and return the status 
-        return dbAdmin.setSettings(settings);
+        psConfig.setProperties(settings);
+        return psConfig.commit();
     }
 
     
@@ -176,7 +199,7 @@ public class Admin {
      */
     public boolean getPermissionFor(Action a, String sAccessType) {
         //If security is not null and access granted then return true
-        return ((security != null) && (security.getAccessRights(adminClient, a)
+        return ((security != null) && (security.autho.getAccessRights(adminClient, a)
                 .get(sAccessType)));
     }
 

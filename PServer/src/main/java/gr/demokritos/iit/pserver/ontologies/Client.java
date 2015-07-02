@@ -10,46 +10,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class represents a PServer client object
+ * This class represents a PServer Client
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class Client extends SystemUser {
 
-//    private String clientUID;
-    private HashMap<String, String> info = new HashMap<>();
-    private HashMap<String, String> keys = new HashMap<>();
-    private String username;
-    private String password;
-    
+    private HashMap<String, String> keys;
+
 
     public Client(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-    public Client(String apiKey) {
-        
-        //TODO: get username pass
-        this.username = username;
-        this.password = password;
-    }
-    
-    /**
-     * Set clients info like name, password, mail
-     *
-     * @param info A Map with clients info
-     */
-    public void setInfo(Map<String, String> info) {
-        this.info.putAll(info);
+        super.username = username;
+        super.password = password;
+        super.info = new HashMap<>();
+        this.keys = new HashMap<>();
     }
 
-    /**
-     * Get clients information
-     *
-     * @return Return a Map with clients information
-     */
-    public Map<String, String> getInfo() {
-        return info;
+    public Client(String apiKey) {
+
+        //TODO: get username pass
+        super.username = "";
+        super.password = "";
+        super.info = new HashMap<>();
+        this.keys = new HashMap<>();
     }
 
     /**
@@ -62,7 +45,7 @@ public class Client extends SystemUser {
     }
 
     /**
-     * Get Clients Keys
+     * Get Client Keys
      *
      * @return A Map with pairs of key and expiration date
      */

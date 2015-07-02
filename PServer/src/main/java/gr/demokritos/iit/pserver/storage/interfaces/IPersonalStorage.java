@@ -16,21 +16,21 @@ import java.util.Map;
  */
 public interface IPersonalStorage {
 
-    int addUsers(List<User> users);
+    boolean addUsers(List<User> users);
 
-    int deleteUsers(String pattern);
+    boolean deleteUsers(String pattern);
 
     Map<String, String> getUsers(String pattern, Integer page);
 
-    int setUsersAttributes(List<User> users);
+    boolean setUsersAttributes(List<User> users);
 
     Map<String, String> getUserAttributes(String username, String pattern, Integer page);
 
-    int setUsersFeatures(ArrayList<User> users);
+    boolean setUsersFeatures(ArrayList<User> users);
 
     Map<String, String> getUserFeatures(String username, String pattern, Integer page);
 
-    int modifyUsersFeatures(List<User> usersList);
+    boolean modifyUsersFeatures(List<User> usersList);
 
     String getUserUID(String username);
 

@@ -5,25 +5,43 @@
  */
 package gr.demokritos.iit.security.authentication;
 
+import gr.demokritos.iit.security.interfaces.ISecurityStorage;
+
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class Authentication {
 
-    public Authentication() {
+    private final ISecurityStorage securityDB;
+
+    public Authentication(ISecurityStorage securityDB) {
+        this.securityDB = securityDB;
     }
 
     
-    public boolean checkCredentials(String username, String password){
+    /**
+     * Check credentials with username and password
+     * @param username 
+     * @param password
+     * @return The status of the checking
+     */
+    public boolean checkCredentials(String username, String password) {
         boolean success = true;
-        
-        //TODO: check from HBase the credentials
-        
-        return success;
+
+        //check from ISecurityStorage the credentials
+        return securityDB.checkCredentials(username, password);
     }
-    
-    
-    
-    
+    /**
+     * Check credentials with api key
+     * @param apikey 
+     * @return The status of the checking
+     */
+    public boolean checkCredentials(String apikey) {
+        boolean success = true;
+
+        //check from ISecurityStorage the credentials
+        return securityDB.checkCredentials(apikey);
+    }
+
 }

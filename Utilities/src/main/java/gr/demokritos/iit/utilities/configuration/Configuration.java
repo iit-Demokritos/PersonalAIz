@@ -9,9 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -33,20 +33,19 @@ public class Configuration {
      * @param configurationFileName The properties file to load
      */
     public Configuration(String configurationFileName) {
-       LOGGER.debug("dssdsd");
         // Create new file from the external path
         this.pFile = new File(EXTERNAL_PROPERTIES_PATH + configurationFileName);
         //If not exist the external file then load the default file inside the resources
         if (!this.pFile.exists()) {
-            this.pFile = new File(getClass().getResource("/configuration/" + 
-                    configurationFileName).getPath());
+            this.pFile = new File(getClass().getResource("/configuration/"
+                    + configurationFileName).getPath());
         }
         this.properties = new Properties();
         //load the properties
         try {
             this.properties.load(new FileInputStream(this.pFile));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Can't open properties file", e);
         }
     }
 
@@ -63,6 +62,21 @@ public class Configuration {
         } else {
             return this.properties.getProperty(sKey);
         }
+    }
+
+    /**
+     * Get the all properties
+     *
+     * @return The property value
+     */
+    public Map<String, String> getProperties() {
+        HashMap<String, String> propMap = new HashMap<>();
+
+        for (String cProp : this.properties.stringPropertyNames()) {
+            propMap.put(cProp, this.properties.getProperty(cProp));
+        }
+
+        return propMap;
     }
 
     /**
@@ -86,15 +100,34 @@ public class Configuration {
     }
 
     /**
-     * Save file to Disk
+     * Set value of the given properties name
+     *
+     * @param properties
      */
-    public void commit() {
+    public void setProperties(Map<String, String> properties) {
+
+        for (String sKey : properties.keySet()) {
+            this.properties.setProperty(sKey, properties.get(sKey));
+        }
+
+    }
+
+    /**
+     * Save file to Disk
+     *
+     * @return
+     */
+    public boolean commit() {
+        boolean status = true;
         try {
             properties.store(new FileWriter(this.pFile, Boolean.FALSE), null);
 //            properties.store(new OutputStreamWriter(new FileOutputStream(p), Charset.forName("UTF-8")));
         } catch (IOException ex) {
-            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            status = false;
+            LOGGER.error("Can't commit properties file", ex);
         }
+
+        return status;
     }
 
 }

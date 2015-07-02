@@ -7,17 +7,16 @@ package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
-import gr.demokritos.iit.pserver.storage.PServerHBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
 import gr.demokritos.iit.security.Security;
 import gr.demokritos.iit.security.authorization.Action;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
-import gr.demokritos.iit.utilities.json.Output;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,6 @@ public class Personal {
 
     private final IPersonalStorage dbPersonal;
     private final PServerConfiguration psConfig;
-    private Output output;
     private Client client;
     public static final Logger LOGGER = LoggerFactory.getLogger(Personal.class);
     public Security security;
@@ -47,23 +45,20 @@ public class Personal {
         this.dbPersonal = dbPersonal;
         this.client = c;
         security = null;
-        Action aAddUsers = new Action("Personal.AddUsers");
-        Action aRemoveUsers = new Action("Personal.RemoveUsers");
-        //...
-        // TODO: Make strings final
-        //TODO: Complete
-        
+
         //Update logging level 
         Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
     }
 
+    /**
+     * Set security control for user authorization
+     *
+     * @param security
+     */
     public void setSecurity(Security security) {
         this.security = security;
     }
-    
-    
 
-    
     /**
      * Add a list of users on PServer Storage. This function help us to add
      * massive, users on PServer. Features or Attributes is optional.
@@ -73,9 +68,7 @@ public class Personal {
      * {"ftr1": "34","ftr3": "3","ftr5": "4"}}}
      * @return A JSON response with method status
      */
-    public String addUsers(String JSONUsers) {
-        //Initialize variables
-        output = new Output();
+    public boolean addUsers(String JSONUsers) {
         //convert JSON with users as a HashMap
         HashMap<String, Object> users = new HashMap<>(
                 JSon.unjsonize(JSONUsers, HashMap.class));
@@ -103,7 +96,13 @@ public class Personal {
                     (Map<? extends String, ? extends HashMap<String, String>>) users.get(cUser)
             );
 
-            //add attributes on user
+            //add attributes on userfeatures.putAll(dbPersonal.getUserFeatures(user, pattern, page));
+//        output.setOutputCode(100);
+//
+//        if (page != null) {
+//            output.setCustomOutputMessage("page " + PServerHBase.paging);
+//        }
+//        
             if (userMap.containsKey("attributes")) {
 
                 HashMap<String, String> attributes = new HashMap<>();
@@ -129,10 +128,8 @@ public class Personal {
 
         // call HBase AddUsers to add the users in HBase Storage 
         // and set the output code
-        output.setOutputCode(dbPersonal.addUsers(usersList));
 //        output.setCustomOutputMessage("custom message");
-
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.addUsers(usersList);
     }
 
     /**
@@ -142,14 +139,9 @@ public class Personal {
      * @param pattern The user pattern that we want to delete
      * @return A JSON response with method status
      */
-    public String deleteUsers(String pattern) {
-        //Initialize variables
-        output = new Output();
+    public boolean deleteUsers(String pattern) {
         //call storage delete Users function with the pattern and add the return 
-        //code on setOutputCode
-        output.setOutputCode(dbPersonal.deleteUsers(pattern));
-//        output.setCustomOutputMessage("test");
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.deleteUsers(pattern);
     }
 
     /**
@@ -161,13 +153,10 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null or page<1 then return all elements in a single page. @return A JSON
-     * response with the user
-     * s list
+     * response with the user s list @return
      */
-    public String getUsers(String pattern, Integer page) {
-        //Initialize variables
-        output = new Output();
-        ArrayList<String> users = new ArrayList<>();
+    public Set<String> getUsers(String pattern, Integer page) {
+//        ArrayList<String> users = new ArrayList<>();
 
         //Check if page is null or page <1
         if (page == null || page < 1) {
@@ -176,15 +165,14 @@ public class Personal {
         }
         //Call HBase to get Users
 //        users.addAll(db.getUsers(pattern, page).keySet());
-        users.addAll(dbPersonal.getUsers(pattern, page).keySet());
-        output.setOutputCode(100);
-//        output.setCustomOutputMessage("test");
-        if (page != null) {
-            output.setCustomOutputMessage("page " + PServerHBase.paging);
-        }
-        output.setOutput(users);
+//        output.setOutputCode(100);
+////        output.setCustomOutputMessage("test");
+//        if (page != null) {
+//            output.setCustomOutputMessage("page " + PServerHBase.paging);
+//        }
+//        output.setOutput(users);
 
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.getUsers(pattern, page).keySet();
     }
 
     /**
@@ -197,9 +185,7 @@ public class Personal {
      * ...},"user2":{"gender":"fmale", "age":"28", ...}}
      * @return A JSON response with method succeed
      */
-    public String setUsersAttributes(String JSONUsersAttributes) {
-        //Initialize variables
-        output = new Output();
+    public boolean setUsersAttributes(String JSONUsersAttributes) {
         //convert JSON with users as a HashMap
         HashMap<String, HashMap<String, String>> users
                 = new HashMap<>(
@@ -228,10 +214,7 @@ public class Personal {
         }
 
         // call HBase setUsersAttributes to set the users Attributes in HBase Storage
-        output.setOutputCode(dbPersonal.setUsersAttributes(usersList));
-//        output.setCustomOutputMessage("custom message");
-
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.setUsersAttributes(usersList);
     }
 
     /**
@@ -247,9 +230,7 @@ public class Personal {
      * null then return all elements in a single page.
      * @return A JSON response with the attribute list
      */
-    public String getUserAttributes(String user, String pattern, Integer page) {
-        //Initialize variables
-        output = new Output();
+    public Map<String, String> getUserAttributes(String user, String pattern, Integer page) {
         HashMap<String, String> attributes = new HashMap<>();
 
         //Check if page is null or page <1
@@ -258,16 +239,15 @@ public class Personal {
             page = null;
         }
 
+//        attributes.putAll(dbPersonal.getUserAttributes(user, pattern, page));
+//        output.setOutputCode(100);
+////        output.setCustomOutputMessage("test");
+//        if (page != null) {
+//            output.setCustomOutputMessage("page " + PServerHBase.paging);
+//        }
+//        output.setOutput(attributes);
         //Call HBase to get User attributes
-        attributes.putAll(dbPersonal.getUserAttributes(user, pattern, page));
-        output.setOutputCode(100);
-//        output.setCustomOutputMessage("test");
-        if (page != null) {
-            output.setCustomOutputMessage("page " + PServerHBase.paging);
-        }
-        output.setOutput(attributes);
-
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.getUserAttributes(user, pattern, page);
     }
 
     /**
@@ -280,9 +260,7 @@ public class Personal {
      * "user2":{"category.sport":"12", "category.economics":"82", ...},...}
      * @return A JSON response with method succeed
      */
-    public String setUsersFeatures(String JSONUsersFeatures) {
-        //Initialize variables
-        output = new Output();
+    public boolean setUsersFeatures(String JSONUsersFeatures) {
         //convert JSON with users as a HashMap
         HashMap<String, HashMap<String, String>> users
                 = new HashMap<>(JSon.unjsonize(JSONUsersFeatures, HashMap.class));
@@ -309,9 +287,7 @@ public class Personal {
         }
 
         // call HBase setUsersFeatures to set the users Features in HBase Storage
-        output.setOutputCode(dbPersonal.setUsersFeatures(usersList));
-
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.setUsersFeatures(usersList);
     }
 
     /**
@@ -325,9 +301,7 @@ public class Personal {
      * "category.economics":"-2", ...},...}
      * @return A JSON response with method succeed
      */
-    public String modifyUsersFeatures(String JSONUsersFeatures) {
-        //Initialize variables
-        output = new Output();
+    public boolean modifyUsersFeatures(String JSONUsersFeatures) {
         //convert JSON with users as a HashMap
         HashMap<String, HashMap<String, String>> users
                 = new HashMap<>(JSon.unjsonize(JSONUsersFeatures, HashMap.class));
@@ -353,9 +327,7 @@ public class Personal {
         }
 
         // call HBase setUsersFeatures to set the users Features in HBase Storage
-        output.setOutputCode(dbPersonal.modifyUsersFeatures(usersList));
-
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.modifyUsersFeatures(usersList);
     }
 
     /**
@@ -372,9 +344,7 @@ public class Personal {
      * @return A JSON response with the user's profile. A list of key-value
      * pairs for user's features.
      */
-    public String getUserFeatures(String user, String pattern, Integer page) {
-        //Initialize variables
-        output = new Output();
+    public Map<String, String> getUserFeatures(String user, String pattern, Integer page) {
         HashMap<String, String> features = new HashMap<>();
 
         //Check if page is null or page <1
@@ -382,20 +352,20 @@ public class Personal {
             //set page null to return single page
             page = null;
         }
+
+//        features.putAll(dbPersonal.getUserFeatures(user, pattern, page));
+//        output.setOutputCode(100);
+//
+//        if (page != null) {
+//            output.setCustomOutputMessage("page " + PServerHBase.paging);
+//        }
+//        output.setOutput(features);
         //Call HBase to get User features
-        features.putAll(dbPersonal.getUserFeatures(user, pattern, page));
-        output.setOutputCode(100);
-
-        if (page != null) {
-            output.setCustomOutputMessage("page " + PServerHBase.paging);
-        }
-        output.setOutput(features);
-
-        return JSon.jsonize(output, Output.class);
+        return dbPersonal.getUserFeatures(user, pattern, page);
     }
 
     public boolean getPermissionFor(Action a, String sAccessType) {
-        return ((security != null) && (security.getAccessRights(client, a).get(
+        return ((security != null) && (security.autho.getAccessRights(client, a).get(
                 sAccessType)));
     }
 }

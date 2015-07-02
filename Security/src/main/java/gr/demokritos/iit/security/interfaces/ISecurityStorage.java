@@ -5,15 +5,24 @@
  */
 package gr.demokritos.iit.security.interfaces;
 
+import gr.demokritos.iit.security.authorization.Action;
+import gr.demokritos.iit.security.ontologies.SystemUser;
+
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface ISecurityStorage {
     
+    //========================== Authentication ================================
     
+    boolean checkCredentials(String username, String password);
+    boolean checkCredentials(String apikey);
     
-    
-    
+    //========================== Authentication ================================
+    //========================== Authorization =================================
+    boolean checkAccess(SystemUser u, Action a, String Access);
+
+    //========================== Authorization =================================
     
 }
