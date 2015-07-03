@@ -5,17 +5,18 @@
  */
 package gr.demokritos.iit.security.authentication;
 
+import gr.demokritos.iit.security.interfaces.IAuthentication;
 import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class Authentication {
+public class Authenticator implements IAuthentication{
 
     private final ISecurityStorage securityDB;
 
-    public Authentication(ISecurityStorage securityDB) {
+    public Authenticator(ISecurityStorage securityDB) {
         this.securityDB = securityDB;
     }
 
@@ -26,8 +27,8 @@ public class Authentication {
      * @param password
      * @return The status of the checking
      */
+    @Override
     public boolean checkCredentials(String username, String password) {
-        boolean success = true;
 
         //check from ISecurityStorage the credentials
         return securityDB.checkCredentials(username, password);
@@ -37,8 +38,8 @@ public class Authentication {
      * @param apikey 
      * @return The status of the checking
      */
+    @Override
     public boolean checkCredentials(String apikey) {
-        boolean success = true;
 
         //check from ISecurityStorage the credentials
         return securityDB.checkCredentials(apikey);

@@ -5,8 +5,8 @@
  */
 package gr.demokritos.iit.security;
 
-import gr.demokritos.iit.security.authentication.Authentication;
-import gr.demokritos.iit.security.authorization.Authorization;
+import gr.demokritos.iit.security.authentication.Authenticator;
+import gr.demokritos.iit.security.authorization.Authorizer;
 import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 import gr.demokritos.iit.security.storage.SecurityHBase;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -16,21 +16,29 @@ import org.apache.commons.codec.digest.DigestUtils;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class Security {
+public class SecurityLayer {
 
-    public final Authorization autho;
-    public final Authentication authe;
+    public final Authorizer autho;
+    public final Authenticator authe;
 
-    public Security() {
+    public SecurityLayer() {
 
         //TODO: Change HBase with something global to change storage from settings
         //create ISecurityStorage 
         ISecurityStorage securityDB = new SecurityHBase();
 
         //Create Authentication instance
-        authe = new Authentication(securityDB);
+        authe = new Authenticator(securityDB);
         //Create Authorization instance
-        autho = new Authorization(securityDB);
+        autho = new Authorizer(securityDB);
+    }
+
+    
+    public SecurityLayer(ISecurityStorage securityDB) {
+        //Create Authentication instance
+        authe = new Authenticator(securityDB);
+        //Create Authorization instance
+        autho = new Authorizer(securityDB);
     }
     
     /**

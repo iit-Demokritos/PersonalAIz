@@ -8,7 +8,7 @@ package gr.demokritos.iit.pserver.api;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
-import gr.demokritos.iit.security.Security;
+import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
@@ -33,7 +33,7 @@ public class Personal {
     private final PServerConfiguration psConfig;
     private Client client;
     public static final Logger LOGGER = LoggerFactory.getLogger(Personal.class);
-    public Security security;
+    public SecurityLayer security;
 
     /**
      * The constructor of personal mode.
@@ -55,7 +55,7 @@ public class Personal {
      *
      * @param security
      */
-    public void setSecurity(Security security) {
+    public void setSecurity(SecurityLayer security) {
         this.security = security;
     }
 

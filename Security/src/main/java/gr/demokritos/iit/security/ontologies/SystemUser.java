@@ -17,7 +17,8 @@ public class SystemUser {
     protected Map<String, String> info;
     protected Map<String, String> roles;
     public String username;
-    public String password;
+    public int authenticatedTime = 0;
+    protected String password;
 
     /**
      * Set system user info like name, password, mail
@@ -53,6 +54,25 @@ public class SystemUser {
      */
     public Map<String, String> getRoles() {
         return roles;
+    }
+
+    /**
+     * Set the time in milliseconds for the period that user is authenticated
+     *
+     * @param authenticatedTime The time in milliseconds
+     */
+    public void setAuthenticatedTime(int authenticatedTime) {
+        this.authenticatedTime = authenticatedTime;
+    }
+    
+    
+    /**
+     * Check if user password is equals with the given password
+     * @param givenPassword
+     * @return 
+     */
+    public boolean comparePassword(String givenPassword){
+        return password.equals(givenPassword);
     }
 
 }

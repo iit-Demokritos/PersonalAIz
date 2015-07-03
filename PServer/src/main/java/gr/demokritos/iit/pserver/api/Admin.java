@@ -7,7 +7,7 @@ package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
-import gr.demokritos.iit.security.Security;
+import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
 import gr.demokritos.iit.security.authorization.Actions;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
@@ -30,7 +30,7 @@ public class Admin {
     public static final Logger LOGGER = LoggerFactory.getLogger(Admin.class);
     private final PServerConfiguration psConfig;
     private final Client adminClient;
-    public Security security;
+    public SecurityLayer security;
     private final HashMap<String,Action> actions = new HashMap<>
         (new Actions().getAdminActions());
 
@@ -48,7 +48,7 @@ public class Admin {
      * Set security control for user authorization 
      * @param security 
      */
-    public void setSecurity(Security security) {
+    public void setSecurity(SecurityLayer security) {
         this.security = security;
     }
 

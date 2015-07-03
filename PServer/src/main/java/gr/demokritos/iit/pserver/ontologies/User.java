@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.pserver.ontologies;
 
+import gr.demokritos.iit.utilities.json.JSon;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,13 +22,23 @@ public class User {
     private HashMap<String, String> attributes = new HashMap<>();
     private HashMap<String, String> features = new HashMap<>();
 
+    public User() {
+
+    }
+
     /**
-     * User Constructor
      *
-     * @param userUUID The user UUID
+     * @param JSONUser A JSON string with the user e.g.
+     * {"test1":{"attributes":{"gender": "male","age": "18"},"features":
+     * {"ftr1": "34","ftr3": "3","ftr5": "4"}}}
      */
-    public User(String userUUID) {
-        this.userUID = userUUID;
+    public User(String JSONUser) {
+
+        //convert JSON with users as a HashMap
+        HashMap<String, Object> user = new HashMap<>(
+                JSon.unjsonize(JSONUser, HashMap.class));
+        
+        
 
     }
 

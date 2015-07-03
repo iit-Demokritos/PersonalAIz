@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.security.authorization;
 
+import gr.demokritos.iit.security.interfaces.IAuthorization;
 import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 import gr.demokritos.iit.security.ontologies.SystemUser;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.Map;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class Authorization {
+public class Authorizer implements IAuthorization{
 
     public static final String READ = "R";
     public static final String WRITE = "W";
@@ -22,7 +23,7 @@ public class Authorization {
     private final ISecurityStorage securityDB;
 
    
-    public Authorization(ISecurityStorage securityDB) {
+    public Authorizer(ISecurityStorage securityDB) {
         this.securityDB = securityDB;
     }
 
@@ -33,6 +34,7 @@ public class Authorization {
      * @param a The action
      * @return The result of the permission
      */
+    @Override
     public boolean hasReadAccess(SystemUser u, Action a) {
         //check permission form storage
         return securityDB.checkAccess(u, a, READ);
@@ -45,6 +47,7 @@ public class Authorization {
      * @param a The action
      * @return The result of the permission
      */
+    @Override
     public boolean hasWriteAccess(SystemUser u, Action a) {
         //check permission form storage
         return securityDB.checkAccess(u, a, WRITE);
@@ -57,6 +60,7 @@ public class Authorization {
      * @param a The action
      * @return The result of the permission
      */
+    @Override
     public boolean hasExecuteAccess(SystemUser u, Action a) {
         //check permission form storage
         return securityDB.checkAccess(u, a, EXECUTE);
@@ -69,6 +73,7 @@ public class Authorization {
      * @param a The action
      * @return A map with read - write - execute and permission status
      */
+    @Override
     public Map<String, Boolean> getAccessRights(SystemUser u, Action a) {
         HashMap<String, Boolean> hmRes = new HashMap<>();
         hmRes.put(READ, hasReadAccess(u, a));

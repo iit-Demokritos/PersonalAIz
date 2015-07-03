@@ -3,12 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.security.authentication;
+package gr.demokritos.iit.security.interfaces;
 
 /**
  *
- * @author ggianna
+ * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IAuthentication {
+
     public boolean checkCredentials(String username, String password);
+
+    public boolean checkCredentials(String apikey);
+
 }
