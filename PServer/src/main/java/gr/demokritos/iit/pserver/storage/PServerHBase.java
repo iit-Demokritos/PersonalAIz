@@ -16,9 +16,11 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Delete;
@@ -754,12 +756,19 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            status=false;
             LOGGER.error("Can't load table " + table_Clients, ex);
+            //return the status
+            return false;
         }
 
+        String clientUIDForAdd = getClientUID(client.getUsername());
+        if (clientUIDForAdd == null) {
+            LOGGER.error("Client UID is null");
+            //return the status
+            return false;
+        }
         //Create put method with row key
-        Put put = new Put(Bytes.toBytes(getClientUID(client.getUsername())));
+        Put put = new Put(Bytes.toBytes(clientUIDForAdd));
 
         //add current client info
         for (String cInfo : client.getInfo().keySet()) {
@@ -783,8 +792,9 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.flushCommits();
 
         } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
-            status=false;
             LOGGER.error(null, ex);
+            //return the status
+            return false;
         }
 
         try {
@@ -793,40 +803,57 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.close();
 
         } catch (IOException ex) {
-            status=false;
             LOGGER.error("Can't close table", ex);
+            //return the status
+            return false;
         }
 
         //return the status
         return status;
     }
 
+    
+    /**
+     * Delete a client user form Storage
+     * @param clientName The client's username
+     * @return The status of this action
+     */
     @Override
     public boolean deleteClient(String clientName) {
         boolean status = true;
         HTable clientsTable = null;
-
+        //TODO: REMOVE CLIENTS PSERVER USERS
+        
         try {
-            // Create an hbase clients table object
+            // Create an hbase clients table
             clientsTable = new HTable(config, table_Clients);
 
         } catch (IOException ex) {
-            status=false;
             LOGGER.error("Can't load table " + table_Clients, ex);
+            //return the status
+            return false;
         }
 
         //Add on delete the rowkey
         String clientUIDForDelete = getClientUID(clientName);
+
+        if (clientUIDForDelete == null) {
+            LOGGER.error("Client UID is null");
+            //return the status
+            return false;
+        }
+        
         Delete deleteClient = new Delete(Bytes.toBytes(clientUIDForDelete));
 
         try {
 
-            //delete user record from the table Clients
+            //delete client user from the table Clients
             clientsTable.delete(deleteClient);
 
         } catch (IOException ex) {
-            status=false;
             LOGGER.error("Can't delete client", ex);
+            //return the status
+            return false;
         }
 
         try {
@@ -837,19 +864,24 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             clientsTable.close();
 
         } catch (IOException ex) {
-            status=false;
             LOGGER.error("Can't flush commits or close table", ex);
+            //return the status
+            return false;
         }
 
         //return the status
         return status;
     }
 
+    /**
+     * Get a set with all clients usernames
+     * @return 
+     */
     @Override
-    public Map<String, String> getClients() {
+    public Set<String> getClients() {
 
         //Initialize variables
-        HashMap<String, String> clients = new HashMap<>();
+        HashSet<String> clients = new HashSet<>();
 
         HTable table = null;
         try {
@@ -858,17 +890,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             table = new HTable(config, table_Clients);
 
             Scan scan = new Scan();
-//            if (pattern != null) {
-//
-//                //if pattern is not null then add the filter pattern
-//                scan.setFilter(
-//                        new SingleColumnValueFilter(
-//                        family_Info,
-//                        qualifier_Username,
-//                        CompareFilter.CompareOp.EQUAL,
-//                        Bytes.toBytes(pattern)
-//                ));
-//            }
+
             ResultScanner scanner = table.getScanner(scan);
 
             for (Result cResult : scanner) {
@@ -879,7 +901,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                         cResult.getRow()
                 );
 
-                clients.put(cName, cUID);
+                clients.add(cName);
 
             }
 
@@ -900,6 +922,12 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * If client exists return the exist UID else generate new UID.
+     *
+     * @param clientName The client's name
+     * @return The UID
+     */
     @Override
     public String getClientUID(String clientName) {
         String UID = null;
@@ -929,10 +957,10 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Error on getClientUID", ex);
+            return null;
         }
         return UID;
     }
-
 
     //=================== Administration ======================================
     //=================== Security ======================================

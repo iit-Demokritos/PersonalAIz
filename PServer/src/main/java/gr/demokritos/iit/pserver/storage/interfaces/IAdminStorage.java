@@ -8,6 +8,7 @@ package gr.demokritos.iit.pserver.storage.interfaces;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -20,7 +21,7 @@ public interface IAdminStorage {
 
     boolean deleteClient(String clientName);
 
-    Map<String, String> getClients();
+    Set<String> getClients();
 
     boolean setClientRoles(String clientName, String role);
 

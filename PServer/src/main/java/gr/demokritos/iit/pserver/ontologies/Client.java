@@ -18,7 +18,11 @@ public class Client extends SystemUser {
 
     private HashMap<String, String> keys;
 
-
+    /**
+     * Constructor with clients username and password
+     * @param username
+     * @param password 
+     */
     public Client(String username, String password) {
         super.username = username;
         super.password = password;
@@ -26,6 +30,10 @@ public class Client extends SystemUser {
         this.keys = new HashMap<>();
     }
 
+    /**
+     * Constructor with clients API key
+     * @param apiKey 
+     */
     public Client(String apiKey) {
 
         //TODO: get username pass
