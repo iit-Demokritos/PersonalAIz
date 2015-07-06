@@ -28,6 +28,18 @@ public class Actions {
         adminActions.put("aSetClientRoles", new Action("Admin.setClientRoles"));
         adminActions.put("aGetSettings", new Action("Admin.GetSettings"));
         adminActions.put("aSetSettings", new Action("Admin.SetSettings"));
+        
+
+        //PServer personal actions
+        personalActions.put("aAddUser", new Action("Admin.AddUser"));
+        personalActions.put("aAddUsers", new Action("Admin.AddUsers"));
+        personalActions.put("aDeleteUsers", new Action("Admin.DeleteUsers"));
+        personalActions.put("aSetUserAttributes", new Action("Admin.SetUserAttributes"));
+        personalActions.put("aSetUserFeatures", new Action("Admin.SetUserFeatures"));
+        personalActions.put("aModifyUserFeatures", new Action("Admin.ModifyUserFeatures"));
+        personalActions.put("aGetUserAttributes", new Action("Admin.GetUserAttributes"));
+        personalActions.put("aGetUserFeatures", new Action("Admin.GetUserFeatures"));
+        personalActions.put("aGetUsers", new Action("Admin.GetUsers"));
 
     }
 

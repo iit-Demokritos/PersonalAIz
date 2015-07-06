@@ -6,7 +6,6 @@
 package gr.demokritos.iit.pserver.storage.interfaces;
 
 import gr.demokritos.iit.pserver.ontologies.User;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,16 +21,13 @@ public interface IPersonalStorage {
 
     Map<String, String> getUsers(String pattern, Integer page);
 
-    boolean setUsersAttributes(List<User> users);
+    boolean setUserAttributes(User user);
 
     Map<String, String> getUserAttributes(String username, String pattern, Integer page);
 
-    boolean setUsersFeatures(ArrayList<User> users);
+    boolean setUserFeatures(User user);
+
+    boolean modifyUserFeatures(User user);
 
     Map<String, String> getUserFeatures(String username, String pattern, Integer page);
-
-    boolean modifyUsersFeatures(List<User> usersList);
-
-    String getUserUID(String username);
-
 }

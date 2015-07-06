@@ -10,10 +10,11 @@ import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
 import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
+import gr.demokritos.iit.security.authorization.Actions;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
-import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,19 +32,21 @@ public class Personal {
 
     private final IPersonalStorage dbPersonal;
     private final PServerConfiguration psConfig;
-    private Client client;
+    private final Client psClient;
     public static final Logger LOGGER = LoggerFactory.getLogger(Personal.class);
     public SecurityLayer security;
+    private final HashMap<String, Action> actions = new HashMap<>(new Actions().getPersonalActions());
 
     /**
      * The constructor of personal mode.
      *
      * @param dbPersonal
+     * @param psClient
      */
-    public Personal(IPersonalStorage dbPersonal, Client c) {
+    public Personal(IPersonalStorage dbPersonal, Client psClient) {
         this.psConfig = new PServerConfiguration();
         this.dbPersonal = dbPersonal;
-        this.client = c;
+        this.psClient = psClient;
         security = null;
 
         //Update logging level 
@@ -60,165 +63,137 @@ public class Personal {
     }
 
     /**
-     * Add a list of users on PServer Storage. This function help us to add
-     * massive, users on PServer. Features or Attributes is optional.
+     * Add a PServer User on Storage.
      *
-     * @param JSONUsers A JSON string with the users e.g.
-     * {"test1":{"attributes":{"gender": "male","age": "18"},"features":
-     * {"ftr1": "34","ftr3": "3","ftr5": "4"}}}
-     * @return A JSON response with method status
+     * @param user A PServer User
+     * @return the status of this action
      */
-    public boolean addUsers(String JSONUsers) {
-        //convert JSON with users as a HashMap
-        HashMap<String, Object> users = new HashMap<>(
-                JSon.unjsonize(JSONUsers, HashMap.class));
+    public boolean addUser(User user) {
 
-        ArrayList<User> usersList = new ArrayList<>();
-
-        //for each username create User object and add it on the list
-        for (String cUser : users.keySet()) {
-
-            // Get user UUID
-            String UUID = dbPersonal.getUserUID(cUser);
-
-            //Create new user object
-            User user = new User(UUID);
-
-            //add info on user
-            HashMap<String, String> info = new HashMap<>();
-
-            //set the user info
-            user.setInfo(info);
-
-            HashMap<String, HashMap<String, String>> userMap
-                    = new HashMap<>();
-            userMap.putAll(
-                    (Map<? extends String, ? extends HashMap<String, String>>) users.get(cUser)
-            );
-
-            //add attributes on userfeatures.putAll(dbPersonal.getUserFeatures(user, pattern, page));
-//        output.setOutputCode(100);
-//
-//        if (page != null) {
-//            output.setCustomOutputMessage("page " + PServerHBase.paging);
-//        }
-//        
-            if (userMap.containsKey("attributes")) {
-
-                HashMap<String, String> attributes = new HashMap<>();
-                attributes.putAll(userMap.get("attributes"));
-
-                //set attributes on user
-                user.setAttributes(attributes);
-            }
-
-            //add features on user
-            if (userMap.containsKey("features")) {
-
-                HashMap<String, String> features = new HashMap<>();
-                features.putAll(userMap.get("features"));
-
-                //set features on user
-                user.setFeatures(features);
-            }
-
-            //add user on the users lsit
-            usersList.add(user);
+        //Check permission
+        if (!getPermissionFor(actions.get("aAddUser"), "W")) {
+            //TODO:  throw exeption   
+            return false;
         }
 
+        ArrayList<User> usersList = new ArrayList<>();
+        usersList.add(user);
+
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
         // call HBase AddUsers to add the users in HBase Storage 
         // and set the output code
-//        output.setCustomOutputMessage("custom message");
         return dbPersonal.addUsers(usersList);
     }
 
+    /**
+     * Add a list of PServer Users on Storage. This function help us to add
+     * massive, users on PServer.
+     *
+     * @param usersList A list of PServer Users
+     * @return the status of this action
+     */
+    public boolean addUsers(ArrayList<User> usersList) {
+
+        //Check permission
+        if (!getPermissionFor(actions.get("aAddUsers"), "W")) {
+            //TODO:  throw exeption   
+            return false;
+        }
+
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
+        // call HBase AddUsers to add the users in HBase Storage 
+        // and set the output code
+        return dbPersonal.addUsers(usersList);
+    }
+    
     /**
      * Delete users from PServer storage basic on given pattern. If pattern is
      * null then the function will delete all users for this client.
      *
      * @param pattern The user pattern that we want to delete
-     * @return A JSON response with method status
+     * @return A boolean status true/false if delete complete or not
      */
     public boolean deleteUsers(String pattern) {
+
+        //Check permission
+        if (!getPermissionFor(actions.get("aDeleteUsers"), "X")) {
+            //TODO:  throw exeption   
+            return false;
+        }
+
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
         //call storage delete Users function with the pattern and add the return 
         return dbPersonal.deleteUsers(pattern);
     }
 
     /**
-     * Get a list with users in PServer basic on the given pattern.
+     * Get a set with users in PServer basic on the given pattern.
      *
      * @param pattern The username pattern that we want in the user list. If the
      * pattern is null then the returned a list which contain the whole users.
      * @param page The page number. Page number will be greater or equal than 1
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
-     * null or page<1 then return all elements in a single page. @return A JSON
-     * response with the user s list @return
+     * null or page<1 then return all elements in a single page. 
+     * @return A set with the usernames. If return is null then permission denied
      */
     public Set<String> getUsers(String pattern, Integer page) {
-//        ArrayList<String> users = new ArrayList<>();
+
+        //Check permission
+        if (!getPermissionFor(actions.get("aGetUsers"), "R")) {
+            //TODO:  throw exeption   
+            return null;
+        }
 
         //Check if page is null or page <1
         if (page == null || page < 1) {
             //set page null to return single page
             page = null;
         }
-        //Call HBase to get Users
-//        users.addAll(db.getUsers(pattern, page).keySet());
-//        output.setOutputCode(100);
-////        output.setCustomOutputMessage("test");
-//        if (page != null) {
-//            output.setCustomOutputMessage("page " + PServerHBase.paging);
-//        }
-//        output.setOutput(users);
+
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
 
         return dbPersonal.getUsers(pattern, page).keySet();
     }
 
     /**
-     * Massive Set for each user in the list, the given attributes. If username
-     * not exists then will be added on PServer.
+     * Set the attributes for the given PServer User. If username not exists
+     * then will be added on PServer.
      *
-     * @param JSONUsersAttributes A JSON string with usernames and for each
-     * username a key-value pairs. Key is the attribute name and value is the
-     * attributes value. e.g. {"user1":{"gender":"male", "age":"18",
-     * ...},"user2":{"gender":"fmale", "age":"28", ...}}
-     * @return A JSON response with method succeed
+     * @param username The username of the user that we want to set the
+     * attributes
+     * @param attributes A map with pairs of attribute name - attribute value
+     * @return A boolean status true/false if setUserAttributes complete or not
      */
-    public boolean setUsersAttributes(String JSONUsersAttributes) {
-        //convert JSON with users as a HashMap
-        HashMap<String, HashMap<String, String>> users
-                = new HashMap<>(
-                        JSon.unjsonize(JSONUsersAttributes, HashMap.class));
+    public boolean setUserAttributes(String username,
+            HashMap<String, String> attributes) {
 
-        ArrayList<User> usersList = new ArrayList<>();
-
-        //for each username create User object and add it on the list
-        for (String cUser : users.keySet()) {
-
-            //get current user UID
-            String cUUID = dbPersonal.getUserUID(cUser);
-
-            // Create new User object
-            User user = new User(cUUID);
-            user.setUsername(cUser);
-
-            HashMap<String, String> attributes = new HashMap<>();
-            attributes.putAll(users.get(cUser));
-
-            //set attributes on user
-            user.setAttributes(attributes);
-
-            //add user on the users lsit
-            usersList.add(user);
+        //Check permission
+        if (!getPermissionFor(actions.get("aSetUserAttributes"), "W")) {
+            //TODO:  throw exeption   
+            return false;
         }
 
-        // call HBase setUsersAttributes to set the users Attributes in HBase Storage
-        return dbPersonal.setUsersAttributes(usersList);
+        // Create new User object
+        User user = new User();
+        user.setUsername(username);
+
+        //set attributes on user
+        user.setAttributes(attributes);
+
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
+
+        // call HBase setUserAttributes to set the user Attributes in HBase Storage
+        return dbPersonal.setUserAttributes(user);
     }
 
     /**
-     * Get the attribute list for the given user.
+     * Get a map with the user attributes.
      *
      * @param user The username that we want the attribute list.
      * @param pattern The attribute pattern that we want in the attribute list.
@@ -228,10 +203,16 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null then return all elements in a single page.
-     * @return A JSON response with the attribute list
+     * @return A map with user attribute name - value pairs. If return is null then permission denied
      */
-    public Map<String, String> getUserAttributes(String user, String pattern, Integer page) {
-        HashMap<String, String> attributes = new HashMap<>();
+    public Map<String, String> getUserAttributes(String user,
+            String pattern, Integer page) {
+
+        //Check permission
+        if (!getPermissionFor(actions.get("aGetUserAttributes"), "R")) {
+            //TODO:  throw exeption   
+            return null;
+        }
 
         //Check if page is null or page <1
         if (page == null || page < 1) {
@@ -239,99 +220,77 @@ public class Personal {
             page = null;
         }
 
-//        attributes.putAll(dbPersonal.getUserAttributes(user, pattern, page));
-//        output.setOutputCode(100);
-////        output.setCustomOutputMessage("test");
-//        if (page != null) {
-//            output.setCustomOutputMessage("page " + PServerHBase.paging);
-//        }
-//        output.setOutput(attributes);
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
+
         //Call HBase to get User attributes
         return dbPersonal.getUserAttributes(user, pattern, page);
     }
 
     /**
-     * Massive Set for each user in the list, the given features. If username
-     * not exists then will be added on PServer.
+     * Set the features for the given PServer User. If username not exists then
+     * will be added on PServer.
      *
-     * @param JSONUsersFeatures A JSON string with usernames and for each
-     * username a with key-value pairs. Key is the feature name and value. e.g.
-     * {"user1":{"category.sport":"1", "category.economics":"8", ...},
-     * "user2":{"category.sport":"12", "category.economics":"82", ...},...}
-     * @return A JSON response with method succeed
+     * @param username The username
+     * @param features A map with user feature name - value
+     * @return A boolean status true/false if setUserFeatures complete or not
      */
-    public boolean setUsersFeatures(String JSONUsersFeatures) {
-        //convert JSON with users as a HashMap
-        HashMap<String, HashMap<String, String>> users
-                = new HashMap<>(JSon.unjsonize(JSONUsersFeatures, HashMap.class));
+    public boolean setUserFeatures(String username,
+            HashMap<String, String> features) {
 
-        ArrayList<User> usersList = new ArrayList<>();
-
-        //for each username create User object and add it on the list
-        for (String cUser : users.keySet()) {
-            //get current user UID
-            String cUUID = dbPersonal.getUserUID(cUser);
-
-            //Create user object
-            User user = new User(cUUID);
-            user.setUsername(cUser);
-
-            HashMap<String, String> features = new HashMap<>();
-            features.putAll(users.get(cUser));
-
-            //set features on user
-            user.setFeatures(features);
-
-            //add user on the users lsit
-            usersList.add(user);
+        //Check permission
+        if (!getPermissionFor(actions.get("aSetUserFeatures"), "W")) {
+            //TODO:  throw exeption   
+            return false;
         }
 
+        //Create user object
+        User user = new User();
+        user.setUsername(username);
+
+        //set features on user
+        user.setFeatures(features);
+
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
+
         // call HBase setUsersFeatures to set the users Features in HBase Storage
-        return dbPersonal.setUsersFeatures(usersList);
+        return dbPersonal.setUserFeatures(user);
     }
 
     /**
-     * Massive Modify (increase/decrease) for each user in the list, the given
-     * features. If username not exists then will be added on PServer.
+     * Modify the features for the given PServer User. If username not exists
+     * then will be added on PServer.
      *
-     * @param JSONUsersFeatures A JSON string with usernames and for each
-     * username a key-value pairs. Key is the feature name and value is the
-     * modification number. e.g. {"user1":{"category.sport":"-1",
-     * "category.economics":"8", ...}, "user2":{"category.sport":"12",
-     * "category.economics":"-2", ...},...}
-     * @return A JSON response with method succeed
+     * @param username The username
+     * @param features A map with user feature name - value (to modify)
+     * @return A boolean status true/false if setUserFeatures complete or not
      */
-    public boolean modifyUsersFeatures(String JSONUsersFeatures) {
-        //convert JSON with users as a HashMap
-        HashMap<String, HashMap<String, String>> users
-                = new HashMap<>(JSon.unjsonize(JSONUsersFeatures, HashMap.class));
+    public boolean modifyUserFeatures(String username,
+            HashMap<String, String> features) {
 
-        ArrayList<User> usersList = new ArrayList<>();
-
-        //for each username create User object and add it on the list
-        for (String cUser : users.keySet()) {
-            //get current user UID
-            String cUUID = dbPersonal.getUserUID(cUser);
-
-            User user = new User(cUUID);
-            user.setUsername(cUser);
-
-            HashMap<String, String> features = new HashMap<>();
-            features.putAll(users.get(cUser));
-
-            //set features on user
-            user.setFeatures(features);
-
-            //add user on the users lsit
-            usersList.add(user);
+        //Check permission
+        if (!getPermissionFor(actions.get("aModifyUserFeatures"), "W")) {
+            //TODO:  throw exeption   
+            return false;
         }
 
-        // call HBase setUsersFeatures to set the users Features in HBase Storage
-        return dbPersonal.modifyUsersFeatures(usersList);
+        User user = new User();
+        user.setUsername(username);
+
+        //set features on user
+        user.setFeatures(features);
+
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
+        
+        // call HBase modifyUserFeatures to set the users Features in HBase Storage
+        return dbPersonal.modifyUserFeatures(user);
     }
 
+
     /**
-     * Get the user profile. User profile is a list with user's features and
+     * Get the user profile. User profile is a Map with user's features and
      * their values.
      *
      * @param user The username that we want to get the profile
@@ -341,31 +300,45 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null then return all elements in a single page.
-     * @return A JSON response with the user's profile. A list of key-value
-     * pairs for user's features.
+     * @return A map of key-value pairs for user's features. If return is null then permission denied
      */
-    public Map<String, String> getUserFeatures(String user, String pattern, Integer page) {
-        HashMap<String, String> features = new HashMap<>();
-
+    public Map<String, String> getUserFeatures(String user, 
+            String pattern, Integer page) {
+       
+        //Check permission
+        if (!getPermissionFor(actions.get("aGetUserFeatures"), "R")) {
+            //TODO:  throw exeption   
+            return null;
+        }
+        
         //Check if page is null or page <1
         if (page == null || page < 1) {
             //set page null to return single page
             page = null;
         }
+        //update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
 
-//        features.putAll(dbPersonal.getUserFeatures(user, pattern, page));
-//        output.setOutputCode(100);
-//
-//        if (page != null) {
-//            output.setCustomOutputMessage("page " + PServerHBase.paging);
-//        }
-//        output.setOutput(features);
         //Call HBase to get User features
         return dbPersonal.getUserFeatures(user, pattern, page);
     }
 
+    /**
+     * Get the permission for the given action and client
+     *
+     * @param a The action that we want to check the permission
+     * @param sAccessType The access type R (read) - W (write) - X (execute)
+     * @return A true or false if the permission granted
+     */
     public boolean getPermissionFor(Action a, String sAccessType) {
-        return ((security != null) && (security.autho.getAccessRights(client, a).get(
-                sAccessType)));
+        Date dt = new Date();
+        //10 minute before
+        long frame = 600;
+
+        //If security is not null and access granted and frame is < 10minutes
+        //then return true
+        return ((security != null) && (security.autho.getAccessRights(psClient, a)
+                .get(sAccessType)) && (psClient.authenticatedTimestamp != 0)
+                && ((dt.getTime() - psClient.authenticatedTimestamp) < frame));
     }
 }

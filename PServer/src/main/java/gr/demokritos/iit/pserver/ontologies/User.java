@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class User {
 
-    private String userUID;
+//    private String userUID;
     private String username;
     private HashMap<String, String> info = new HashMap<>();
     private HashMap<String, String> attributes = new HashMap<>();
@@ -38,6 +38,59 @@ public class User {
         HashMap<String, Object> user = new HashMap<>(
                 JSon.unjsonize(JSONUser, HashMap.class));
         
+//        ArrayList<User> usersList = new ArrayList<>();
+//        
+//          //for each username create User object and add it on the list
+//        for (String cUser : users.keySet()) {
+//
+//            // Get user UUID
+//            String UUID = dbPersonal.getUserUID(cUser);
+//
+//            //Create new user object
+//            User user = new User(UUID);
+//
+//            //add info on user
+//            HashMap<String, String> info = new HashMap<>();
+//
+//            //set the user info
+//            user.setInfo(info);
+//
+//            HashMap<String, HashMap<String, String>> userMap
+//                    = new HashMap<>();
+//            userMap.putAll(
+//                    (Map<? extends String, ? extends HashMap<String, String>>) users.get(cUser)
+//            );
+//
+//            //add attributes on userfeatures.putAll(dbPersonal.getUserFeatures(user, pattern, page));
+////        output.setOutputCode(100);
+////
+////        if (page != null) {
+////            output.setCustomOutputMessage("page " + PServerHBase.paging);
+////        }
+////        
+//            if (userMap.containsKey("attributes")) {
+//
+//                HashMap<String, String> attributes = new HashMap<>();
+//                attributes.putAll(userMap.get("attributes"));
+//
+//                //set attributes on user
+//                user.setAttributes(attributes);
+//            }
+//
+//            //add features on user
+//            if (userMap.containsKey("features")) {
+//
+//                HashMap<String, String> features = new HashMap<>();
+//                features.putAll(userMap.get("features"));
+//
+//                //set features on user
+//                user.setFeatures(features);
+//            }
+//
+//            //add user on the users lsit
+//            usersList.add(user);
+//        }
+//        
         
 
     }
@@ -50,9 +103,9 @@ public class User {
         return username;
     }
 
-    public String getUserUID() {
-        return userUID;
-    }
+//    public String getUserUID() {
+//        return userUID;
+//    }
 
     public void setInfo(HashMap<String, String> info) {
         this.info = info;

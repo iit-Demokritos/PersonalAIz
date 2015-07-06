@@ -7,7 +7,6 @@ package gr.demokritos.iit.pserver.storage.interfaces;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,7 +26,6 @@ public interface IAdminStorage {
 
     List<String> getClientRoles(String clientName);
 
-    String getClientUID(String clientName);
 
     //========================== Client =======================================
 //    //=========================== Roles =======================================
@@ -38,5 +36,4 @@ public interface IAdminStorage {
 //    Map<String, Boolean> getRoleActions(String roleName);
 //
 //    //=========================== Roles =======================================
-
 }

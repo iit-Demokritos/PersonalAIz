@@ -67,26 +67,13 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     private final byte[] qualifier_Password = Bytes.toBytes("Password");
 
     //=================== HBase Qualifiers ====================================
-    private Configuration config;
+    private final Configuration config;
     private String clientUID;
     private final Integer pageSize = 20;
     public static String paging;
 
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PServerHBase.class);
 
-//    /**
-//     * The constructor of PServer HBase storage system.
-//     *
-//     * @param clientUID
-//     */
-//    public PServerHBase(String clientUID) {
-//        //Set client UID on a global private variable
-//        this.clientUID = clientUID;
-//
-//        //Create new HBase configuration
-//        config = HBaseConfiguration.create();
-//
-//    }
     /**
      * The constructor of PServer HBase storage system.
      */
@@ -100,12 +87,13 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * Add a list of user objects on HBase
      *
      * @param users A list with all users that i want to add on
-     * @return the Output code
+     * @return The status of this action
      */
     @Override
     public boolean addUsers(
             List<User> users) {
 
+        boolean status = true;
         HTable usersTable = null;
         HTable clientsTable = null;
 
@@ -119,6 +107,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Add Users failed", ex);
+            return false;
         }
 
         //Create put method with clients row key
@@ -128,10 +117,10 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         for (User user : users) {
 
             //Create put method with row key
-            Put put = new Put(Bytes.toBytes(user.getUserUID()));
+            Put put = new Put(Bytes.toBytes(getUserUID(user.getUsername())));
 
             //-----------------------------------------------
-            Increment inc = new Increment(Bytes.toBytes(user.getUserUID()));
+            Increment inc = new Increment(Bytes.toBytes(getUserUID(user.getUsername())));
 
             //------------------------------------------------
             //add current user info
@@ -181,6 +170,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             } catch (RetriesExhaustedWithDetailsException | InterruptedIOException ex) {
                 LOGGER.error("Add Users failed", ex);
+                return false;
             }
 
             //if increment is not null then add to user table
@@ -192,13 +182,14 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
                 } catch (IOException ex) {
                     LOGGER.error("Add Users failed", ex);
+                    return false;
                 }
             }
 
             //put username and UUID on clients user PUT
             putClientUsers.add(family_ClientUsers,
                     Bytes.toBytes(user.getUsername()),
-                    Bytes.toBytes(user.getUserUID()));
+                    Bytes.toBytes(getUserUID(user.getUsername())));
         }
 
         try {
@@ -210,10 +201,9 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             usersTable.flushCommits();
             clientsTable.flushCommits();
 
-        } catch (InterruptedIOException ex) {
+        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
             LOGGER.error("Add Users failed", ex);
-        } catch (RetriesExhaustedWithDetailsException ex) {
-            LOGGER.error("Add Users failed", ex);
+            return false;
         }
 
         try {
@@ -224,10 +214,11 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Add Users failed", ex);
+            return false;
         }
 
-        //TODO: change status
-        return true;
+        //return the action status
+        return status;
 
     }
 
@@ -235,11 +226,12 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * Delete users from HBase storage
      *
      * @param pattern the pattern of the users that i want to delete
-     * @return the Output code
+     * @return The status of this action
      */
     @Override
     public boolean deleteUsers(String pattern) {
 
+        boolean status = true;
         HTable usersTable = null;
         HTable clientsTable = null;
         HashMap<String, String> usersForDelete;
@@ -253,6 +245,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Can't create usersTable or clientsTable", ex);
+            return false;
         }
 
         //get all users basic on pattern
@@ -272,6 +265,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             } catch (IOException ex) {
                 LOGGER.error("Can't delete user:" + cUserName + " from userTable", ex);
+                return false;
             }
 
             //add delete column record for the current user
@@ -289,6 +283,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Can't delete client user from clientsTable", ex);
+            return false;
         }
 
         try {
@@ -299,10 +294,11 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Error on close tables", ex);
+            return false;
         }
 
-        //TODO: change real status code
-        return true;
+        //the action status
+        return status;
     }
 
     /**
@@ -326,6 +322,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Can't create clientsTable", ex);
+            return null;
         }
 
         Get get = new Get(Bytes.toBytes(clientUID));
@@ -357,6 +354,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             } catch (IOException ex) {
                 LOGGER.error("Error on table get", ex);
+                return null;
             }
 
             if ((totalItems % pageSize) != 0) {
@@ -376,6 +374,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Error on table get", ex);
+            return null;
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_ClientUsers);
@@ -394,14 +393,14 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     /**
      * Set the User's Attributes
      *
-     * @param users A list with user object and the the attributes that i want
-     * to set
-     * @return the Output code
+     * @param user A PServer User object
+     * @return The status of this action
      */
     @Override
-    public boolean setUsersAttributes(List<User> users) {
-
-        return addUsers(users);
+    public boolean setUserAttributes(User user) {
+        ArrayList<User> usersList = new ArrayList<>();
+        usersList.add(user);
+        return addUsers(usersList);
     }
 
     /**
@@ -438,6 +437,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Can't load table " + table_Users, ex);
+            return null;
         }
 
         Get get = new Get(Bytes.toBytes(userUID));
@@ -469,6 +469,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             } catch (IOException ex) {
                 LOGGER.error("Error on get from table", ex);
+                return null;
             }
 
             if ((totalItems % pageSize) != 0) {
@@ -488,6 +489,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Error on get from table", ex);
+            return null;
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Attributes);
@@ -509,14 +511,14 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      *
      * Set the User's Features
      *
-     * @param users A list with user object and the the attributes that i want
-     * to set
-     * @return the Output code
+     * @param user A PServer User object
+     * @return The status of this action
      */
     @Override
-    public boolean setUsersFeatures(ArrayList<User> users) {
-
-        return addUsers(users);
+    public boolean setUserFeatures(User user) {
+        ArrayList<User> usersList = new ArrayList<>();
+        usersList.add(user);
+        return addUsers(usersList);
     }
 
     /**
@@ -554,6 +556,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Can't load table " + table_Users, ex);
+            return null;
         }
 
         Get get = new Get(Bytes.toBytes(userUID));
@@ -585,6 +588,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             } catch (IOException ex) {
                 LOGGER.error("Error on get from table", ex);
+                return null;
             }
 
             if ((totalItems % pageSize) != 0) {
@@ -605,6 +609,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Error on get from table", ex);
+            return null;
         }
 
         NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Features);
@@ -635,13 +640,14 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
     /**
-     * Increase or decrease Users features
+     * Increase or decrease User features
      *
-     * @param usersList
-     * @return
+     * @param user A PServer User object
+     * @return The status of this action
      */
     @Override
-    public boolean modifyUsersFeatures(List<User> usersList) {
+    public boolean modifyUserFeatures(User user) {
+        boolean status = true;
 
         //create new Users HTable
         HTable usersTable = null;
@@ -652,26 +658,24 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Can't load table " + table_Users, ex);
+            return false;
         }
 
-        //for each user
-        for (User user : usersList) {
+        Increment inc = new Increment(Bytes.toBytes(getUserUID(user.getUsername())));
+        //add current user features
+        for (String cFeature : user.getFeatures().keySet()) {
+            inc.addColumn(family_Features,
+                    Bytes.toBytes(cFeature),
+                    Long.parseLong(user.getFeatures().get(cFeature)));
+        }
 
-            Increment inc = new Increment(Bytes.toBytes(user.getUserUID()));
-            //add current user features
-            for (String cFeature : user.getFeatures().keySet()) {
-                inc.addColumn(family_Features,
-                        Bytes.toBytes(cFeature),
-                        Long.parseLong(user.getFeatures().get(cFeature)));
-            }
+        try {
 
-            try {
+            usersTable.increment(inc);
 
-                usersTable.increment(inc);
-
-            } catch (IOException ex) {
-                LOGGER.error("Error on increment the values for the user " + user, ex);
-            }
+        } catch (IOException ex) {
+            LOGGER.error("Error on increment the values for the user " + user, ex);
+            return false;
         }
 
         try {
@@ -681,6 +685,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
             LOGGER.error("Can't flush the commits", ex);
+            return false;
         }
 
         try {
@@ -690,10 +695,11 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         } catch (IOException ex) {
             LOGGER.error("Can't close table", ex);
+            return false;
         }
 
-        //TODO: change with real status 
-        return true;
+        //The action status
+        return status;
     }
 
     /**
@@ -703,8 +709,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * @param username The username that i want the UUID
      * @return the UUID for the given username
      */
-    @Override
-    public String getUserUID(String username) {
+    private String getUserUID(String username) {
         String UUID = null;
         try {
 
@@ -812,9 +817,9 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         return status;
     }
 
-    
     /**
      * Delete a client user form Storage
+     *
      * @param clientName The client's username
      * @return The status of this action
      */
@@ -823,7 +828,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         boolean status = true;
         HTable clientsTable = null;
         //TODO: REMOVE CLIENTS PSERVER USERS
-        
+
         try {
             // Create an hbase clients table
             clientsTable = new HTable(config, table_Clients);
@@ -842,7 +847,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             //return the status
             return false;
         }
-        
+
         Delete deleteClient = new Delete(Bytes.toBytes(clientUIDForDelete));
 
         try {
@@ -875,7 +880,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     /**
      * Get a set with all clients usernames
-     * @return 
+     *
+     * @return
      */
     @Override
     public Set<String> getClients() {
@@ -928,8 +934,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      * @param clientName The client's name
      * @return The UID
      */
-    @Override
-    public String getClientUID(String clientName) {
+    private String getClientUID(String clientName) {
         String UID = null;
         try {
 
