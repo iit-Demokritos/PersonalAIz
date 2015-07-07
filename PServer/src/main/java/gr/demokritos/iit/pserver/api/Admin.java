@@ -31,7 +31,7 @@ public class Admin {
     public static final Logger LOGGER = LoggerFactory.getLogger(Admin.class);
     private final PServerConfiguration psConfig;
     private final Client adminClient;
-    public SecurityLayer security;
+    private SecurityLayer security;
     private final HashMap<String, Action> actions = new HashMap<>(new Actions().getAdminActions());
 
     public Admin(IAdminStorage dbAdmin, Client adminClient) {

@@ -9,6 +9,7 @@ import gr.demokritos.iit.pserver.api.Admin;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.storage.PServerHBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
+import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
 import java.util.HashMap;
@@ -21,6 +22,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -30,8 +33,11 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class AdminREST {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminREST.class);
     private final PServerHBase db = new PServerHBase();
     private Admin admin;
+    private final SecurityLayer security = new SecurityLayer();
+    private Output output;
 
     /**
      *
@@ -50,6 +56,20 @@ public class AdminREST {
             @QueryParam("info") String clientInfo
     ) {
 
+        // Check the api key Credentials
+        if (!security.authe.checkCredentials(userKey)) {
+            //TODO: return JSON    
+            return null;
+        }
+
+        // Create PServer Admin instance
+        admin = new Admin(db, new Client(userKey));
+
+        //set security layer on PServer Admin
+        admin.setSecurity(security);
+        
+        
+        
         HashMap<String, String> info = new HashMap<String, String>();
         if (clientInfo != null) {
             info.putAll(JSon.unjsonize(clientInfo, HashMap.class));
@@ -57,7 +77,9 @@ public class AdminREST {
 
         admin.addClient(clientName, clientPass, info);
 
-        return null;
+        
+        
+        return JSon.jsonize(output, Output.class);
     }
 
     /**
@@ -68,12 +90,26 @@ public class AdminREST {
      */
     @Path("client/{clientName}")
     @DELETE
-    public String deleteClients(
+    public String deleteClient(
             @PathParam("userKey") String userKey,
             @DefaultValue("*") @PathParam("clientName") String clientName
     ) {
 
-        return null;
+        if (!security.authe.checkCredentials(userKey)) {
+            //TODO: return JSON    
+            return null;
+        }
+
+        // Create PServer Admin instance
+        admin = new Admin(db, new Client(userKey));
+
+        //set security layer on PServer Admin
+        admin.setSecurity(security);
+        
+        
+        
+        
+        return JSon.jsonize(output, Output.class);
     }
 
     /**
@@ -90,8 +126,20 @@ public class AdminREST {
             @DefaultValue("*") @QueryParam("pattern") String pattern,
             @DefaultValue("*") @QueryParam("page") String page
     ) {
+        if (!security.authe.checkCredentials(userKey)) {
+            //TODO: return JSON    
+            return null;
+        }
+        // Create PServer Admin instance
+        admin = new Admin(db, new Client(userKey));
 
-        return null;
+        //set security layer on PServer Admin
+        admin.setSecurity(security);
+        
+        
+        
+        
+        return JSon.jsonize(output, Output.class);
     }
 
     /**
@@ -104,8 +152,19 @@ public class AdminREST {
     public String setSettings(
             @PathParam("userKey") String userKey
     ) {
+        if (!security.authe.checkCredentials(userKey)) {
+            //TODO: return JSON    
+            return null;
+        }
+        // Create PServer Admin instance
+        admin = new Admin(db, new Client(userKey));
 
-        return null;
+        //set security layer on PServer Admin
+        admin.setSecurity(security);
+        
+        
+        
+        return JSon.jsonize(output, Output.class);
     }
 
     /**
@@ -119,21 +178,19 @@ public class AdminREST {
             @PathParam("userKey") String userKey
     ) {
 
-        return null;
-    }
+        if (!security.authe.checkCredentials(userKey)) {
+            //TODO: return JSON    
+            return null;
+        }
+        // Create PServer Admin instance
+        admin = new Admin(db, new Client(userKey));
 
-    /**
-     * Create an administrator object
-     *
-     * @param apiKey
-     * @return
-     */
-    private void createAdmin(String apiKey) {
-        //Create a Client with given apiKey
-        Client adminClient = new Client(apiKey);
-        //Create pserver admin
-        admin = new Admin(db, adminClient);
-
+        
+        //set security layer on PServer Admin
+        admin.setSecurity(security);
+        
+        
+        return JSon.jsonize(output, Output.class);
     }
 
 }
