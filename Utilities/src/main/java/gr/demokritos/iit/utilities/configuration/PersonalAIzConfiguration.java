@@ -14,6 +14,9 @@ public class PersonalAIzConfiguration extends Configuration {
     public static String PERSONALAIZ_PROPERTIES = "PersonalAIz.properties";
 
     public PersonalAIzConfiguration(String configurationFileName) {
+        super(configurationFileName);
+    }
+    public PersonalAIzConfiguration() {
         super(PERSONALAIZ_PROPERTIES);
     }
 

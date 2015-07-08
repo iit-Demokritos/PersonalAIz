@@ -16,6 +16,7 @@ import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -81,9 +82,9 @@ public class Personal {
 
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
+
         // call HBase AddUsers to add the users in HBase Storage 
-        // and set the output code
-        return dbPersonal.addUsers(usersList);
+        return dbPersonal.addUsers(usersList, psClient.username);
     }
 
     /**
@@ -93,7 +94,7 @@ public class Personal {
      * @param usersList A list of PServer Users
      * @return the status of this action
      */
-    public boolean addUsers(ArrayList<User> usersList) {
+    public boolean addUsers(List<User> usersList) {
 
         //Check permission
         if (!getPermissionFor(actions.get("aAddUsers"), "W")) {
@@ -103,16 +104,16 @@ public class Personal {
 
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
+
         // call HBase AddUsers to add the users in HBase Storage 
-        // and set the output code
-        return dbPersonal.addUsers(usersList);
+        return dbPersonal.addUsers(usersList, psClient.username);
     }
-    
+
     /**
      * Delete users from PServer storage basic on given pattern. If pattern is
      * null then the function will delete all users for this client.
      *
-     * @param pattern The user pattern that we want to delete
+     * @param pattern The user pattern that we want to delete. If pattern is null then delete all user.
      * @return A boolean status true/false if delete complete or not
      */
     public boolean deleteUsers(String pattern) {
@@ -125,8 +126,9 @@ public class Personal {
 
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
+       
         //call storage delete Users function with the pattern and add the return 
-        return dbPersonal.deleteUsers(pattern);
+        return dbPersonal.deleteUsers(pattern, psClient.username);
     }
 
     /**
@@ -157,7 +159,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        return dbPersonal.getUsers(pattern, page).keySet();
+        return dbPersonal.getUsers(pattern, page, psClient.username).keySet();
     }
 
     /**
@@ -179,8 +181,7 @@ public class Personal {
         }
 
         // Create new User object
-        User user = new User();
-        user.setUsername(username);
+        User user = new User(username);
 
         //set attributes on user
         user.setAttributes(attributes);
@@ -189,7 +190,7 @@ public class Personal {
         psClient.updateAuthenticatedTimestamp();
 
         // call HBase setUserAttributes to set the user Attributes in HBase Storage
-        return dbPersonal.setUserAttributes(user);
+        return dbPersonal.setUserAttributes(user, psClient.username);
     }
 
     /**
@@ -203,7 +204,8 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null then return all elements in a single page.
-     * @return A map with user attribute name - value pairs. If return is null then permission denied
+     * @return A map with user attribute name - value pairs. If return is null
+     * then permission denied
      */
     public Map<String, String> getUserAttributes(String user,
             String pattern, Integer page) {
@@ -224,7 +226,7 @@ public class Personal {
         psClient.updateAuthenticatedTimestamp();
 
         //Call HBase to get User attributes
-        return dbPersonal.getUserAttributes(user, pattern, page);
+        return dbPersonal.getUserAttributes(user, pattern, page, psClient.username);
     }
 
     /**
@@ -245,8 +247,7 @@ public class Personal {
         }
 
         //Create user object
-        User user = new User();
-        user.setUsername(username);
+        User user = new User(username);
 
         //set features on user
         user.setFeatures(features);
@@ -255,7 +256,7 @@ public class Personal {
         psClient.updateAuthenticatedTimestamp();
 
         // call HBase setUsersFeatures to set the users Features in HBase Storage
-        return dbPersonal.setUserFeatures(user);
+        return dbPersonal.setUserFeatures(user, psClient.username);
     }
 
     /**
@@ -275,19 +276,17 @@ public class Personal {
             return false;
         }
 
-        User user = new User();
-        user.setUsername(username);
+        User user = new User(username);
 
         //set features on user
         user.setFeatures(features);
 
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-        
-        // call HBase modifyUserFeatures to set the users Features in HBase Storage
-        return dbPersonal.modifyUserFeatures(user);
-    }
 
+        // call HBase modifyUserFeatures to set the users Features in HBase Storage
+        return dbPersonal.modifyUserFeatures(user, psClient.username);
+    }
 
     /**
      * Get the user profile. User profile is a Map with user's features and
@@ -300,17 +299,18 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null then return all elements in a single page.
-     * @return A map of key-value pairs for user's features. If return is null then permission denied
+     * @return A map of key-value pairs for user's features. If return is null
+     * then permission denied
      */
-    public Map<String, String> getUserFeatures(String user, 
+    public Map<String, String> getUserFeatures(String user,
             String pattern, Integer page) {
-       
+
         //Check permission
         if (!getPermissionFor(actions.get("aGetUserFeatures"), "R")) {
             //TODO:  throw exeption   
             return null;
         }
-        
+
         //Check if page is null or page <1
         if (page == null || page < 1) {
             //set page null to return single page
@@ -320,7 +320,7 @@ public class Personal {
         psClient.updateAuthenticatedTimestamp();
 
         //Call HBase to get User features
-        return dbPersonal.getUserFeatures(user, pattern, page);
+        return dbPersonal.getUserFeatures(user, pattern, page, psClient.username);
     }
 
     /**

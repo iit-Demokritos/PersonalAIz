@@ -13,6 +13,9 @@ public class PServerConfiguration extends Configuration {
 
     public static String PSERVER_PROPERTIES = "PServer.properties";
 
+    public PServerConfiguration(String configurationFileName) {
+        super(configurationFileName);
+    }
     public PServerConfiguration() {
         super(PSERVER_PROPERTIES);
     }
