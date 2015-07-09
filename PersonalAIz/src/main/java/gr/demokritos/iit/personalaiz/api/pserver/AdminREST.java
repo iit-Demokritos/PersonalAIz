@@ -65,9 +65,9 @@ public class AdminREST {
             output.setCustomOutputMessage("Security Authentication Failed");
             return JSon.jsonize(output, Output.class);
         }
-        
+
         //Update logging level 
-        updateLogLevel();
+        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
 
         // Create PServer Admin instance
         admin = new Admin(db, new Client(userKey));
@@ -110,9 +110,9 @@ public class AdminREST {
             output.setCustomOutputMessage("Security Authentication Failed");
             return JSon.jsonize(output, Output.class);
         }
-        
+
         //Update logging level 
-        updateLogLevel();
+        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
 
         // Create PServer Admin instance
         admin = new Admin(db, new Client(userKey));
@@ -147,9 +147,9 @@ public class AdminREST {
             output.setCustomOutputMessage("Security Authentication Failed");
             return JSon.jsonize(output, Output.class);
         }
-        
+
         //Update logging level 
-        updateLogLevel();
+        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
 
         // Create PServer Admin instance
         admin = new Admin(db, new Client(userKey));
@@ -189,9 +189,9 @@ public class AdminREST {
             output.setCustomOutputMessage("Security Authentication Failed");
             return JSon.jsonize(output, Output.class);
         }
-        
+
         //Update logging level 
-        updateLogLevel();
+        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
 
         // Create PServer Admin instance
         admin = new Admin(db, new Client(userKey));
@@ -209,10 +209,10 @@ public class AdminREST {
                 JSon.unjsonize(JSONSettings, HashMap.class));
 
         if (admin.setSettings(settings)) {
-            LOGGER.info("Complete Set PServer settings: "+settings.toString());
+            LOGGER.info("Complete Set PServer settings: " + settings.toString());
             output.setCustomOutputMessage("Set PServer settings complete");
         } else {
-            LOGGER.info("Failed Set PServer settings: "+settings.toString());
+            LOGGER.info("Failed Set PServer settings: " + settings.toString());
             output.setCustomOutputMessage("Set PServer settings failed");
         }
 
@@ -236,9 +236,9 @@ public class AdminREST {
             output.setCustomOutputMessage("Security Authentication Failed");
             return JSon.jsonize(output, Output.class);
         }
-        
+
         //Update logging level 
-        updateLogLevel();
+        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
 
         // Create PServer Admin instance
         admin = new Admin(db, new Client(userKey));
@@ -259,11 +259,6 @@ public class AdminREST {
         output.setOutput(settings);
 
         return JSon.jsonize(output, Output.class);
-    }
-
-    private void updateLogLevel() {
-        //Update logging level 
-        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
     }
 
 }
