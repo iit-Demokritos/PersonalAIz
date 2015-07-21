@@ -6,6 +6,7 @@
 package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
+import static gr.demokritos.iit.pserver.storage.PServerHBase.LOGGER;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
@@ -31,14 +32,14 @@ public class Admin {
     public static final Logger LOGGER = LoggerFactory.getLogger(Admin.class);
     private final PServerConfiguration psConfig;
     private final Client adminClient;
-    private SecurityLayer security;
+    private SecurityLayer security = new SecurityLayer();
     private final HashMap<String, Action> actions = new HashMap<>(new Actions().getAdminActions());
 
     public Admin(IAdminStorage dbAdmin, Client adminClient) {
         this.psConfig = new PServerConfiguration();
         this.dbAdmin = dbAdmin;
         this.adminClient = adminClient;
-        security = null;
+//        security = null;
 
         //Update logging level 
         Logging.updateLoggerLevel(Admin.class, psConfig.getLogLevel());
@@ -62,15 +63,17 @@ public class Admin {
      * (e.g.mail:info@mail.com)
      * @return A boolean status true/false if add complete or not
      */
-    public boolean addClient(String clientName, String password, 
+    public boolean addClient(String clientName, String password,
             HashMap<String, String> info) {
-
         //Check permission
         if (!getPermissionFor(actions.get("aAddClient"), "W")) {
             //TODO:  throw exeption   
+        LOGGER.error("in");
             return false;
         }
-
+        if (info == null) {
+            info = new HashMap<>();
+        }
         Client client = new Client(clientName, password);
         info.put("Username", clientName);
         //encrypt password before add it on the info map
@@ -221,8 +224,10 @@ public class Admin {
         //If security is not null and access granted and frame is < 10minutes
         //then return true
         return ((security != null) && (security.autho.getAccessRights(adminClient, a)
-                .get(sAccessType)) && (adminClient.authenticatedTimestamp != 0)
-                && ((dt.getTime() - adminClient.authenticatedTimestamp) < frame));
+                .get(sAccessType)) && (adminClient.authenticatedTimestamp != 0));
+//        return ((security != null) && (security.autho.getAccessRights(adminClient, a)
+//                .get(sAccessType)) && (adminClient.authenticatedTimestamp != 0)
+//                && (new Date(dt.getTime() - frame).after(new Date(adminClient.authenticatedTimestamp))));
     }
 
 }

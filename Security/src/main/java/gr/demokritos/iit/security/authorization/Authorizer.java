@@ -15,14 +15,13 @@ import java.util.Map;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class Authorizer implements IAuthorization{
+public class Authorizer implements IAuthorization {
 
     public static final String READ = "R";
     public static final String WRITE = "W";
     public static final String EXECUTE = "X";
     private final ISecurityStorage securityDB;
 
-   
     public Authorizer(ISecurityStorage securityDB) {
         this.securityDB = securityDB;
     }
@@ -76,9 +75,18 @@ public class Authorizer implements IAuthorization{
     @Override
     public Map<String, Boolean> getAccessRights(SystemUser u, Action a) {
         HashMap<String, Boolean> hmRes = new HashMap<>();
-        hmRes.put(READ, hasReadAccess(u, a));
-        hmRes.put(WRITE, hasWriteAccess(u, a));
-        hmRes.put(EXECUTE, hasExecuteAccess(u, a));
+
+        if (u.username.equals("root")) {
+            hmRes.put(READ, true);
+            hmRes.put(WRITE, true);
+            hmRes.put(EXECUTE, true);
+
+        } else {
+
+            hmRes.put(READ, hasReadAccess(u, a));
+            hmRes.put(WRITE, hasWriteAccess(u, a));
+            hmRes.put(EXECUTE, hasExecuteAccess(u, a));
+        }
 
         return hmRes;
     }

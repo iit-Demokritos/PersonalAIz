@@ -10,6 +10,7 @@ import gr.demokritos.iit.pserver.storage.PServerHBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,6 @@ public class AdminTest {
 
     @Before
     public void setUp() {
-        System.out.println("* JUnitTest: setUp() method");
-        this.dbAdmin = new PServerHBase();
     }
 
     @After
@@ -73,7 +72,9 @@ public class AdminTest {
         boolean expResult;
 
         // test-1
-        instance = new Admin(new PServerHBase(), new Client("root", "root"));
+        Client cl =new Client("root", "root");
+        cl.setAuthenticatedTimestamp(new Date().getTime());
+        instance = new Admin(new PServerHBase(), cl);
         clientName = "client1";
         password = "client1";
         info.clear();
@@ -86,7 +87,7 @@ public class AdminTest {
         assertEquals(expResult, instance.addClient(clientName, password, info));
 
         // test-2
-        instance = new Admin(dbAdmin, new Client("root","root"));
+        instance = new Admin(new PServerHBase(), cl);
         clientName = "client2";
         password = "client2";
         expResult = true;
@@ -97,7 +98,8 @@ public class AdminTest {
         assertEquals(expResult, instance.addClient(clientName, password, null));
 
         // test-3
-        instance = new Admin(dbAdmin, new Client("0000000000"));
+        cl =new Client("root", "root");
+        instance = new Admin(new PServerHBase(), cl);
         instance.setSecurity(new SecurityLayer());
         clientName = "client3";
         password = "client3";
@@ -107,11 +109,28 @@ public class AdminTest {
         System.out.println("- test-3 : un: " + clientName
                 + " ,pw: " + password
                 + " ,info: " + info.toString()
+                + " ,clientKey: root without premmision");
+        assertEquals(expResult, instance.addClient(clientName, password, info));
+      
+        // test-4
+        instance = new Admin(new PServerHBase(),  new Client("0000000000"));
+        instance.setSecurity(new SecurityLayer());
+        clientName = "client4";
+        password = "client4";
+        info.clear();
+        info.put("mail", "info@mail.com");
+        expResult = false;
+        System.out.println("- test-4 : un: " + clientName
+                + " ,pw: " + password
+                + " ,info: " + info.toString()
                 + " ,clientKey: 0000000000");
         assertEquals(expResult, instance.addClient(clientName, password, info));
 
+        
+        
+       
     }
-
+//
 //    /**
 //     * Test of deleteClient method, of class Admin.
 //     */
@@ -120,13 +139,22 @@ public class AdminTest {
 //        System.out.println("* JUnitTest: deleteClient() method");
 //        String clientName = "";
 //        Admin instance = null;
-//        boolean expResult = false;
-//        boolean result = instance.deleteClient(clientName);
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+//        boolean expResult;
 //
+//        
+//        //test-1
+//        
+//        
+//        assertEquals(expResult, instance.deleteClient("Client"));
+//    
+//    
+//        
+//        
+//        
+//        
+//    
+//    }
+
 //    /**
 //     * Test of getClients method, of class Admin.
 //     */

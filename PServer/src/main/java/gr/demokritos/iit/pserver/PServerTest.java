@@ -5,10 +5,14 @@
  */
 package gr.demokritos.iit.pserver;
 
+import gr.demokritos.iit.pserver.api.Admin;
 import gr.demokritos.iit.pserver.api.Personal;
+import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.PServerHBase;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
 import org.apache.hadoop.hbase.exceptions.DeserializationException;
 
 /**
@@ -25,12 +29,17 @@ public class PServerTest {
                 + "}";
 
         System.out.println("===============================================");
-        
-        String userJSON ="{\"attributes\":{\"gender\":\"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr3\": \"3\",\"ftr5\": \"4\"}}";
-        User user = new User("panagiotis");
-        user.userCreator(userJSON);
-        System.out.println(user.getFeatures());
-        System.out.println(user.getAttributes());
+        Client cl =new Client("root", "root");
+        cl.setAuthenticatedTimestamp(new Date().getTime());
+         Admin admin= new Admin(new PServerHBase(),cl );
+         HashMap<String, String> info = new HashMap<>();
+         
+         admin.addClient("root", "root", info);
+//        String userJSON ="{\"attributes\":{\"gender\":\"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr3\": \"3\",\"ftr5\": \"4\"}}";
+//        User user = new User("panagiotis");
+//        user.userCreator(userJSON);
+//        System.out.println(user.getFeatures());
+//        System.out.println(user.getAttributes());
 //        HBase db = new HBase("Admin");
 //        PServerHBase db = new PServerHBase("1ec1caa1-3fd9-3afb-8933-79a17f82e7a8");
 //        Admin ad =new Admin(db);

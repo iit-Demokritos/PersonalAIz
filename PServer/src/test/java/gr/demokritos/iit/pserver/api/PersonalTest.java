@@ -44,33 +44,20 @@ public class PersonalTest {
     public void tearDown() {
     }
 
-//    /**
-//     * Test of setSecurity method, of class Personal.
-//     */
-//    @Test
-//    public void testSetSecurity() {
-//        System.out.println("setSecurity");
-//        SecurityLayer security = null;
-//        Personal instance = null;
-//        instance.setSecurity(security);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of addUser method, of class Personal.
-//     */
-//    @Test
-//    public void testAddUser() {
-//        System.out.println("addUser");
-//        User user = null;
-//        Personal instance = null;
-//        boolean expResult = false;
+
+    /**
+     * Test of addUser method, of class Personal.
+     */
+    @Test
+    public void testAddUser() {
+        System.out.println("addUser");
+        User user = null;
+        Personal instance = null;
+        boolean expResult = false;
 //        boolean result = instance.addUser(user);
 //        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+        // TODO review the generated test code and remove the default call to fail.
+    }
 //
 //    /**
 //     * Test of addUsers method, of class Personal.
