@@ -6,7 +6,6 @@
 package gr.demokritos.iit.pserver.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
-import static gr.demokritos.iit.pserver.storage.PServerHBase.LOGGER;
 import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
@@ -95,7 +94,7 @@ public class Admin {
      * @return A boolean status true/false if delete complete or not
      */
     public boolean deleteClient(String clientName) {
-
+        
         //Check permission
         if (!getPermissionFor(actions.get("aDeleteClient"), "X")) {
             //TODO:  throw exeption   
@@ -216,7 +215,7 @@ public class Admin {
      * @param sAccessType The access type R (read) - W (write) - X (execute)
      * @return A true or false if the permission granted
      */
-    public boolean getPermissionFor(Action a, String sAccessType) {
+    private boolean getPermissionFor(Action a, String sAccessType) {
         Date dt = new Date();
         //10 minute before
         long frame = 600;

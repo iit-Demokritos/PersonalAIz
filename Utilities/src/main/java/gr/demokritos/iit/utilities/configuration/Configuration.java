@@ -105,7 +105,7 @@ public class Configuration {
      * @param properties
      */
     public void setProperties(Map<String, String> properties) {
-
+        this.properties.clear();
         for (String sKey : properties.keySet()) {
             this.properties.setProperty(sKey, properties.get(sKey));
         }
