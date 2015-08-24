@@ -48,16 +48,6 @@ public class AdminTest {
     }
 
     /**
-     * Test of setSecurity method, of class Admin.
-     */
-//    @Test
-//    public void testSetSecurity() {
-//        System.out.println("* JUnitTest: setSecurity() method");
-//        SecurityLayer security = new SecurityLayer();
-//        Admin instance = new Admin(dbAdmin, new Client("root", "root"));
-//        instance.setSecurity(security);
-//    }
-    /**
      * Test of addClient, getClients, deleteClient method, of class Admin.
      */
     @Test

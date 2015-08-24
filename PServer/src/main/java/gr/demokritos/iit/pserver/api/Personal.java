@@ -35,7 +35,7 @@ public class Personal {
     private final PServerConfiguration psConfig;
     private final Client psClient;
     public static final Logger LOGGER = LoggerFactory.getLogger(Personal.class);
-    public SecurityLayer security;
+    private SecurityLayer security = new SecurityLayer();
     private final HashMap<String, Action> actions = new HashMap<>(new Actions().getPersonalActions());
 
     /**
@@ -48,7 +48,7 @@ public class Personal {
         this.psConfig = new PServerConfiguration();
         this.dbPersonal = dbPersonal;
         this.psClient = psClient;
-        security = null;
+//        security = null;
 
         //Update logging level 
         Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
@@ -335,10 +335,16 @@ public class Personal {
         //10 minute before
         long frame = 600;
 
+        
+        return ((security != null) 
+                && 
+                (security.autho.getAccessRights(psClient, a).get(sAccessType)) 
+                && 
+                (psClient.authenticatedTimestamp != 0));
         //If security is not null and access granted and frame is < 10minutes
         //then return true
-        return ((security != null) && (security.autho.getAccessRights(psClient, a)
-                .get(sAccessType)) && (psClient.authenticatedTimestamp != 0)
-                && ((dt.getTime() - psClient.authenticatedTimestamp) < frame));
+//        return ((security != null) && (security.autho.getAccessRights(psClient, a)
+//                .get(sAccessType)) && (psClient.authenticatedTimestamp != 0)
+//                && ((dt.getTime() - psClient.authenticatedTimestamp) < frame));
     }
 }

@@ -402,7 +402,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      */
     @Override
     public boolean setUserAttributes(User user, String clientName) {
-        ArrayList<User> usersList = new ArrayList<>();
+        List<User> usersList = new ArrayList<>();
         usersList.add(user);
         return addUsers(usersList, clientName);
     }
