@@ -115,13 +115,13 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         //for each user
         for (User user : users) {
-            String userID = getUserUID(user.getUsername(), clientName);
+//            String userID = getUserUID(user.getUsername(), clientName);
+            String userID = generateUserUID(user.getUsername(), clientName);
             //Create put method with row key
             Put put = new Put(Bytes.toBytes(userID));
 
             //-----------------------------------------------
-            Increment inc = new Increment(Bytes.toBytes(userID));
-
+//            Increment inc = new Increment(Bytes.toBytes(userID));
             //------------------------------------------------
             //add current user info
             for (String cInfo : user.getInfo().keySet()) {
@@ -144,24 +144,31 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             //add current user features
             for (String cFeature : user.getFeatures().keySet()) {
-
-                try {
-
-                    //add feature as element for increase
-                    inc.addColumn(family_Features,
-                            Bytes.toBytes(cFeature),
-                            Long.parseLong(user.getFeatures().get(cFeature)));
-
-                } catch (Exception e) {
-
-                    //if feature is not integer then add it as not increasement feature 
-                    put.add(family_Features,
-                            Bytes.toBytes(cFeature),
-                            Bytes.toBytes(user.getFeatures().get(cFeature)));
-
-                }
+                //if feature is not integer then add it as not increasement feature 
+                put.add(family_Features,
+                        Bytes.toBytes(cFeature),
+                        Bytes.toBytes(user.getFeatures().get(cFeature)));
 
             }
+//            for (String cFeature : user.getFeatures().keySet()) {
+//
+//                try {
+//
+//                    //add feature as element for increase
+//                    inc.addColumn(family_Features,
+//                            Bytes.toBytes(cFeature),
+//                            Long.parseLong(user.getFeatures().get(cFeature)));
+//
+//                } catch (Exception e) {
+//
+//                    //if feature is not integer then add it as not increasement feature 
+//                    put.add(family_Features,
+//                            Bytes.toBytes(cFeature),
+//                            Bytes.toBytes(user.getFeatures().get(cFeature)));
+//
+//                }
+//
+//            }
 
             try {
 
@@ -174,18 +181,17 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             }
 
             //if increment is not null then add to user table
-            if (!inc.isEmpty()) {
-
-                try {
-
-                    usersTable.increment(inc);
-
-                } catch (IOException ex) {
-                    LOGGER.error("Add Users increment features failed", ex);
-                    return false;
-                }
-            }
-
+//            if (!inc.isEmpty()) {
+//
+//                try {
+//
+//                    usersTable.increment(inc);
+//
+//                } catch (IOException ex) {
+//                    LOGGER.error("Add Users increment features failed", ex);
+//                    return false;
+//                }
+//            }
             //put username and UUID on clients user PUT
             putClientUsers.add(family_ClientUsers,
                     Bytes.toBytes(user.getUsername()),
@@ -211,6 +217,85 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             //close tables
             usersTable.close();
             clientsTable.close();
+
+        } catch (IOException ex) {
+            LOGGER.error("Add Users failed", ex);
+            return false;
+        }
+
+        //return the action status
+        return status;
+
+    }
+
+    public boolean updateUsers(
+            List<User> users,
+            String clientName) {
+
+        boolean status = true;
+        HTable usersTable = null;
+
+        try {
+
+            //create new Users HTable
+            usersTable = new HTable(config, table_Users);
+
+        } catch (IOException ex) {
+            LOGGER.error("Problem on load tables", ex);
+            return false;
+        }
+
+        //for each user
+        for (User user : users) {
+            String userID = getUserUID(user.getUsername(), clientName);
+            //Create put method with row key
+            Put put = new Put(Bytes.toBytes(userID));
+
+            //-----------------------------------------------
+//            Increment inc = new Increment(Bytes.toBytes(userID));
+            //------------------------------------------------
+            //add current user attributes
+            for (String cAttribute : user.getAttributes().keySet()) {
+                put.add(family_Attributes,
+                        Bytes.toBytes(cAttribute),
+                        Bytes.toBytes(user.getAttributes().get(cAttribute)));
+            }
+
+            //add current user features
+            for (String cFeature : user.getFeatures().keySet()) {
+                //if feature is not integer then add it as not increasement feature 
+                put.add(family_Features,
+                        Bytes.toBytes(cFeature),
+                        Bytes.toBytes(user.getFeatures().get(cFeature)));
+
+            }
+
+            try {
+
+                //add user record on users table
+                usersTable.put(put);
+
+            } catch (RetriesExhaustedWithDetailsException | InterruptedIOException ex) {
+                LOGGER.error("Add Users no increment features failed", ex);
+                return false;
+            }
+
+        }
+
+        try {
+
+            //Flush Commits
+            usersTable.flushCommits();
+
+        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
+            LOGGER.error("Add Users failed", ex);
+            return false;
+        }
+
+        try {
+
+            //close tables
+            usersTable.close();
 
         } catch (IOException ex) {
             LOGGER.error("Add Users failed", ex);
@@ -402,9 +487,15 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      */
     @Override
     public boolean setUserAttributes(User user, String clientName) {
+        String userID = getUserUID(user.getUsername(), clientName);
+        if (userID == null) {
+            LOGGER.error("User not exists");
+            return false;
+        }
         List<User> usersList = new ArrayList<>();
         usersList.add(user);
-        return addUsers(usersList, clientName);
+        return updateUsers(usersList, clientName);
+//        return addUsers(usersList, clientName);
     }
 
     /**
@@ -507,9 +598,15 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      */
     @Override
     public boolean setUserFeatures(User user, String clientName) {
+        String userID = getUserUID(user.getUsername(), clientName);
+        if (userID == null) {
+            LOGGER.error("User not exists");
+            return false;
+        }
         ArrayList<User> usersList = new ArrayList<>();
         usersList.add(user);
-        return addUsers(usersList, clientName);
+        return updateUsers(usersList, clientName);
+//        return addUsers(usersList, clientName);
     }
 
     /**
@@ -571,7 +668,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                     new FilterList(filters)
             );
         }
-        
+
         //if page not null then set the offset of the page 
         if (page != null) {
 
@@ -646,51 +743,82 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             LOGGER.error("User not exists");
             return false;
         }
-        
-        Increment inc = new Increment(Bytes.toBytes(userID));
-        //add current user features
-        for (String cFeature : user.getFeatures().keySet()) {
-            inc.addColumn(family_Features,
-                    Bytes.toBytes(cFeature),
-                    Long.parseLong(user.getFeatures().get(cFeature)));
+
+        //Get user features
+        HashMap<String, String> userFeatures = new HashMap<>(
+                getUserFeatures(user.getUsername(), null, null, clientName));
+
+        HashMap<String, String> featureModify = new HashMap<>(user.getFeatures());
+
+        for (String cFeature : featureModify.keySet()) {
+            try {
+                int newValue;
+                //If it is a new feature then add it with the value of modification
+                if (userFeatures.containsKey(cFeature)) {
+                    int oldValue = Integer.parseInt(userFeatures.get(cFeature));
+                    int inc = Integer.parseInt(featureModify.get(cFeature));
+                    newValue = oldValue + inc;
+
+                } else {
+                    newValue = Integer.parseInt(featureModify.get(cFeature));
+                }
+                user.getFeatures().put(cFeature, String.valueOf(newValue));
+            } catch (Exception ex) {
+                LOGGER.error("No numeric feature:" + cFeature
+                        + " value: " + featureModify.get(cFeature));
+                return false;
+            }
         }
 
-        try {
+        List<User> usersList = new ArrayList<>();
+        usersList.add(user);
+        return updateUsers(usersList, clientName);
+//        return addUsers(usersList, clientName);
 
-            usersTable.increment(inc);
-
-        } catch (IOException ex) {
-            LOGGER.error("Error on increment the values for the user " + user, ex);
-            return false;
-        }
-
-        try {
-
-            //Flush Commits
-            usersTable.flushCommits();
-
-        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
-            LOGGER.error("Can't flush the commits", ex);
-            return false;
-        }
-
-        try {
-
-            //close tables
-            usersTable.close();
-
-        } catch (IOException ex) {
-            LOGGER.error("Can't close table", ex);
-            return false;
-        }
-
-        //The action status
-        return status;
+//------------------------------------------------------------------------------        
+//        Increment inc = new Increment(Bytes.toBytes(userID));
+//        //add current user features
+//        for (String cFeature : user.getFeatures().keySet()) {
+//            inc.addColumn(family_Features,
+//                    Bytes.toBytes(cFeature),
+//                    Long.parseLong(user.getFeatures().get(cFeature)));
+//        }
+//
+//        try {
+//
+//            usersTable.increment(inc);
+//
+//        } catch (IOException ex) {
+//            LOGGER.error("Error on increment the values for the user " + user, ex);
+//            return false;
+//        }
+//
+//        try {
+//
+//            //Flush Commits
+//            usersTable.flushCommits();
+//
+//        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
+//            LOGGER.error("Can't flush the commits", ex);
+//            return false;
+//        }
+//
+//        try {
+//
+//            //close tables
+//            usersTable.close();
+//
+//        } catch (IOException ex) {
+//            LOGGER.error("Can't close table", ex);
+//            return false;
+//        }
+//
+//        //The action status
+//        return status;
     }
 
     /**
-     * Get the UUID for the given username If not User exist on Storage create
-     * new UUID
+     * Get the UUID for the given username If not User exist on Storage return null
      *
      * @param username The username that i want the UUID
      * @return the UUID for the given username
@@ -709,14 +837,28 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                     result.getValue(family_ClientUsers, Bytes.toBytes(username))
             );
 
-            if (UUID == null) {
-                //Create new UUID
-                UUID = Util.getUUID(clientUID + "-" + username).toString();
-            }
-
+//            if (UUID == null) {
+//                //Create new UUID
+//                UUID = Util.getUUID(clientUID + "-" + username).toString();
+//            }
         } catch (IOException ex) {
             LOGGER.error("IOException", ex);
         }
+        return UUID;
+    }
+
+    /**
+     * Generate new UUID
+     * @param username The username
+     * @param clientName The clients name
+     * @return The UUID
+     */
+    private String generateUserUID(String username, String clientName) {
+        String UUID = null;
+        String clientUID = getClientUID(clientName);
+
+        //Create new UUID
+        UUID = Util.getUUID(clientUID + "-" + username).toString();
         return UUID;
     }
 
@@ -816,7 +958,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         HTable clientsTable = null;
 
         // Delete client users from Users table
-        if(!deleteUsers(null, clientName)){
+        if (!deleteUsers(null, clientName)) {
             LOGGER.error("Fail to remove client users from Users table");
             //return the status
             return false;
