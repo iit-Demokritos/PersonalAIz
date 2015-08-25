@@ -67,7 +67,6 @@ public class Admin {
         //Check permission
         if (!getPermissionFor(actions.get("aAddClient"), "W")) {
             //TODO:  throw exeption   
-        LOGGER.error("in");
             return false;
         }
         if (info == null) {
