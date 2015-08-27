@@ -31,10 +31,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-@Path("{userKey}/admin")
+@Path("pserver/{userKey}/admin")
 @Produces(MediaType.APPLICATION_JSON)
 public class AdminREST {
-
+ 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminREST.class);
     private final IAdminStorage db = new PServerHBase();
     private Admin admin;
@@ -137,11 +137,12 @@ public class AdminREST {
      * @param userKey The user API Key
      * @return
      */
-    @Path("clients")
+    @Path("/clients")
     @GET
     public String getClients(
             @PathParam("userKey") String userKey
     ) {
+        System.out.println("----> "+userKey);
         if (!security.authe.checkCredentials(userKey)) {
             LOGGER.info("No valid API Key: " + userKey);
             output.setCustomOutputMessage("Security Authentication Failed");
