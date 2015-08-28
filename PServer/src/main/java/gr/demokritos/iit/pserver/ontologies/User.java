@@ -17,9 +17,9 @@ import java.util.Map;
 public class User {
 
     private final String username;
-    private HashMap<String, String> info = new HashMap<>();
-    private HashMap<String, String> attributes = new HashMap<>();
-    private HashMap<String, String> features = new HashMap<>();
+    private Map<String, String> info = new HashMap<>();
+    private Map<String, String> attributes = new HashMap<>();
+    private Map<String, String> features = new HashMap<>();
 
     /**
      * Empty User constructor
@@ -57,7 +57,7 @@ public class User {
         return username;
     }
 
-    public void setInfo(HashMap<String, String> info) {
+    public void setInfo(Map<String, String> info) {
         this.info = info;
     }
 
@@ -65,16 +65,18 @@ public class User {
         return info;
     }
 
-    public void setAttributes(HashMap<String, String> attributes) {
-        this.attributes = attributes;
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes.clear();
+        this.attributes.putAll(attributes);
     }
 
     public Map<String, String> getAttributes() {
         return attributes;
     }
 
-    public void setFeatures(HashMap<String, String> features) {
-        this.features = features;
+    public void setFeatures(Map<String, String> features) {
+        this.features.clear();
+        this.features.putAll(features);
     }
 
     public Map<String, String> getFeatures() {

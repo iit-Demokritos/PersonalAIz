@@ -19,6 +19,8 @@ public class Output {
     private String outputMessage;
     private Object output;
 
+    public Output() {
+    }
 
     /**
      * Set the output code

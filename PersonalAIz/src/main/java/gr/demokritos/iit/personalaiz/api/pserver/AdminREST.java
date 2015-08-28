@@ -14,15 +14,16 @@ import gr.demokritos.iit.utilities.configuration.PersonalAIzConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
 import gr.demokritos.iit.utilities.logging.Logging;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,20 +32,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-@Path("pserver/{userKey}/admin")
+@Path("pserver/{userAuthe}/admin/")
 @Produces(MediaType.APPLICATION_JSON)
 public class AdminREST {
- 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminREST.class);
     private final IAdminStorage db = new PServerHBase();
     private Admin admin;
+    private Client cl;
     private final SecurityLayer security = new SecurityLayer();
-    private Output output;
+    private Output output=new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
     /**
      *
-     * @param userKey System user API Key
+     * @param userAuthe System user API Key or Username - pass credentials
      * @param clientName Client Username
      * @param clientPass Client Password
      * @param clientInfo {"mail":"info@mail.org","infoname":"infovalue"}
@@ -53,24 +55,44 @@ public class AdminREST {
     @Path("client/{clientName}")
     @POST
     public String addClient(
-            @PathParam("userKey") String userKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("clientName") String clientName,
-            @QueryParam("password") String clientPass,
-            @QueryParam("info") String clientInfo
+            @FormParam("password") String clientPass,
+            @FormParam("info") String clientInfo
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
-
-        // Create PServer Admin instance
-        admin = new Admin(db, new Client(userKey));
 
         //set security layer on PServer Admin
         admin.setSecurity(security);
@@ -94,28 +116,49 @@ public class AdminREST {
     /**
      * Delete a client from PServer
      *
-     * @param userKey The user API Key
+     * @param userAuthe The user API Key or Username - pass credentials
      * @param clientName The client username that i want to delete
      * @return
      */
     @Path("client/{clientName}")
     @DELETE
     public String deleteClient(
-            @PathParam("userKey") String userKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("clientName") String clientName
     ) {
 
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
-
-        // Create PServer Admin instance
-        admin = new Admin(db, new Client(userKey));
 
         //set security layer on PServer Admin
         admin.setSecurity(security);
@@ -134,31 +177,52 @@ public class AdminREST {
     /**
      * Get the PServer clients
      *
-     * @param userKey The user API Key
+     * @param userAuthe The user API Key or Username - pass credentials
      * @return
      */
-    @Path("/clients")
+    @Path("clients")
     @GET
     public String getClients(
-            @PathParam("userKey") String userKey
+            @PathParam("userAuthe") String userAuthe
     ) {
-        System.out.println("----> "+userKey);
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
 
-        // Create PServer Admin instance
-        admin = new Admin(db, new Client(userKey));
-
         //set security layer on PServer Admin
         admin.setSecurity(security);
 
-        ArrayList clients = new ArrayList(admin.getClients());
+        HashSet<String> clients = new HashSet<>(admin.getClients());
         if (clients.isEmpty()) {
             LOGGER.info("Security Authorization Failed");
             output.setCustomOutputMessage("Security Authorization Failed");
@@ -173,7 +237,7 @@ public class AdminREST {
     /**
      * Set PServer settings
      *
-     * @param userKey The user API Key
+     * @param userAuthe The user API Key or Username - pass credentials
      * @param JSONSettings A JSON with key - value pairs with the settings. e.g.
      * {"SettingName":"SettingValue"}
      * @return
@@ -181,21 +245,42 @@ public class AdminREST {
     @Path("settings")
     @POST
     public String setSettings(
-            @PathParam("userKey") String userKey,
-            @QueryParam("settings") String JSONSettings
+            @PathParam("userAuthe") String userAuthe,
+            @FormParam("settings") String JSONSettings
     ) {
 
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
-
-        // Create PServer Admin instance
-        admin = new Admin(db, new Client(userKey));
 
         //set security layer on PServer Admin
         admin.setSecurity(security);
@@ -223,26 +308,47 @@ public class AdminREST {
     /**
      * Get PServer Settings map
      *
-     * @param userKey The user API Key
+     * @param userAuthe The user API Key or Username - pass credentials
      * @return
      */
     @Path("settings")
     @GET
     public String getSettings(
-            @PathParam("userKey") String userKey
+            @PathParam("userAuthe") String userAuthe
     ) {
 
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
-
-        // Create PServer Admin instance
-        admin = new Admin(db, new Client(userKey));
 
         //set security layer on PServer Admin
         admin.setSecurity(security);

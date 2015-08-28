@@ -10,12 +10,12 @@
     </listener>
     
     <servlet>
-        <servlet-name>PServer API</servlet-name>
+        <servlet-name>PersonalAIz API</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>PServer API</servlet-name>
+        <servlet-name>PersonalAIz API</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
     
@@ -28,38 +28,5 @@
         <param-name>resteasy.servlet.mapping.prefix</param-name>
         <param-value>/</param-value>
     </context-param>
-    
-    
-    
-    
-    
-    
-    <!--    <servlet>
-        <servlet-name>PServer API</servlet-name>
-        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>gr.demokritos.iit.personalaiz.api.pserver</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet>
-        <servlet-name>Data Sources API</servlet-name>
-        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>gr.demokritos.iit.personalaiz.api.datasources</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    
-    <servlet-mapping>
-        <servlet-name>PServer API</servlet-name>
-        <url-pattern>/pserver/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Data Sources API</servlet-name>
-        <url-pattern>/datasource/*</url-pattern>
-    </servlet-mapping>-->
+
 </web-app>

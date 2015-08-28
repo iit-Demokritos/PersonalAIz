@@ -16,18 +16,17 @@ import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,54 +39,76 @@ import org.slf4j.LoggerFactory;
 /**
  * Root resource (exposed at "pserver/:credentials/personal" path)
  */
-@Path("{userKey}/personal")
+@Path("pserver/{userAuthe}/personal/")
 @Produces(MediaType.APPLICATION_JSON)
 public class PersonalREST {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonalREST.class);
     private final IPersonalStorage db = new PServerHBase();
     private Personal personal;
+    private Client cl;
     private final SecurityLayer security = new SecurityLayer();
-    private Output output;
+    private Output output = new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
     /**
      * Method handling HTTP GET requests. The returned object will be sent to
      * the client as "text/plain" media type.
      *
-     * @param userKey
+     * @param userAuthe
      * @param JSONUsers
      * @return String that will be returned as a text/plain response.
      */
     //POST users/:JSONUsers | Add new users
-    @Path("users/{JSONUsers}")
+//    @Path("users/{JSONUsers}")
+    @Path("users")
     @POST
     public String addUsers(
-            @PathParam("userKey") String userKey,
-            @PathParam("JSONUsers") String JSONUsers
+            @PathParam("userAuthe") String userAuthe,
+            @FormParam("JSONUsers") String JSONUsers
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
 
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
-
         //set security layer on PServer Personal
         personal.setSecurity(security);
 
         //convert JSONUsers to users objects
-        ArrayList<User> usersList = new ArrayList<User>();
+        ArrayList<User> usersList = new ArrayList<>();
 
         //convert JSON with users as a HashMap
-        HashMap<String, Object> users = new HashMap<String, Object>(
+        HashMap<String, Object> users = new HashMap<>(
                 JSon.unjsonize(JSONUsers, HashMap.class));
 
         //for each username create User object and add it on the list
@@ -96,8 +117,7 @@ public class PersonalREST {
             //Create new user object
             User user = new User(cUser);
 
-            HashMap<String, HashMap<String, String>> userMap
-                    = new HashMap<String, HashMap<String, String>>();
+            HashMap<String, HashMap<String, String>> userMap = new HashMap<>();
             userMap.putAll(
                     (Map<? extends String, ? extends HashMap<String, String>>) users.get(cUser)
             );
@@ -130,30 +150,50 @@ public class PersonalREST {
 
     /**
      *
-     * @param userKey
+     * @param userAuthe
      * @param pattern
      * @return
      */
     //DELETE users | Delete users
-    @Path("users")
-    @DELETE
+    @Path("users/delete")
+    @POST
     public String deleteUsers(
-            @PathParam("userKey") String userKey,
-            @QueryParam("pattern") String pattern
+            @PathParam("userAuthe") String userAuthe,
+            @FormParam("pattern") String pattern
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
-
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
 
         //set security layer on PServer Personal
         personal.setSecurity(security);
@@ -171,7 +211,7 @@ public class PersonalREST {
 
     /**
      *
-     * @param userKey
+     * @param userAuthe
      * @param pattern
      * @param page
      * @return
@@ -180,69 +220,118 @@ public class PersonalREST {
     @Path("users")
     @GET
     public String getUsers(
-            @PathParam("userKey") String userKey,
-            @QueryParam("pattern") String pattern,
-            @QueryParam("page") String page
+            @PathParam("userAuthe") String userAuthe,
+            @FormParam("pattern") String pattern,
+            @FormParam("page") String page
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
 
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
-
         //set security layer on PServer Personal
         personal.setSecurity(security);
 
-        HashSet<String> users = new HashSet<String>(
-                personal.getUsers(pattern, Integer.parseInt(page)));
-
-        if (users.isEmpty()) {
-            LOGGER.info("Security Authorization Failed");
-            output.setCustomOutputMessage("Security Authorization Failed");
-        } else {
-            LOGGER.info("Complete Get Users");
-            output.setOutput(users);
+        int pageParam = -1;
+        if (page != null) {
+            pageParam = Integer.parseInt(page);
         }
+
+        HashSet<String> users = new HashSet<>(
+                personal.getUsers(pattern, pageParam));
+
+        LOGGER.info("Complete Get Users");
+        output.setCustomOutputMessage("Complete Get Users");
+        output.setOutput(users);
+//        if (users.isEmpty()) {
+//            LOGGER.info("Security Authorization Failed");
+//            output.setCustomOutputMessage("Security Authorization Failed");
+//            output.setOutput(users);
+//        } else {
+//            LOGGER.info("Complete Get Users");
+//            output.setOutput(users);
+//        }
 
         return JSon.jsonize(output, Output.class);
     }
 
     /**
      *
-     * @param userKey
+     * @param userAuthe
      * @param user
      * @param JSONUserAttributes {"gender":"male","age": "18"}
      * @return
      */
     //PUT users/:User/attributes/:JSONUserAttributes | Set user’s attributes
-    @Path("users/{User}/attributes/{JSONUserAttributes}")
+    @Path("users/{user}/attributes")
     @PUT
     public String setUserAttributes(
-            @PathParam("userKey") String userKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("user") String user,
-            @PathParam("JSONUserAttributes") String JSONUserAttributes
+            @FormParam("JSONUserAttributes") String JSONUserAttributes
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
-
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
 
         //set security layer on PServer Personal
         personal.setSecurity(security);
@@ -263,32 +352,52 @@ public class PersonalREST {
 
     /**
      *
-     * @param userKey
+     * @param userAuthe
      * @param user
      * @param JSONUserFeatures
      * @return
      */
     //PUT users/:User/features/:JSONUserFeatures | Set user’s features
-    @Path("users/{User}/features/{JSONUserFeatures}")
+    @Path("users/{user}/features")
     @PUT
     public String setUserFeatures(
-            @PathParam("userKey") String userKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("user") String user,
-            @PathParam("JSONUserFeatures") String JSONUserFeatures
+            @FormParam("JSONUserFeatures") String JSONUserFeatures
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
-
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
 
         //set security layer on PServer Personal
         personal.setSecurity(security);
@@ -309,32 +418,52 @@ public class PersonalREST {
 
     /**
      *
-     * @param userKey
+     * @param userAuthe
      * @param user
      * @param JSONUserFeatures
      * @return
      */
     //PUT users/:User/features/modify/:JSONUserFeatures | Modify (increase/decrease) user’s feature
-    @Path("users/{User}/features/modify/{JSONUserFeatures}")
+    @Path("users/{user}/features/modify")
     @PUT
     public String modifyUserFeatures(
-            @PathParam("userKey") String userKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("user") String user,
-            @PathParam("JSONUserFeatures") String JSONUserFeatures
+            @FormParam("JSONUserFeatures") String JSONUserFeatures
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
-
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
 
         //set security layer on PServer Personal
         personal.setSecurity(security);
@@ -355,48 +484,72 @@ public class PersonalREST {
 
     /**
      *
-     * @param userKey
+     * @param userAuthe
      * @param user
      * @param pattern
      * @param page
      * @return
      */
     //GET users/:User/features | Get user’s profile
-    @Path("users/{User}/features")
+    @Path("users/{user}/features")
     @GET
     public String getUserProfile(
-            @PathParam("userKey") String userKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("user") String user,
-            @QueryParam("pattern") String pattern,
-            @QueryParam("page") String page
+            @FormParam("pattern") String pattern,
+            @FormParam("page") String page
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
 
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
-
         //set security layer on PServer Personal
         personal.setSecurity(security);
 
-        HashMap<String, String> userProfile = new HashMap<String, String>(
-                personal.getUserFeatures(user, pattern, Integer.parseInt(page)));
+        int pageParam = -1;
+        if (page != null) {
+            pageParam = Integer.parseInt(page);
+        }
 
-        if (userProfile.isEmpty()) {
-            LOGGER.info("Security Authorization Failed");
-            output.setCustomOutputMessage("Security Authorization Failed");
-        } else {
+        try {
+            HashMap<String, String> userProfile = new HashMap<>(
+                    personal.getUserFeatures(user, pattern, pageParam));
             LOGGER.info("Complete Get User Profile");
             output.setCustomOutputMessage("Complete Get User Profile");
             output.setOutput(userProfile);
+        } catch (Exception e) {
+            LOGGER.info("User not exist");
+            output.setCustomOutputMessage("User not exist");
         }
 
         return JSon.jsonize(output, Output.class);
@@ -404,40 +557,65 @@ public class PersonalREST {
 
     /**
      *
-     * @param userKey
+     * @param userAuthe
      * @param user
      * @param pattern
      * @param page
      * @return
      */
     //GET users/:User/attributes | Get user’s attributes
-    @Path("users/{User}/attributes")
+    @Path("users/{user}/attributes")
     @GET
     public String getUserAttributes(
-            @PathParam("userKey") String userKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("user") String user,
-            @QueryParam("pattern") String pattern,
-            @QueryParam("page") String page
+            @FormParam("pattern") String pattern,
+            @FormParam("page") String page
     ) {
 
-        // Check the api key Credentials
-        if (!security.authe.checkCredentials(userKey)) {
-            LOGGER.info("No valid API Key: " + userKey);
-            output.setCustomOutputMessage("Security Authentication Failed");
-            return JSon.jsonize(output, Output.class);
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Personal instance
+            personal = new Personal(db, cl);
         }
 
         //Update logging level 
         Logging.updateLoggerLevel(PersonalREST.class, config.getLogLevel());
 
-        //Create PServer Personal instance
-        personal = new Personal(db, new Client(userKey));
-
         //set security layer on PServer Personal
         personal.setSecurity(security);
 
-        HashMap<String, String> userAttributes = new HashMap<String, String>(
-                personal.getUserAttributes(user, pattern, Integer.parseInt(page)));
+        int pageParam = -1;
+        if (page != null) {
+            pageParam = Integer.parseInt(page);
+        }
+
+        HashMap<String, String> userAttributes = new HashMap<>(
+                personal.getUserAttributes(user, pattern, pageParam));
 
         if (userAttributes.isEmpty()) {
             LOGGER.info("Security Authorization Failed");
