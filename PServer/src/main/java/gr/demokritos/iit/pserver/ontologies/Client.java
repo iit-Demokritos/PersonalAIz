@@ -36,7 +36,7 @@ public class Client extends SystemUser {
      */
     public Client(String apiKey) {
 
-        //TODO: get username pass
+        //TODO: get username pass based on API key
         super.username = "";
         super.password = "";
         super.info = new HashMap<>();

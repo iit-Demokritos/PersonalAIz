@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 public class AdminREST {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminREST.class);
+    //TODO: Change HBase with something global to change storage from settings
     private final IAdminStorage db = new PServerHBase();
     private Admin admin;
     private Client cl;

@@ -73,7 +73,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aAddUser"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 
@@ -98,7 +98,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aAddUsers"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 
@@ -120,7 +120,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aDeleteUsers"), "X")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 
@@ -146,7 +146,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aGetUsers"), "R")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return null;
         }
 
@@ -176,7 +176,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aSetUserAttributes"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 
@@ -212,7 +212,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aGetUserAttributes"), "R")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return null;
         }
 
@@ -242,7 +242,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aSetUserFeatures"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 
@@ -272,7 +272,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aModifyUserFeatures"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 
@@ -307,7 +307,7 @@ public class Personal {
 
         //Check permission
         if (!getPermissionFor(actions.get("aGetUserFeatures"), "R")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return null;
         }
 

@@ -38,7 +38,6 @@ public class Admin {
         this.psConfig = new PServerConfiguration();
         this.dbAdmin = dbAdmin;
         this.adminClient = adminClient;
-//        security = null;
 
         //Update logging level 
         Logging.updateLoggerLevel(Admin.class, psConfig.getLogLevel());
@@ -66,7 +65,7 @@ public class Admin {
             HashMap<String, String> info) {
         //Check permission
         if (!getPermissionFor(actions.get("aAddClient"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
         if (info == null) {
@@ -96,7 +95,7 @@ public class Admin {
         
         //Check permission
         if (!getPermissionFor(actions.get("aDeleteClient"), "X")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 
@@ -116,7 +115,7 @@ public class Admin {
 
         //Check permission
         if (!getPermissionFor(actions.get("aGetClients"), "R")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return null;
         }
 
@@ -134,10 +133,10 @@ public class Admin {
 
         //Check permission
         if (!getPermissionFor(actions.get("aSetClientRoles"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
-        //TODO: implement
+        //TODO: implement setClientRoles()
 
         //update Authenticated time
         adminClient.updateAuthenticatedTimestamp();
@@ -156,9 +155,10 @@ public class Admin {
 
         //Check permission
         if (!getPermissionFor(actions.get("aSetClientRoles"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return null;
         }
+        //TODO: implement getClientRoles()
 
         //update Authenticated time
         adminClient.updateAuthenticatedTimestamp();
@@ -176,7 +176,7 @@ public class Admin {
 
         //Check permission
         if (!getPermissionFor(actions.get("aGetSettings"), "R")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return null;
         }
 
@@ -196,7 +196,7 @@ public class Admin {
 
         //Check permission
         if (!getPermissionFor(actions.get("aSetSettings"), "W")) {
-            //TODO:  throw exeption   
+            LOGGER.error("Premission Denied");
             return false;
         }
 

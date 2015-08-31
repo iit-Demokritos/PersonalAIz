@@ -35,7 +35,7 @@ public class SecurityHBase implements ISecurityStorage {
     @Override
     public boolean checkCredentials(String username, String password) {
        
-        //TODO: Implement read from HBase and return the status
+        //FIXME: checkCredentials Implement read from HBase and return the status
         return true;
     }
   
@@ -47,7 +47,7 @@ public class SecurityHBase implements ISecurityStorage {
     @Override
     public boolean checkCredentials(String apikey) {
        
-        //TODO: Implement read from HBase and return the status
+        //FIXME: checkCredentials Implement read from HBase and return the status
         return true;
     }
     
@@ -68,7 +68,7 @@ public class SecurityHBase implements ISecurityStorage {
     @Override
     public boolean checkAccess(SystemUser u, Action a, String Access) {
 
-        //TODO: Implement read from HBase and return the status
+        //FIXME: checkAccess Implement read from HBase and return the status
         return true;
     }
 

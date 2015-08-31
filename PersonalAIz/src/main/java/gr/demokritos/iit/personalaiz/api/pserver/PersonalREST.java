@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 public class PersonalREST {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonalREST.class);
+    //TODO: Change HBase with something global to change storage from settings
     private final IPersonalStorage db = new PServerHBase();
     private Personal personal;
     private Client cl;
