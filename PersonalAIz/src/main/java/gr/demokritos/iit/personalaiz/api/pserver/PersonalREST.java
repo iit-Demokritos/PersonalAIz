@@ -618,14 +618,9 @@ public class PersonalREST {
         HashMap<String, String> userAttributes = new HashMap<>(
                 personal.getUserAttributes(user, pattern, pageParam));
 
-        if (userAttributes.isEmpty()) {
-            LOGGER.info("Security Authorization Failed");
-            output.setCustomOutputMessage("Security Authorization Failed");
-        } else {
-            LOGGER.info("Complete Get User Attributes");
-            output.setCustomOutputMessage("Complete Get User Attributes");
-            output.setOutput(userAttributes);
-        }
+        LOGGER.info("Complete Get User Attributes");
+        output.setCustomOutputMessage("Complete Get User Attributes");
+        output.setOutput(userAttributes);
 
         return JSon.jsonize(output, Output.class);
     }
