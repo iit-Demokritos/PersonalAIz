@@ -773,52 +773,11 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         List<User> usersList = new ArrayList<>();
         usersList.add(user);
         return updateUsers(usersList, clientName);
-//        return addUsers(usersList, clientName);
-
-//------------------------------------------------------------------------------        
-//        Increment inc = new Increment(Bytes.toBytes(userID));
-//        //add current user features
-//        for (String cFeature : user.getFeatures().keySet()) {
-//            inc.addColumn(family_Features,
-//                    Bytes.toBytes(cFeature),
-//                    Long.parseLong(user.getFeatures().get(cFeature)));
-//        }
-//
-//        try {
-//
-//            usersTable.increment(inc);
-//
-//        } catch (IOException ex) {
-//            LOGGER.error("Error on increment the values for the user " + user, ex);
-//            return false;
-//        }
-//
-//        try {
-//
-//            //Flush Commits
-//            usersTable.flushCommits();
-//
-//        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
-//            LOGGER.error("Can't flush the commits", ex);
-//            return false;
-//        }
-//
-//        try {
-//
-//            //close tables
-//            usersTable.close();
-//
-//        } catch (IOException ex) {
-//            LOGGER.error("Can't close table", ex);
-//            return false;
-//        }
-//
-//        //The action status
-//        return status;
     }
 
     /**
-     * Get the UUID for the given username If not User exist on Storage return null
+     * Get the UUID for the given username If not User exist on Storage return
+     * null
      *
      * @param username The username that i want the UUID
      * @return the UUID for the given username
@@ -849,6 +808,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     /**
      * Generate new UUID
+     *
      * @param username The username
      * @param clientName The clients name
      * @return The UUID
@@ -865,14 +825,107 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     //=================== Personal Mode =======================================
     //=================== Stereotype Mode =====================================
     @Override
-    public String addStereotype() {
+    public boolean addStereotype(String stereotypeName, String rule, String clientName) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public boolean deleteStereotype(String pattern, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<String> getStereotypes(String pattern, Integer page, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean remakeStereotype(String stereotypeName, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean updateStereotypeFeatures(String stereotypeName, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean updateStereotypeUsers(String stereotypeName, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean findStereotypeUsers(String stereotypeName, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean checkStereotypeUsers(String stereotypeName, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean setStereotypeFeatures(String stereotypeName, Map<String, String> features, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean modifyStereotypeFeatures(String stereotypeName, Map<String, String> features, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Map<String, String> getStereotypeFeatures(String stereotypeName, String pattern, Integer page, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean deleteStereotypeFeatures(String stereotypeName, String pattern, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<String> getStereotypeUsers(String stereotypeName, String pattern, Integer page, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<String> getUserStereotypes(String username, String pattern, Integer page, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean addUserOnStereotype(String username, String stereotypeName, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean DeleteUserFromStereotype(String username, String stereotypeName, String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
+    
+    /**
+     * Generate new StereotypeID
+     *
+     * @param username The Stereotype name
+     * @param clientName The client name
+     * @return The StereotypeID
+     */
+    private String generateStereotypeUID(String stereotypeName, String clientName) {
+        String UUID = null;
+        String clientUID = getClientUID(clientName);
+
+        //Create new StereotypeID
+        UUID = Util.getUUID(clientUID + "-" + stereotypeName).toString();
+        return UUID;
+    }
+
     //=================== Stereotype Mode =====================================
     //=================== Community Mode ======================================
     //=================== Community Mode ======================================
     //=================== Administration ======================================
-
     /**
      * Add the given client on HBase. If user exists update client.
      *
@@ -909,13 +962,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             put.add(family_Info,
                     Bytes.toBytes(cInfo),
                     Bytes.toBytes(client.getInfo().get(cInfo)));
-        }
-
-        //add client keys
-        for (String cKey : client.getKeys().keySet()) {
-            put.add(family_Keys,
-                    Bytes.toBytes(cKey),
-                    Bytes.toBytes(client.getKeys().get(cKey)));
         }
 
         try {
@@ -1103,6 +1149,4 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
     //=================== Administration ======================================
-    //=================== Security ======================================
-    //=================== Security ======================================
 }
