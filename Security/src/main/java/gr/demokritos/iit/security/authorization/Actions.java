@@ -28,19 +28,36 @@ public class Actions {
         adminActions.put("aSetClientRoles", new Action("Admin.setClientRoles"));
         adminActions.put("aGetSettings", new Action("Admin.GetSettings"));
         adminActions.put("aSetSettings", new Action("Admin.SetSettings"));
-        
 
         //PServer personal actions
-        personalActions.put("aAddUser", new Action("Admin.AddUser"));
-        personalActions.put("aAddUsers", new Action("Admin.AddUsers"));
-        personalActions.put("aDeleteUsers", new Action("Admin.DeleteUsers"));
-        personalActions.put("aSetUserAttributes", new Action("Admin.SetUserAttributes"));
-        personalActions.put("aSetUserFeatures", new Action("Admin.SetUserFeatures"));
-        personalActions.put("aModifyUserFeatures", new Action("Admin.ModifyUserFeatures"));
-        personalActions.put("aGetUserAttributes", new Action("Admin.GetUserAttributes"));
-        personalActions.put("aGetUserFeatures", new Action("Admin.GetUserFeatures"));
-        personalActions.put("aGetUsers", new Action("Admin.GetUsers"));
+        personalActions.put("aAddUser", new Action("Personal.AddUser"));
+        personalActions.put("aAddUsers", new Action("Personal.AddUsers"));
+        personalActions.put("aDeleteUsers", new Action("Personal.DeleteUsers"));
+        personalActions.put("aSetUserAttributes", new Action("Personal.SetUserAttributes"));
+        personalActions.put("aSetUserFeatures", new Action("Personal.SetUserFeatures"));
+        personalActions.put("aModifyUserFeatures", new Action("Personal.ModifyUserFeatures"));
+        personalActions.put("aGetUserAttributes", new Action("Personal.GetUserAttributes"));
+        personalActions.put("aGetUserFeatures", new Action("Personal.GetUserFeatures"));
+        personalActions.put("aGetUsers", new Action("Personal.GetUsers"));
 
+        //PServer stereotype actions
+        stereotypeActions.put("aAddStereotype", new Action("Stereotype.AddStereotype"));
+        stereotypeActions.put("aDeleteStereotypes", new Action("Stereotype.DeleteStereotypes"));
+        stereotypeActions.put("aGetStereotypes", new Action("Stereotype.GetStereotypes"));
+        stereotypeActions.put("aRemakeStereotype", new Action("Stereotype.RemakeStereotype"));
+        stereotypeActions.put("aUpadateStereotypeFeatures", new Action("Stereotype.UpadateStereotypeFeatures"));
+        stereotypeActions.put("aUpadateStereotypeUsers", new Action("Stereotype.UpadateStereotypeUsers"));
+        stereotypeActions.put("aFindStereotypeUsers", new Action("Stereotype.FindStereotypeUsers"));
+        stereotypeActions.put("aCheckStereotypeUsers", new Action("Stereotype.CheckStereotypeUsers"));
+        stereotypeActions.put("aSetStereotypeFeatures", new Action("Stereotype.SetStereotypeFeatures"));
+        stereotypeActions.put("aModifyStereotypeFeatures", new Action("Stereotype.ModifyStereotypeFeatures"));
+        stereotypeActions.put("aGetStereotypeFeatures", new Action("Stereotype.GetStereotypeFeatures"));
+        stereotypeActions.put("aDeleteStereotypeFeatures", new Action("Stereotype.DeleteStereotypeFeatures"));
+        stereotypeActions.put("aGetStereotypeUsers", new Action("Stereotype.GetStereotypeUsers"));
+        stereotypeActions.put("aGetUserStereotypes", new Action("Stereotype.GetUserStereotypes"));
+        stereotypeActions.put("aAddUserOnStereotype", new Action("Stereotype.AddUserOnStereotype"));
+        stereotypeActions.put("aDeleteUserFromStereotype", new Action("Stereotype.DeleteUserFromStereotype"));
+        
     }
 
     

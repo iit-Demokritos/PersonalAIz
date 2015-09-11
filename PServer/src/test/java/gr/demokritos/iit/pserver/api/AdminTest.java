@@ -290,7 +290,7 @@ public class AdminTest {
 //        boolean expResult = false;
 //        boolean result = instance.setClientRoles();
 //        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
+//        // review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
 //
@@ -305,7 +305,7 @@ public class AdminTest {
 //        List<String> expResult = null;
 //        List<String> result = instance.getClientRoles(clientName);
 //        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
+//        // review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
 }

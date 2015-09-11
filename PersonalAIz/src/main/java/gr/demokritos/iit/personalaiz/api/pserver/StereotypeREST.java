@@ -36,7 +36,7 @@ public class StereotypeREST {
      */
   
 
-// TODO: Implement Add Stereotypes
+//  Implement Add Stereotypes
 // POST /:steretoypeName | Add new stereotype on the platform
     @Path("/{steretoypeName}")
     @POST
@@ -49,7 +49,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Get stereotypes
+//  Implement Get stereotypes
 // GET /  | Get a list with all stereotype names in the platform
     @GET
     public String getStereotypes(
@@ -61,7 +61,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Delete stereotypes
+//  Implement Delete stereotypes
 // DELETE /  | Delete stereotype from the platform. If no pattern remove all the stereotypes
     @DELETE
     public String deleteStereotypes(
@@ -73,7 +73,7 @@ public class StereotypeREST {
     }
 
 
-// TODO: Implement Remake stereotype
+//  Implement Remake stereotype
 // PUT /:stereotypeName  | Remake stereotype of the given stereotype Name
     @Path("{stereotypeName}")
     @PUT
@@ -86,7 +86,7 @@ public class StereotypeREST {
     }
 
 
-// TODO: Implement Get stereotype users
+//  Implement Get stereotype users
 // GET /:stereotypeName/users  | Get a list with users that belongs to the given stereotype name
     @Path("{stereotypeName}/users")
     @GET
@@ -100,7 +100,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Get stereotype profile
+//  Implement Get stereotype profile
 // GET /:stereotypeName/profile  | Get stereotype profile for the given stereotype name
     @Path("{stereotypeName}/profile")
     @GET
@@ -117,7 +117,7 @@ public class StereotypeREST {
     
 
 // ===========================================   
-// TODO: Implement Add user on stereotype
+//  Implement Add user on stereotype
 // POST /users/:username/:stereotypeNameObject | Add a user on a stereotype with association degree
     @Path("users/{username}/{stereotypeNameObject}")
     @POST
@@ -130,7 +130,7 @@ public class StereotypeREST {
      return null;
     }
 
-// TODO: Implement Get user’s stereotypes
+//  Implement Get user’s stereotypes
 // GET /users/:username | Get a list with stereotypes that user belongs
     @Path("users/{username}")
     @GET
@@ -144,7 +144,7 @@ public class StereotypeREST {
      return null;
     }
 
-// TODO: Implement Set user’s stereotype degrees
+//  Implement Set user’s stereotype degrees
 // PUT /users/:userName/:stereotypeNameObject | Set new association degree for a stereotype
     @Path("users/{userName}/{stereotypeNameObject}")
     @PUT
@@ -157,7 +157,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Modify user’s stereotype degrees
+//  Implement Modify user’s stereotype degrees
 // PUT /users/:userName/modify/:stereotypeNameObject | Modify association degree (increase/decrease) for a stereotype
     @Path("users/{userName}/modify/{stereotypeNameObject}")
     @PUT
@@ -170,7 +170,7 @@ public class StereotypeREST {
      return null;
     }
 
-// TODO: Implement Delete user from stereotype
+//  Implement Delete user from stereotype
 // DELETE /users/:username/:stereotypeNameObject | Delete user from stereotypes
     @Path("users/{username}/{stereotypeNameObject}")
     @DELETE
@@ -183,7 +183,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Update stereotype users
+//  Implement Update stereotype users
 // PUT /users/:stereotypeName/update | Removes all users not matching the stereotypes rule and inserts any new users that do match
     @Path("users/{stereotypeName}/update")
     @PUT
@@ -195,7 +195,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Check stereotype users
+//  Implement Check stereotype users
 // PUT /users/:stereotypeName/check | Removes any current users that do not match the stereotypes rule
     @Path("users/{stereotypeName}/check")
     @PUT
@@ -207,7 +207,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Find stereotype users
+//  Implement Find stereotype users
 // PUT /users/:stereotypeName/find | Finds and adds to the stereotype all users matching its rule
     @Path("users/{stereotypeName}/find")
     @PUT
@@ -222,7 +222,7 @@ public class StereotypeREST {
     
     
 // ===========================================   
-// TODO: Implement Add features on stereotype
+//  Implement Add features on stereotype
 // POST /features/:stereotypeName/:featureNameObject | Add a list of feature names and value on a stereotype
     @Path("features/{stereotypeName}/{featureNameObject}")
     @POST
@@ -235,7 +235,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Delete feature from stereotypes
+//  Implement Delete feature from stereotypes
 // DELETE /features/:featureName/:stereotypeNameObject | Delete feature from stereotypes
     @Path("features/{featureName}/{stereotypeNameObject}")
     @DELETE
@@ -248,7 +248,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Set features on stereotype
+//  Implement Set features on stereotype
 // PUT /features/:stereotypeName/:featureNameObject | set a list of feature names and value on a stereotype
     @Path("features/{stereotypeName}/{featureNameObject}")
     @PUT
@@ -261,7 +261,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Modify features on stereotype
+//  Implement Modify features on stereotype
 // PUT /features/:stereotypeName/modify/:featureNameObject | Modify a list of feature names and value on a stereotype
     @Path("features/{stereotypeName}/modify/{featureNameObject}")
     @PUT
@@ -274,7 +274,7 @@ public class StereotypeREST {
      return null;
     }
     
-// TODO: Implement Update stereotype features
+//  Implement Update stereotype features
 // PUT /features/:stereotypeName/update | Removes all features from the stereotype 
 //    and then adds and sets all features as needed based on the stereotypes current users and their degrees
     @Path("features/{stereotypeName}/update")

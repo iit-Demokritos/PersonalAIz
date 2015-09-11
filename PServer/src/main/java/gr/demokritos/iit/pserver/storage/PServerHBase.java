@@ -26,7 +26,6 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
@@ -51,6 +50,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     //=================== HBase tables ========================================
     private final String table_Users = "Users";
     private final String table_Clients = "Clients";
+    private final String table_Stereotypes = "Stereotypes";
 
     //=================== HBase tables ========================================
     //=================== HBase Families ======================================
@@ -58,7 +58,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     private final byte[] family_Attributes = Bytes.toBytes("Attributes");
     private final byte[] family_Features = Bytes.toBytes("Features");
     private final byte[] family_ClientUsers = Bytes.toBytes("ClientUsers");
-    private final byte[] family_Keys = Bytes.toBytes("Keys");
+    private final byte[] family_Stereotypes = Bytes.toBytes("Stereotypes");
+    private final byte[] family_Users = Bytes.toBytes("Users");
 
     //=================== HBase Families ======================================
     //=================== HBase Qualifiers ====================================
@@ -829,14 +830,180 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     *
+     * @param pattern
+     * @param clientName
+     * @return
+     */
     @Override
-    public boolean deleteStereotype(String pattern, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean deleteStereotypes(String pattern, String clientName) {
+
+        boolean status = true;
+        HTable clientsTable = null;
+        HTable usersTable = null;
+        HTable stereotypeTable = null;
+        HashMap<String, String> stereotypesForDelete;
+
+        try {
+
+            // Create an hbase clients table object
+            clientsTable = new HTable(config, table_Clients);
+            // Create an hbase users table object
+            usersTable = new HTable(config, table_Users);
+            // Create an hbase stereotypes table object
+            stereotypeTable = new HTable(config, table_Stereotypes);
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't load usersTable or clientsTable or stereotypesTable", ex);
+            return false;
+        }
+
+        //get all stereotypes based on pattern
+        stereotypesForDelete = new HashMap<>(getStereotypes(pattern, null, clientName));
+
+        // Delete stereotypes form the client table
+        Delete clientStereotypesDelete = new Delete(Bytes.toBytes(getClientUID(clientName)));
+
+        //For eash stereotype delete them from the table
+        for (String cSterName : stereotypesForDelete.keySet()) {
+
+            Delete stereotypeDelete = new Delete(Bytes.toBytes(stereotypesForDelete.get(cSterName)));
+
+            try {
+
+                //delete stereotype record from the table Stereotypes
+                stereotypeTable.delete(stereotypeDelete);
+
+            } catch (IOException ex) {
+                LOGGER.error("Can't delete stereotype:" + cSterName + " from stereotypeTable", ex);
+                return false;
+            }
+
+            //add delete column record for the current stereotype
+            clientStereotypesDelete.deleteColumn(family_Stereotypes, Bytes.toBytes(cSterName));
+
+            ArrayList<String> users = new ArrayList<>();
+            users.addAll(getStereotypeUsers(cSterName, null, null, clientName));
+
+            for (String cUser : users) {
+
+                // Delete stereotypes form the user table
+                Delete userStereotypesDelete = new Delete(Bytes.toBytes(getUserUID(cUser, clientName)));
+                //add delete column record for the current stereotype
+                userStereotypesDelete.deleteColumn(family_Stereotypes, Bytes.toBytes(cSterName));
+                try {
+                    // delete stereotype column from the table users
+                    usersTable.delete(userStereotypesDelete);
+                } catch (IOException ex) {
+                    LOGGER.error("Can't delete stereotype:" + cSterName + " from usersTable", ex);
+                    return false;
+                }
+            }
+        }
+
+        try {
+
+            // delete stereotype column from the table client
+            clientsTable.delete(clientStereotypesDelete);
+
+            // flush the Commits
+            clientsTable.flushCommits();
+            stereotypeTable.flushCommits();
+            usersTable.flushCommits();
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't delete stereotype from clientsTable or stereotypeTable or usersTable", ex);
+            return false;
+        }
+
+        try {
+
+            // close the table
+            clientsTable.close();
+            stereotypeTable.close();
+            usersTable.close();
+
+        } catch (IOException ex) {
+            LOGGER.error("Error on close tables", ex);
+            return false;
+        }
+
+        //the action status
+        return status;
     }
 
+    /**
+     *
+     * @param pattern
+     * @param page
+     * @param clientName
+     * @return
+     */
     @Override
-    public List<String> getStereotypes(String pattern, Integer page, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Map<String, String> getStereotypes(String pattern, Integer page, String clientName) {
+
+        //Initialize variables
+        HashMap<String, String> stereotypes = new HashMap<>();
+
+        HTable table = null;
+        try {
+
+            //Create clients table
+            table = new HTable(config, table_Clients);
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't create clientsTable", ex);
+            return null;
+        }
+
+        Get get = new Get(Bytes.toBytes(getClientUID(clientName)));
+        get.addFamily(family_Stereotypes);
+
+        ArrayList<Filter> filters = new ArrayList<>();
+
+        //if pattern is not null then add the filter pattern
+        if (pattern != null) {
+            //set stereotype pattern as filter 
+            filters.add(new ColumnPrefixFilter(Bytes.toBytes(pattern)));
+        }
+
+        //if pattern and page is null then not add extra filters
+        if (!filters.isEmpty()) {
+            //Set the filter list on get 
+            get.setFilter(
+                    new FilterList(filters)
+            );
+        }
+
+        //if page not null then set the offset of the page 
+        if (page != null) {
+            //add page filter of the result
+            get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
+        }
+
+        Result result = null;
+
+        try {
+
+            result = table.get(get);
+
+        } catch (IOException ex) {
+            LOGGER.error("Error on table get", ex);
+            return null;
+        }
+
+        NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Stereotypes);
+
+        if (result.isEmpty()) {
+            return stereotypes;
+        }
+
+        for (byte[] cQ : familyMap.descendingKeySet()) {
+            stereotypes.put(Bytes.toString(cQ), Bytes.toString(familyMap.descendingMap().get(cQ)));
+        }
+
+        return stereotypes;
     }
 
     @Override
@@ -874,24 +1041,320 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     *
+     * @param stereotypeName
+     * @param pattern
+     * @param page
+     * @param clientName
+     * @return
+     */
     @Override
     public Map<String, String> getStereotypeFeatures(String stereotypeName, String pattern, Integer page, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        //Initialize variables
+        HashMap<String, String> featuresMap = new HashMap<>();
+
+        //get Stereotype ID from table Clients
+        String stereotypeID = getStereotypeUID(stereotypeName, clientName);
+
+        if (stereotypeID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return null;
+        }
+
+        HTable table = null;
+
+        try {
+
+            table = new HTable(config, table_Stereotypes);
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't load table " + table_Stereotypes, ex);
+            return null;
+        }
+
+        Get get = new Get(Bytes.toBytes(stereotypeID));
+        get.addFamily(family_Features);
+
+        ArrayList<Filter> filters = new ArrayList<>();
+
+        //if pattern is not null then add the filter pattern
+        if (pattern != null) {
+            //set features pattern as filter 
+            filters.add(new ColumnPrefixFilter(Bytes.toBytes(pattern)));
+        }
+
+        //if pattern and page is null then not add extra filters
+        if (!filters.isEmpty()) {
+            //Set the filter list on get 
+            get.setFilter(
+                    new FilterList(filters)
+            );
+        }
+
+        //if page not null then set the offset of the page 
+        if (page != null) {
+            //add page filter of the result
+            get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
+        }
+
+        Result result = null;
+
+        try {
+
+            result = table.get(get);
+
+        } catch (IOException ex) {
+            LOGGER.error("Error on get from table", ex);
+            return null;
+        }
+
+        NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Features);
+
+        if (result.isEmpty()) {
+            return featuresMap;
+        }
+
+        //For each Feature on the list
+        for (byte[] cQ : familyMap.descendingKeySet()) {
+            featuresMap.put(Bytes.toString(cQ),
+                    Bytes.toString(familyMap.descendingMap().get(cQ)));
+        }
+
+        return featuresMap;
     }
 
+    /**
+     *
+     * @param stereotypeName
+     * @param pattern
+     * @param clientName
+     * @return
+     */
     @Override
     public boolean deleteStereotypeFeatures(String stereotypeName, String pattern, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        boolean status = true;
+        HTable stereotypeTable = null;
+        HashMap<String, String> featuresForDelete;
+
+        try {
+
+            // Create an hbase stereotypes table object
+            stereotypeTable = new HTable(config, table_Stereotypes);
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't load stereotypesTable", ex);
+            return false;
+        }
+
+        //get all features based on pattern
+        featuresForDelete = new HashMap<>(getStereotypeFeatures(stereotypeName,
+                pattern, null, clientName));
+
+        // Delete stereotypes form the client table
+        Delete stereotypeFeaturesDelete = new Delete(
+                Bytes.toBytes(getStereotypeUID(stereotypeName, clientName)));
+
+        //For eash feature delete them from the table
+        for (String cFtrName : featuresForDelete.keySet()) {
+            //add delete column record for the current stereotype
+            stereotypeFeaturesDelete.deleteColumn(
+                    family_Features, Bytes.toBytes(cFtrName));
+        }
+
+        try {
+
+            // delete feature column from the table stereotype
+            stereotypeTable.delete(stereotypeFeaturesDelete);
+
+            // flush the Commits
+            stereotypeTable.flushCommits();
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't delete stereotype features from stereotype Table", ex);
+            return false;
+        }
+
+        try {
+        
+            // close the table
+            stereotypeTable.close();
+
+        } catch (IOException ex) {
+            LOGGER.error("Error on close tables", ex);
+            return false;
+        }
+
+        //the action status
+        return status;
     }
 
+    /**
+     *
+     * @param stereotypeName
+     * @param pattern
+     * @param page
+     * @param clientName
+     * @return
+     */
     @Override
     public List<String> getStereotypeUsers(String stereotypeName, String pattern, Integer page, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        //Initialize variables
+        ArrayList<String> usersList = new ArrayList<>();
+
+        //get Stereotype ID from table Clients
+        String stereotypeID = getStereotypeUID(stereotypeName, clientName);
+
+        if (stereotypeID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return null;
+        }
+
+        HTable table = null;
+
+        try {
+
+            table = new HTable(config, table_Stereotypes);
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't load table " + table_Stereotypes, ex);
+            return null;
+        }
+
+        Get get = new Get(Bytes.toBytes(stereotypeID));
+        get.addFamily(family_Users);
+
+        ArrayList<Filter> filters = new ArrayList<>();
+
+        //if pattern is not null then add the filter pattern
+        if (pattern != null) {
+            //set usernames pattern as filter 
+            filters.add(new ColumnPrefixFilter(Bytes.toBytes(pattern)));
+        }
+
+        //if pattern and page is null then not add extra filters
+        if (!filters.isEmpty()) {
+            //Set the filter list on get 
+            get.setFilter(
+                    new FilterList(filters)
+            );
+        }
+
+        //if page not null then set the offset of the page 
+        if (page != null) {
+            //add page filter of the result
+            get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
+        }
+
+        Result result = null;
+
+        try {
+
+            result = table.get(get);
+
+        } catch (IOException ex) {
+            LOGGER.error("Error on get from table", ex);
+            return null;
+        }
+
+        NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Users);
+
+        if (result.isEmpty()) {
+            return usersList;
+        }
+
+        //For each User on the list
+        for (byte[] cQ : familyMap.descendingKeySet()) {
+            usersList.add(Bytes.toString(cQ));
+        }
+
+        return usersList;
     }
 
+    /**
+     *
+     * @param username
+     * @param pattern
+     * @param page
+     * @param clientName
+     * @return
+     */
     @Override
     public List<String> getUserStereotypes(String username, String pattern, Integer page, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        //Initialize variables
+        ArrayList<String> strList = new ArrayList<>();
+
+        //get User UID from table Clients
+        String userUID = getUserUID(username, clientName);
+
+        if (userUID == null) {
+            LOGGER.error("User not exists");
+            return null;
+        }
+
+        HTable table = null;
+
+        try {
+
+            table = new HTable(config, table_Users);
+
+        } catch (IOException ex) {
+            LOGGER.error("Can't load table " + table_Users, ex);
+            return null;
+        }
+
+        Get get = new Get(Bytes.toBytes(userUID));
+        get.addFamily(family_Stereotypes);
+
+        ArrayList<Filter> filters = new ArrayList<>();
+
+        //if pattern is not null then add the filter pattern
+        if (pattern != null) {
+            //set stereotype pattern as filter 
+            filters.add(new ColumnPrefixFilter(Bytes.toBytes(pattern)));
+        }
+
+        //if pattern and page is null then not add extra filters
+        if (!filters.isEmpty()) {
+            //Set the filter list on get 
+            get.setFilter(
+                    new FilterList(filters)
+            );
+        }
+
+        //if page not null then set the offset of the page 
+        if (page != null) {
+            //add page filter of the result
+            get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
+        }
+
+        Result result = null;
+
+        try {
+
+            result = table.get(get);
+
+        } catch (IOException ex) {
+            LOGGER.error("Error on get from table", ex);
+            return null;
+        }
+
+        NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(family_Stereotypes);
+
+        if (result.isEmpty()) {
+            return strList;
+        }
+
+        //For each Stereotype on the list
+        for (byte[] cQ : familyMap.descendingKeySet()) {
+            strList.add(Bytes.toString(cQ));
+        }
+
+        return strList;
     }
 
     @Override
@@ -904,8 +1367,33 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    
-    
+    /**
+     * Get the stereotype ID for the given stereotype name If not stereotype
+     * exist on Storage return null
+     *
+     * @param username The username that i want the UUID
+     * @return the UUID for the given username
+     */
+    private String getStereotypeUID(String stereotype, String clientName) {
+        String sterID = null;
+        String clientUID = getClientUID(clientName);
+        try {
+
+            HTable table = new HTable(config, table_Clients);
+            Get get = new Get(Bytes.toBytes(clientUID));
+            get.setFilter((new ColumnPrefixFilter(Bytes.toBytes(stereotype))));
+            Result result = table.get(get);
+
+            sterID = Bytes.toString(
+                    result.getValue(family_Stereotypes, Bytes.toBytes(stereotype))
+            );
+
+        } catch (IOException ex) {
+            LOGGER.error("IOException", ex);
+        }
+        return sterID;
+    }
+
     /**
      * Generate new StereotypeID
      *

@@ -38,7 +38,7 @@ public class CommunityREST {
     
 
     
-// TODO: Implement Add new user community
+//  Implement Add new user community
 // POST /user/:communityName/:communityUsersObject | Add new user custom community on the platform
     @Path("user/{communityName}/{communityUsersObject}")
     @POST
@@ -51,7 +51,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Add user association
+//  Implement  Add user association
 // POST /user/:user1/and/:user2/associate/:weight | Add the weight of user’s association between two users
     @Path("user/{user1}/and/{user2}/associate/{weight}")
     @POST
@@ -65,7 +65,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Calculate User association
+//  Implement  Calculate User association
 // POST /user/:metricAlgorithm/association | Calculates the association distance for all users in the platform
     @Path("user/{metricAlgorithm}/association")
     @POST
@@ -78,7 +78,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Make user communities
+//  Implement  Make user communities
 // POST /user/:clusterAlgorithm/with/:associationType | Make clustering to users and find user communities
     @Path("user/{clusterAlgorithm}/with/{associationType}")
     @POST
@@ -92,7 +92,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Delete user communities
+//  Implement  Delete user communities
 // DELETE /user | Make clustering to users and find user communities
     @Path("user")
     @DELETE
@@ -104,7 +104,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Get user communities
+//  Implement  Get user communities
 // GET /user | Get a list with user communities on the platform
     @Path("user")
     @GET
@@ -117,7 +117,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Get user community profile
+//  Implement  Get user community profile
 // GET /user/:communityName | Get user’s community profile
     @Path("user/{communityName}")
     @GET
@@ -131,7 +131,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Get user community users
+//  Implement  Get user community users
 // GET /user/:communityName/users | Get users that belongs to  given community user
     @Path("user/{communityName}/users")
     @GET
@@ -145,7 +145,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Get users communities
+//  Implement  Get users communities
 // GET /user/:username/communities | Get the communities that user contained
     @Path("user/{username}/communities")
     @GET
@@ -163,7 +163,7 @@ public class CommunityREST {
     
     
 // ===========================================   
-// TODO: Implement  Add new feature community
+//  Implement  Add new feature community
 // POST /feature/:communityName/:communityFeatureObject | Add new custom feature community on the platform
     @Path("feature/{communityName}/{communityFeatureObject}")
     @POST
@@ -176,7 +176,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Calculate Feature association
+//  Implement  Calculate Feature association
 // POST /feature/:metricAlgorithm/association | Calculates the association distance for all features in the platform
     @Path("feature/{metricAlgorithm}/association")
     @POST
@@ -189,7 +189,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Make feature communities
+//  Implement  Make feature communities
 // POST /feature/:clusterAlgorithm/with/:associationType | Make clustering to features and find feature communities
     @Path("feature/{clusterAlgorithm}/with/{associationType}")
     @POST
@@ -203,7 +203,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Delete feature communities
+//  Implement  Delete feature communities
 // DELETE /feature | Delete feature communities from the platform
     @Path("feature")
     @DELETE
@@ -215,7 +215,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Get feature communities
+//  Implement  Get feature communities
 // GET /feature | Get a list with feature communities on the platform
     @Path("feature")
     @GET
@@ -228,7 +228,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Get feature community features
+//  Implement  Get feature community features
 // GET /feature/:communityName/features | Get features that belongs to  given feature community
     @Path("feature/{communityName}/features")
     @GET
@@ -242,7 +242,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Implement  Get feature’s  feature communities
+//  Implement  Get feature’s  feature communities
 // GET /feature/:featurename/communities | Get the communities that feature contained
     @Path("feature/{featurename}/communities")
     @GET
@@ -260,7 +260,7 @@ public class CommunityREST {
     
     
 // ===========================================   
-// TODO: Get Metric algorithms
+//  Get Metric algorithms
 // GET /metrics | Get list with metric algorithms and their parameter description
     @Path("metrics")
     @GET
@@ -271,7 +271,7 @@ public class CommunityREST {
      return null;
     }
     
-// TODO: Get Clustering algorithms
+//  Get Clustering algorithms
 // GET /clusters | Get list with cluster algorithms and their parameter description
     @Path("clusters")
     @GET

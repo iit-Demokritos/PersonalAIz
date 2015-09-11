@@ -15,8 +15,8 @@ import java.util.Map;
 public interface IStereotypeStorage {
     
     boolean addStereotype(String stereotypeName, String rule, String clientName);
-    boolean deleteStereotype(String pattern, String clientName);
-    List<String> getStereotypes(String pattern, Integer page, String clientName);
+    boolean deleteStereotypes(String pattern, String clientName);
+    Map<String,String> getStereotypes(String pattern, Integer page, String clientName);
     
     
     

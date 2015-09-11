@@ -83,7 +83,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        // call HBase AddUsers to add the users in HBase Storage 
+        // call storage AddUsers to add the users on PServer 
         return dbPersonal.addUsers(usersList, psClient.username);
     }
 
@@ -105,7 +105,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        // call HBase AddUsers to add the users in HBase Storage 
+        //Call storage AddUsers to add the users on PServer
         return dbPersonal.addUsers(usersList, psClient.username);
     }
 
@@ -189,7 +189,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        // call HBase setUserAttributes to set the user Attributes in HBase Storage
+        // call storage setUserAttributes to set the user Attributes on PServer
         return dbPersonal.setUserAttributes(user, psClient.username);
     }
 
@@ -225,7 +225,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        //Call HBase to get User attributes
+        //Call storage to get User attributes
         return dbPersonal.getUserAttributes(user, pattern, page, psClient.username);
     }
 
@@ -255,7 +255,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        // call HBase setUsersFeatures to set the users Features in HBase Storage
+        // call storage setUsersFeatures to set the users Features on PServer
         return dbPersonal.setUserFeatures(user, psClient.username);
     }
 
@@ -284,7 +284,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        // call HBase modifyUserFeatures to set the users Features in HBase Storage
+        //Call storage modifyUserFeatures to set the users Features on PServer
         return dbPersonal.modifyUserFeatures(user, psClient.username);
     }
 
@@ -319,7 +319,7 @@ public class Personal {
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
-        //Call HBase to get User features
+        //Call storage to get User features
         return dbPersonal.getUserFeatures(user, pattern, page, psClient.username);
     }
 
