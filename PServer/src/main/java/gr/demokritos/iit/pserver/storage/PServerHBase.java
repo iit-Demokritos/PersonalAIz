@@ -1178,7 +1178,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         }
 
         try {
-        
+
             // close the table
             stereotypeTable.close();
 
@@ -1637,4 +1637,57 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
     //=================== Administration ======================================
+    //=================== Test functions ======================================
+    public void getUsers() {
+
+        //Initialize variables
+        HashMap<String, String> users = new HashMap<>();
+
+        HTable table = null;
+        try {
+
+            //Create clients table
+            table = new HTable(config, table_Clients);
+
+            Scan scan = new Scan();
+
+            FilterList list = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+            
+            SingleColumnValueFilter filter1 = new SingleColumnValueFilter(
+                    family_Attributes,
+                    Bytes.toBytes("AttributeName"),
+                    CompareFilter.CompareOp.EQUAL,
+                    Bytes.toBytes("age")
+            );
+            list.addFilter(filter1);
+            
+            SingleColumnValueFilter filter2 = new SingleColumnValueFilter(
+                    family_Attributes,
+                    Bytes.toBytes("AttributeName"),
+                    CompareFilter.CompareOp.EQUAL,
+                    Bytes.toBytes("age")
+            );
+            list.addFilter(filter2);
+            scan.setFilter(list);
+
+            ResultScanner scanner = table.getScanner(scan);
+
+            for (Result cResult : scanner) {
+                String cName = Bytes.toString(
+                        cResult.getValue(family_Info, qualifier_Username)
+                );
+                String cUID = Bytes.toString(
+                        cResult.getRow()
+                );
+
+                users.put(cName,cUID);
+
+            }
+
+        } catch (IOException ex) {
+            LOGGER.error("Error on get clients", ex);
+        }
+
+    }
+
 }
