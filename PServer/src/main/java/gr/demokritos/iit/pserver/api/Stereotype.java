@@ -433,7 +433,7 @@ public class Stereotype {
         psClient.updateAuthenticatedTimestamp();
 
         //Call storage deleteUserFromStereotype to delete a user from Stereotype
-        return dbStereotype.DeleteUserFromStereotype(username, stereotypeName, psClient.username);
+        return dbStereotype.deleteUserFromStereotype(username, stereotypeName, psClient.username);
     }
 
     

@@ -1363,7 +1363,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
     @Override
-    public boolean DeleteUserFromStereotype(String username, String stereotypeName, String clientName) {
+    public boolean deleteUserFromStereotype(String username, String stereotypeName, String clientName) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

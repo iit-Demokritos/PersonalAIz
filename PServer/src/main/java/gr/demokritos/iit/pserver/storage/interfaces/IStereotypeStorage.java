@@ -45,7 +45,7 @@ public interface IStereotypeStorage {
             Integer page, String clientName);
     boolean addUserOnStereotype(String username, String stereotypeName, 
             String clientName);
-    boolean DeleteUserFromStereotype(String username, String stereotypeName, 
+    boolean deleteUserFromStereotype(String username, String stereotypeName, 
             String clientName);
     
 }
