@@ -26,6 +26,7 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
@@ -122,7 +123,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             Put put = new Put(Bytes.toBytes(userID));
 
             //-----------------------------------------------
-//            Increment inc = new Increment(Bytes.toBytes(userID));
+            Increment inc = new Increment(Bytes.toBytes(userID));
             //------------------------------------------------
             //add current user info
             for (String cInfo : user.getInfo().keySet()) {
@@ -138,6 +139,20 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             //add current user attributes
             for (String cAttribute : user.getAttributes().keySet()) {
+//                  if (user.getAttributes().get(cAttribute).matches("[0-9]+")) {
+//                    //add feature as element for increase
+//                    inc.addColumn(family_Attributes,
+//                            Bytes.toBytes(cAttribute),
+//                            Long.parseLong(user.getAttributes().get(cAttribute)));
+//
+//                }else{
+//
+//                    //if feature is not integer then add it as not increasement feature 
+//                    put.add(family_Attributes,
+//                            Bytes.toBytes(cAttribute),
+//                            Bytes.toBytes(user.getAttributes().get(cAttribute)));
+//
+//                }
                 put.add(family_Attributes,
                         Bytes.toBytes(cAttribute),
                         Bytes.toBytes(user.getAttributes().get(cAttribute)));

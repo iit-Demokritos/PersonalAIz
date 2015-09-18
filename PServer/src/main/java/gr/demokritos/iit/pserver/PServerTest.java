@@ -70,7 +70,7 @@ public class PServerTest {
 
         Random r = new Random(50);
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 5; i++) {
 
             //Create new User
             String username = "TestUser" + i;
@@ -89,15 +89,22 @@ public class PServerTest {
             } else {
                 attributes.put("country", "gr");
             }
+            
+            HashMap<String, String> info = new HashMap<>();
+            info.put("Username", username);
+            user.setInfo(info);
+
+            attributes.put("oc", Integer.toString(r.nextInt(3)));
+
             user.setAttributes(attributes);
 
-            HashMap<String, String> features = new HashMap<>();
-            features.put("category.sport", Integer.toString(r.nextInt(30)));
-            features.put("category.eco", Integer.toString(r.nextInt(30)));
-            features.put("txt.basket", Integer.toString(r.nextInt(50)));
-            features.put("txt.hellas", Integer.toString(r.nextInt(50)));
-            user.setFeatures(features);
-            System.out.println(username+" --> "+attributes);
+//            HashMap<String, String> features = new HashMap<>();
+//            features.put("category.sport", Integer.toString(r.nextInt(30)));
+//            features.put("category.eco", Integer.toString(r.nextInt(30)));
+//            features.put("txt.basket", Integer.toString(r.nextInt(50)));
+//            features.put("txt.hellas", Integer.toString(r.nextInt(50)));
+//            user.setFeatures(features);
+            System.out.println(username + " --> " + attributes);
             instance.addUser(user);
 
         }
