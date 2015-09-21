@@ -32,11 +32,11 @@ public class TestStringTokenizer {
 
         HTable table = null;
         
-//TestUser4 --> {country=en, gender=male, oc=1, age=2}
-//TestUser1 --> {country=en, gender=male, oc=0, age=31}
 //TestUser0 --> {country=en, gender=male, oc=1, age=33}
-//TestUser3 --> {country=gr, gender=female, oc=0, age=35}
+//TestUser1 --> {country=en, gender=male, oc=0, age=31}
 //TestUser2 --> {country=en, gender=male, oc=2, age=43}
+//TestUser3 --> {country=gr, gender=female, oc=0, age=35}
+//TestUser4 --> {country=en, gender=male, oc=1, age=2}
 
         String rule = "(age>40|AND|gender:male)|OR|country:gr";
         System.out.println("Rule --> " + rule);

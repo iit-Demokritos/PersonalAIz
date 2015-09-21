@@ -11,6 +11,7 @@ import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.PServerHBase;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
@@ -24,12 +25,12 @@ public class PServerTest {
 
     public static void main(String[] args) throws IOException, DeserializationException {
 
-        String clientInfo = "{"
-                + "\"mail\":\"info@mail.com\","
-                + "\"info1\":\"info1value\""
-                + "}";
-
-        System.out.println("===============================================");
+//        String clientInfo = "{"
+//                + "\"mail\":\"info@mail.com\","
+//                + "\"info1\":\"info1value\""
+//                + "}";
+//
+//        System.out.println("===============================================");
 //        Client cl =new Client("root", "root");
 //        cl.setAuthenticatedTimestamp(new Date().getTime());
 //         Admin admin= new Admin(new PServerHBase(),cl );
@@ -37,6 +38,8 @@ public class PServerTest {
 //         
 //         admin.addClient("root", "root", info);
 //        String userJSON ="{\"attributes\":{\"gender\":\"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr3\": \"3\",\"ftr5\": \"4\"}}";
+
+
 //        User user = new User("panagiotis");
 //        user.userCreator(userJSON);
 //        System.out.println(user.getFeatures());
@@ -64,11 +67,12 @@ public class PServerTest {
         Client cl = new Client("root", "root");
         //Set client auth time
         cl.setAuthenticatedTimestamp(new Date().getTime());
-        //Create new personal instance
+//        //Create new personal instance
         Personal instance = new Personal(new PServerHBase(), cl);
-        instance.deleteUsers(null);
+//        instance.deleteUsers(null);
 
         Random r = new Random(50);
+        ArrayList<User> usersList = new ArrayList<>();
 
         for (int i = 0; i < 5; i++) {
 
@@ -105,9 +109,9 @@ public class PServerTest {
 //            features.put("txt.hellas", Integer.toString(r.nextInt(50)));
 //            user.setFeatures(features);
             System.out.println(username + " --> " + attributes);
-            instance.addUser(user);
-
+            usersList.add(user);
         }
+            instance.addUsers(usersList);
 
         System.out.println("===============================================");
     }

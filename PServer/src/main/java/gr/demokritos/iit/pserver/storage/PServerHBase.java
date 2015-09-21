@@ -117,13 +117,12 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         //for each user
         for (User user : users) {
-//            String userID = getUserUID(user.getUsername(), clientName);
             String userID = generateUserUID(user.getUsername(), clientName);
             //Create put method with row key
             Put put = new Put(Bytes.toBytes(userID));
 
             //-----------------------------------------------
-            Increment inc = new Increment(Bytes.toBytes(userID));
+//            Increment inc = new Increment(Bytes.toBytes(userID));
             //------------------------------------------------
             //add current user info
             for (String cInfo : user.getInfo().keySet()) {
@@ -139,20 +138,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             //add current user attributes
             for (String cAttribute : user.getAttributes().keySet()) {
-//                  if (user.getAttributes().get(cAttribute).matches("[0-9]+")) {
-//                    //add feature as element for increase
-//                    inc.addColumn(family_Attributes,
-//                            Bytes.toBytes(cAttribute),
-//                            Long.parseLong(user.getAttributes().get(cAttribute)));
-//
-//                }else{
-//
-//                    //if feature is not integer then add it as not increasement feature 
-//                    put.add(family_Attributes,
-//                            Bytes.toBytes(cAttribute),
-//                            Bytes.toBytes(user.getAttributes().get(cAttribute)));
-//
-//                }
                 put.add(family_Attributes,
                         Bytes.toBytes(cAttribute),
                         Bytes.toBytes(user.getAttributes().get(cAttribute)));
@@ -166,25 +151,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                         Bytes.toBytes(user.getFeatures().get(cFeature)));
 
             }
-//            for (String cFeature : user.getFeatures().keySet()) {
-//
-//                try {
-//
-//                    //add feature as element for increase
-//                    inc.addColumn(family_Features,
-//                            Bytes.toBytes(cFeature),
-//                            Long.parseLong(user.getFeatures().get(cFeature)));
-//
-//                } catch (Exception e) {
-//
-//                    //if feature is not integer then add it as not increasement feature 
-//                    put.add(family_Features,
-//                            Bytes.toBytes(cFeature),
-//                            Bytes.toBytes(user.getFeatures().get(cFeature)));
-//
-//                }
-//
-//            }
 
             try {
 
@@ -196,18 +162,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                 return false;
             }
 
-            //if increment is not null then add to user table
-//            if (!inc.isEmpty()) {
-//
-//                try {
-//
-//                    usersTable.increment(inc);
-//
-//                } catch (IOException ex) {
-//                    LOGGER.error("Add Users increment features failed", ex);
-//                    return false;
-//                }
-//            }
             //put username and UUID on clients user PUT
             putClientUsers.add(family_ClientUsers,
                     Bytes.toBytes(user.getUsername()),
@@ -267,9 +221,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             //Create put method with row key
             Put put = new Put(Bytes.toBytes(userID));
 
-            //-----------------------------------------------
-//            Increment inc = new Increment(Bytes.toBytes(userID));
-            //------------------------------------------------
             //add current user attributes
             for (String cAttribute : user.getAttributes().keySet()) {
                 put.add(family_Attributes,
@@ -283,7 +234,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                 put.add(family_Features,
                         Bytes.toBytes(cFeature),
                         Bytes.toBytes(user.getFeatures().get(cFeature)));
-
             }
 
             try {
