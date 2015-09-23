@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.pserver;
 
+import gr.demokritos.iit.pserver.storage.FilterListObject;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class TestStringTokenizer {
 //TestUser3 --> {country=gr, gender=female, oc=0, age=35}
 //TestUser4 --> {country=en, gender=male, oc=1, age=2}
 
-        String rule = "(age>40|AND|gender:male)|OR|country:gr";
+        String rule = "(age>3|AND|gender:male)|OR|country:gr";
         System.out.println("Rule --> " + rule);
 
         String tmp = rule.replaceAll("\\|AND\\|", "&");
@@ -206,7 +207,7 @@ public class TestStringTokenizer {
         Scan scan = new Scan();
 
         scan.setFilter(currentState.getList());
-
+        
         ResultScanner scanner = table.getScanner(scan);
 
         for (Result cResult : scanner) {

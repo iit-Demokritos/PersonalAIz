@@ -102,12 +102,12 @@ public class PServerTest {
 
             user.setAttributes(attributes);
 
-//            HashMap<String, String> features = new HashMap<>();
-//            features.put("category.sport", Integer.toString(r.nextInt(30)));
-//            features.put("category.eco", Integer.toString(r.nextInt(30)));
-//            features.put("txt.basket", Integer.toString(r.nextInt(50)));
-//            features.put("txt.hellas", Integer.toString(r.nextInt(50)));
-//            user.setFeatures(features);
+            HashMap<String, String> features = new HashMap<>();
+            features.put("category.sport", Integer.toString(r.nextInt(30)));
+            features.put("category.eco", Integer.toString(r.nextInt(30)));
+            features.put("txt.basket", Integer.toString(r.nextInt(50)));
+            features.put("txt.hellas", Integer.toString(r.nextInt(50)));
+            user.setFeatures(features);
             System.out.println(username + " --> " + attributes);
             usersList.add(user);
         }
@@ -117,3 +117,11 @@ public class PServerTest {
     }
 
 }
+
+
+
+//TestUser2 --> {country=en, gender=male, oc=1, age=2}
+//TestUser4 --> {country=gr, gender=male, oc=2, age=24} -
+//TestUser0 --> {country=en, gender=male, oc=1, age=33} -
+//TestUser1 --> {country=en, gender=male, oc=2, age=43} -
+//TestUser3 --> {country=en, gender=female, oc=2, age=44}

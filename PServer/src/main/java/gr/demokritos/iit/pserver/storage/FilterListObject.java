@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.pserver;
+package gr.demokritos.iit.pserver.storage;
 
 import org.apache.hadoop.hbase.filter.FilterList;
 

@@ -26,7 +26,6 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
@@ -67,6 +66,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     private final byte[] qualifier_Client = Bytes.toBytes("Client");
     private final byte[] qualifier_Username = Bytes.toBytes("Username");
     private final byte[] qualifier_Password = Bytes.toBytes("Password");
+    private final byte[] qualifier_Rule = Bytes.toBytes("Rule");
 
     //=================== HBase Qualifiers ====================================
     private final Configuration config;
@@ -133,7 +133,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             //add Client info on storage 
             put.add(family_Info,
-                    Bytes.toBytes("Client"),
+                    qualifier_Client,
                     Bytes.toBytes(getClientUID(clientName)));
 
             //add current user attributes
@@ -690,20 +690,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      */
     @Override
     public boolean modifyUserFeatures(User user, String clientName) {
-        boolean status = true;
 
-        //create new Users HTable
-        HTable usersTable = null;
-
-        try {
-
-            usersTable = new HTable(config, table_Users);
-
-        } catch (IOException ex) {
-            LOGGER.error("Can't load table " + table_Users, ex);
-            return false;
-        }
-
+        //Get user UID
         String userID = getUserUID(user.getUsername(), clientName);
         if (userID == null) {
             LOGGER.error("User not exists");
@@ -790,9 +778,97 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     //=================== Personal Mode =======================================
     //=================== Stereotype Mode =====================================
+    /**
+     * Add new stereotype on HBase storage
+     *
+     * @param stereotypeName The stereotypes name
+     * @param rule The rule to create the stereotype
+     * @param clientName The clients name
+     * @return The status of this action
+     */
     @Override
     public boolean addStereotype(String stereotypeName, String rule, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        HTable stereotypesTable = null;
+        HTable clientsTable = null;
+
+        //Generate stereotype UID
+        String stereotypeUID = generateStereotypeUID(stereotypeName, clientName);
+
+        //Get clients UID
+        String clientUID = getClientUID(clientName);
+
+        try {
+
+            //create new Stereotypes HTable
+            stereotypesTable = new HTable(config, table_Stereotypes);
+
+            //create new Clients HTable
+            clientsTable = new HTable(config, table_Clients);
+
+        } catch (IOException ex) {
+            LOGGER.error("Problem on load tables", ex);
+            return false;
+        }
+
+        //Add record on Clients table --> stereotypes CF
+        //Create put method with client row key
+        Put putClientStereotypes = new Put(Bytes.toBytes(clientUID));
+        //put Stereotype name and UID on clients Stereotype PUT
+        putClientStereotypes.add(family_Stereotypes,
+                Bytes.toBytes(stereotypeName),
+                Bytes.toBytes(stereotypeUID));
+
+        //Add record on Stereotypes table
+        //Create put method with stereotype row key
+        Put putStereotype = new Put(Bytes.toBytes(stereotypeUID));
+        putStereotype.add(family_Info,
+                qualifier_Client,
+                Bytes.toBytes(clientUID));
+        putStereotype.add(family_Info,
+                qualifier_Rule,
+                Bytes.toBytes(rule));
+
+        try {
+            //Put on tables
+            stereotypesTable.put(putStereotype);
+            clientsTable.put(putClientStereotypes);
+
+            //Flush Commits
+            stereotypesTable.flushCommits();
+            clientsTable.flushCommits();
+
+        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
+            LOGGER.error("Fail to add stereotype on tables", ex);
+            return false;
+        }
+
+        try {
+            //close tables
+            stereotypesTable.close();
+            clientsTable.close();
+        } catch (IOException ex) {
+            LOGGER.error("Fail to close stereotype and client tables", ex);
+            return false;
+        }
+
+        //Call find stereotype users to add users on the stereotype
+        if (findStereotypeUsers(stereotypeName, clientName)) {
+            //Call update stereotype features
+            if (updateStereotypeFeatures(stereotypeName, clientName)) {
+                return true;
+            } else {
+                LOGGER.error("Fail to update stereotype features."
+                        + " Delete Stereotype from storage");
+                deleteStereotypes(stereotypeName, clientName);
+                return false;
+            }
+        } else {
+            LOGGER.error("Fail to find stereotype users."
+                    + " Delete Stereotype from storage");
+            deleteStereotypes(stereotypeName, clientName);
+            return false;
+        }
     }
 
     /**
@@ -971,51 +1047,301 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         return stereotypes;
     }
 
+    /**
+     * Remake the stereotype with the given name
+     *
+     * @param stereotypeName The stereotypes name
+     * @param clientName The client name
+     * @return The status of this action
+     */
     @Override
     public boolean remakeStereotype(String stereotypeName, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        //Call update stereotype Users to update stereotype users
+        if (updateStereotypeUsers(stereotypeName, clientName)) {
+            //Call update stereotype Features to update features
+            if (updateStereotypeFeatures(stereotypeName, clientName)) {
+                return true;
+            } else {
+                LOGGER.error("Error on update Stereotype Features");
+                return false;
+            }
+        } else {
+            LOGGER.error("Error on update Stereotype Users");
+            return false;
+        }
     }
 
     @Override
     public boolean updateStereotypeFeatures(String stereotypeName, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean updateStereotypeUsers(String stereotypeName, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean findStereotypeUsers(String stereotypeName, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean checkStereotypeUsers(String stereotypeName, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean setStereotypeFeatures(String stereotypeName, Map<String, String> features, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean modifyStereotypeFeatures(String stereotypeName, Map<String, String> features, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //Check if stereotype exists
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return false;
+        }
+        return false;
     }
 
     /**
+     * Update the stereotypes users. Check the users who not satisfies the rule
+     * and find the new users who satisfies the rule.
      *
-     * @param stereotypeName
-     * @param pattern
-     * @param page
-     * @param clientName
-     * @return
+     * @param stereotypeName The stereotype name
+     * @param clientName The client name
+     * @return The status of this action
      */
     @Override
-    public Map<String, String> getStereotypeFeatures(String stereotypeName, String pattern, Integer page, String clientName) {
+    public boolean updateStereotypeUsers(String stereotypeName, String clientName) {
+
+        //Call check stereotype users 
+        if (checkStereotypeUsers(stereotypeName, clientName)) {
+            //Call find stereotype users
+            if (findStereotypeUsers(stereotypeName, clientName)) {
+                return true;
+            } else {
+                LOGGER.error("Error on Find Stereotype Users");
+                return false;
+            }
+        } else {
+            LOGGER.error("Error on Check Stereotype Users");
+            return false;
+        }
+    }
+
+    /**
+     * Find the new users that satisfies the stereotype rule and them on
+     * stereotype
+     *
+     * @param stereotypeName The stereotype name
+     * @param clientName The client name
+     * @return The status of this action
+     */
+    @Override
+    public boolean findStereotypeUsers(String stereotypeName, String clientName) {
+
+        Boolean status = true;
+
+        //Get stereotypes UID
+        String stereotypeUID = generateStereotypeUID(stereotypeName, clientName);
+        //Check if stereotype exists
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return false;
+        }
+        //Get the rule from stereotype
+        String rule = getStereoypeRule(stereotypeUID);
+        //Parse query to filter
+        QueryParser qp = new QueryParser();
+        FilterList filter = qp.getParsedQuery(rule);
+
+        //Get all stereotype users
+        ArrayList<String> allSystemUsers = new ArrayList<>();
+        allSystemUsers.addAll(
+                getStereotypeUsers(stereotypeName, null, null, clientName));
+
+        //Get all users how satisfies the rule
+        ArrayList<String> findUsers = new ArrayList<>();
+        findUsers.addAll(getUsersFromFilter(filter, clientName));
+
+        //For each user in find list
+        for (String cUser : findUsers) {
+            //Check if is already exist on stereotypes users
+            if (!allSystemUsers.contains(cUser)) {
+                //If not exist add username to on stereotype
+                if (!addUserOnStereotype(cUser, stereotypeName, clientName)) {
+                    LOGGER.error("Fail to add user:" + cUser + " on Stereotype" + stereotypeName);
+                    status = false;
+                }
+            }
+        }
+
+        return status;
+    }
+
+    /**
+     * Check the stereotype users and remove the users who not satisfies the
+     * stereotype rule
+     *
+     * @param stereotypeName The stereotype name
+     * @param clientName The client name
+     * @return The status of this action
+     */
+    @Override
+    public boolean checkStereotypeUsers(String stereotypeName, String clientName) {
+
+        Boolean status = true;
+
+        //Get stereotypes UID
+        String stereotypeUID = generateStereotypeUID(stereotypeName, clientName);
+        //Check if stereotype exists
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return false;
+        }
+
+        //Get the rule from stereotype
+        String rule = getStereoypeRule(stereotypeUID);
+        //Parse query to filter
+        QueryParser qp = new QueryParser();
+        FilterList filter = qp.getParsedQuery(rule);
+
+        //Get all stereotype users
+        ArrayList<String> allSystemUsers = new ArrayList<>();
+        allSystemUsers.addAll(
+                getStereotypeUsers(stereotypeName, null, null, clientName));
+
+        //Get all users how satisfies the rule
+        ArrayList<String> checkUsers = new ArrayList<>();
+        checkUsers.addAll(getUsersFromFilter(filter, clientName));
+
+        //For each user in the stereotype
+        for (String cUser : checkUsers) {
+            //Check if exist on check users list
+            if (!allSystemUsers.contains(cUser)) {
+                //If not exist delete username from stereotype
+                if (!deleteUserFromStereotype(cUser, stereotypeName, clientName)) {
+                    LOGGER.error("Fail to delete user:" + cUser + " on Stereotype" + stereotypeName);
+                    status = false;
+                }
+            }
+        }
+
+        return status;
+    }
+
+    /**
+     * Set Stereotypes features. Add on stereotype if features not exist
+     *
+     * @param stereotypeName The stereotype name
+     * @param features A map with featurs key value pairs. (key: feature name ,
+     * value: the feature value)
+     * @param clientName The client name
+     * @return The status of this action
+     */
+    @Override
+    public boolean setStereotypeFeatures(String stereotypeName,
+            Map<String, String> features, String clientName) {
+
+        boolean status = true;
+        HTable stereotypesTable = null;
+
+        //Get stereotypes UID
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return false;
+        }
+
+        try {
+            //create new Stereotypes HTable
+            stereotypesTable = new HTable(config, table_Stereotypes);
+        } catch (IOException ex) {
+            LOGGER.error("Problem on load Stereotype table", ex);
+            return false;
+        }
+
+        //Create put method with row key
+        Put put = new Put(Bytes.toBytes(stereotypeUID));
+
+        //add current stereotype features
+        for (String cFeature : features.keySet()) {
+            put.add(family_Features,
+                    Bytes.toBytes(cFeature),
+                    Bytes.toBytes(features.get(cFeature)));
+        }
+
+        try {
+            //add the updated records on stereotypes table
+            stereotypesTable.put(put);
+            //Flush Commits
+            stereotypesTable.flushCommits();
+        } catch (RetriesExhaustedWithDetailsException | InterruptedIOException ex) {
+            LOGGER.error("Set stereotype features failed", ex);
+            return false;
+        }
+
+        try {
+            //close tables
+            stereotypesTable.close();
+        } catch (IOException ex) {
+            LOGGER.error("Failed to close stereotype table", ex);
+            return false;
+        }
+
+        //return the action status
+        return status;
+    }
+
+    /**
+     * Modify Stereotypes features (increase/decrease). Add on stereotype if
+     * features not exist
+     *
+     * @param stereotypeName The stereotype name
+     * @param modifyFeatures The map with features. Key - value pairs (key:
+     * feature name , value: the modification value)
+     * @param clientName The client name
+     * @return The status of this action
+     */
+    @Override
+    public boolean modifyStereotypeFeatures(String stereotypeName,
+            Map<String, String> modifyFeatures, String clientName) {
+
+        //Get stereotype UID
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
+        //Check if sterotype exists
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return false;
+        }
+
+        //Get stereotype features
+        HashMap<String, String> stereotypeFeatures = new HashMap<>();
+        stereotypeFeatures.putAll(
+                getStereotypeFeatures(stereotypeName,
+                        null,
+                        null,
+                        clientName));
+
+        HashMap<String, String> featuresForSet = new HashMap<>();
+
+        for (String cFeature : modifyFeatures.keySet()) {
+            try {
+                int newValue;
+                //If it is a new feature then add it with the value of modification
+                if (stereotypeFeatures.containsKey(cFeature)) {
+                    int oldValue = Integer.parseInt(stereotypeFeatures.get(cFeature));
+                    int inc = Integer.parseInt(modifyFeatures.get(cFeature));
+                    newValue = oldValue + inc;
+
+                } else {
+                    newValue = Integer.parseInt(modifyFeatures.get(cFeature));
+                }
+                featuresForSet.put(cFeature, String.valueOf(newValue));
+            } catch (Exception ex) {
+                LOGGER.error("No numeric feature:" + cFeature
+                        + " value: " + modifyFeatures.get(cFeature));
+                return false;
+            }
+        }
+
+        //Set new features
+        return setStereotypeFeatures(stereotypeName, featuresForSet, clientName);
+    }
+
+    /**
+     * Get all stereotypes features based on stereotype name, pattern and page
+     *
+     * @param stereotypeName The stereotype name
+     * @param pattern The feature pattern. If null return all features
+     * @param page The page of the result. If null return all features on single
+     * page
+     * @param clientName The client name
+     * @return A map with feature key - value pairs
+     */
+    @Override
+    public Map<String, String> getStereotypeFeatures(String stereotypeName,
+            String pattern, Integer page, String clientName) {
 
         //Initialize variables
         HashMap<String, String> featuresMap = new HashMap<>();
@@ -1255,9 +1581,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         //get User UID from table Clients
         String userUID = getUserUID(username, clientName);
-
         if (userUID == null) {
-            LOGGER.error("User not exists");
+            LOGGER.error("User: " + username + " not exists");
             return null;
         }
 
@@ -1322,14 +1647,170 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         return strList;
     }
 
+    /**
+     * Add a user on stereotype manually.
+     *
+     * @param username The username
+     * @param stereotypeName The stereotype name
+     * @param clientName The client name
+     * @return The status of this action
+     */
     @Override
     public boolean addUserOnStereotype(String username, String stereotypeName, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        //Get user UID
+        String userUID = getUserUID(username, clientName);
+        //Check user if exist
+        if (userUID == null) {
+            LOGGER.error("User: " + username + " not exists");
+            return false;
+        }
+
+        //Get stereotype UID
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
+        //Check stereotype if exist
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype: " + stereotypeName + " not exists");
+            return false;
+        }
+
+        HTable stereotypesTable = null;
+        HTable usersTable = null;
+
+        try {
+            //create new Stereotypes HTable
+            stereotypesTable = new HTable(config, table_Stereotypes);
+
+            //create new Users HTable
+            usersTable = new HTable(config, table_Users);
+
+        } catch (IOException ex) {
+            LOGGER.error("Failed to load tables", ex);
+            return false;
+        }
+
+        //Create Users put
+        Put putStereotypeOnUsers = new Put(Bytes.toBytes(userUID));
+        //Create Stereotypes put
+        Put putUserOnStereotypes = new Put(Bytes.toBytes(stereotypeUID));
+
+        //Put stereotype name and stereotype UID on stereotypes CF at users table
+        putStereotypeOnUsers.add(family_Stereotypes,
+                Bytes.toBytes(stereotypeName),
+                Bytes.toBytes(stereotypeUID));
+        //Put user name and user UID on users CF at stereotype table
+        putUserOnStereotypes.add(family_Users,
+                Bytes.toBytes(username),
+                Bytes.toBytes(userUID));
+
+        try {
+            //Put on table Stereotypes
+            stereotypesTable.put(putUserOnStereotypes);
+            //Put on table Users
+            usersTable.put(putStereotypeOnUsers);
+
+            //Flush Commits
+            stereotypesTable.flushCommits();
+            usersTable.flushCommits();
+
+        } catch (InterruptedIOException | RetriesExhaustedWithDetailsException ex) {
+            LOGGER.error("Fail to put user on stereotype", ex);
+            return false;
+        }
+
+        try {
+            //Close tables
+            stereotypesTable.close();
+            usersTable.close();
+        } catch (IOException ex) {
+            LOGGER.error("Fail to close Stereotypes and Users tables", ex);
+            return false;
+        }
+
+        return true;
     }
 
+    /**
+     * Delete user from stereotype
+     *
+     * @param username The username
+     * @param stereotypeName The stereotype name
+     * @param clientName The client name
+     * @return The status of this action
+     */
     @Override
     public boolean deleteUserFromStereotype(String username, String stereotypeName, String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        //Get user UID
+        String userUID = getUserUID(username, clientName);
+        //Check user if exist
+        if (userUID == null) {
+            LOGGER.error("User: " + username + " not exists");
+            return false;
+        }
+
+        //Get stereotype UID
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
+        //Check stereotype if exist
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype: " + stereotypeName + " not exists");
+            return false;
+        }
+
+        HTable stereotypesTable = null;
+        HTable usersTable = null;
+
+        try {
+            //create new Stereotypes HTable
+            stereotypesTable = new HTable(config, table_Stereotypes);
+
+            //create new Users HTable
+            usersTable = new HTable(config, table_Users);
+
+        } catch (IOException ex) {
+            LOGGER.error("Failed to load tables", ex);
+            return false;
+        }
+
+        //Create Users Delete
+        Delete deleteStereotypeFromUsers = new Delete(Bytes.toBytes(userUID));
+        //Create Stereotypes Delete
+        Delete deleteUserFromStereotypes = new Delete(Bytes.toBytes(stereotypeUID));
+
+        //Delete stereotype name and stereotype UID from users table
+        deleteStereotypeFromUsers.deleteColumn(
+                family_Stereotypes,
+                Bytes.toBytes(stereotypeName));
+        //Delete user name and user UID from stereotypes table
+        deleteUserFromStereotypes.deleteColumn(
+                family_Users,
+                Bytes.toBytes(username));
+
+        try {
+            //Delete from table Stereotypes
+            stereotypesTable.delete(deleteUserFromStereotypes);
+            //Delete from table Users
+            usersTable.delete(deleteStereotypeFromUsers);
+
+            //Flush Commits
+            stereotypesTable.flushCommits();
+            usersTable.flushCommits();
+
+        } catch (IOException ex) {
+            LOGGER.error("Fail to delete user from stereotype", ex);
+            return false;
+        }
+
+        try {
+            //Close tables
+            stereotypesTable.close();
+            usersTable.close();
+        } catch (IOException ex) {
+            LOGGER.error("Fail to close Stereotypes and Users tables", ex);
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -1373,6 +1854,66 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         //Create new StereotypeID
         UUID = Util.getUUID(clientUID + "-" + stereotypeName).toString();
         return UUID;
+    }
+
+    /**
+     * Scan users table and find the users who satisfies the filter
+     *
+     * @param fl The given filter
+     * @return A list with usernames
+     */
+    private List<String> getUsersFromFilter(FilterList givenFilterList,
+            String clientName) {
+
+        ArrayList<String> users = new ArrayList<>();
+        //Create users table
+        HTable table = null;
+        try {
+            table = new HTable(config, table_Users);
+        } catch (IOException ex) {
+            LOGGER.error("Fail to create users table", ex);
+            return null;
+        }
+
+        Scan scan = new Scan();
+
+        FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        //Add given filter list to scans filter list
+        fl.addFilter(givenFilterList);
+        //Add filter to get only users from the current client
+        fl.addFilter(new SingleColumnValueFilter(
+                family_Info,
+                qualifier_Client,
+                CompareFilter.CompareOp.EQUAL,
+                Bytes.toBytes(getClientUID(clientName))
+        ));
+        scan.setFilter(fl);
+
+        ResultScanner scanner;
+        try {
+            scanner = table.getScanner(scan);
+
+            for (Result cResult : scanner) {
+                String cName = Bytes.toString(
+                        cResult.getValue(family_Info,
+                                qualifier_Username)
+                );
+
+                users.add(cName);
+            }
+        } catch (IOException ex) {
+            LOGGER.error("Can't scan table Users with the given filter.", ex);
+            return null;
+        }
+
+        return users;
+    }
+
+    private String getStereoypeRule(String stereotypeUID) {
+        String rule = "";
+
+        //TODO: implement get rule
+        return rule;
     }
 
     //=================== Stereotype Mode =====================================
@@ -1603,56 +2144,5 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     //=================== Administration ======================================
     //=================== Test functions ======================================
-    public void getUsers() {
-
-        //Initialize variables
-        HashMap<String, String> users = new HashMap<>();
-
-        HTable table = null;
-        try {
-
-            //Create clients table
-            table = new HTable(config, table_Clients);
-
-            Scan scan = new Scan();
-
-            FilterList list = new FilterList(FilterList.Operator.MUST_PASS_ALL);
-            
-            SingleColumnValueFilter filter1 = new SingleColumnValueFilter(
-                    family_Attributes,
-                    Bytes.toBytes("AttributeName"),
-                    CompareFilter.CompareOp.EQUAL,
-                    Bytes.toBytes("age")
-            );
-            list.addFilter(filter1);
-            
-            SingleColumnValueFilter filter2 = new SingleColumnValueFilter(
-                    family_Attributes,
-                    Bytes.toBytes("AttributeName"),
-                    CompareFilter.CompareOp.EQUAL,
-                    Bytes.toBytes("age")
-            );
-            list.addFilter(filter2);
-            scan.setFilter(list);
-
-            ResultScanner scanner = table.getScanner(scan);
-
-            for (Result cResult : scanner) {
-                String cName = Bytes.toString(
-                        cResult.getValue(family_Info, qualifier_Username)
-                );
-                String cUID = Bytes.toString(
-                        cResult.getRow()
-                );
-
-                users.put(cName,cUID);
-
-            }
-
-        } catch (IOException ex) {
-            LOGGER.error("Error on get clients", ex);
-        }
-
-    }
 
 }

@@ -5,21 +5,13 @@
  */
 package gr.demokritos.iit.pserver.storage;
 
-import gr.demokritos.iit.pserver.FilterListObject;
-import static gr.demokritos.iit.pserver.storage.PServerHBase.LOGGER;
 import gr.demokritos.iit.pserver.storage.interfaces.IQueryParser;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
@@ -32,19 +24,17 @@ import org.slf4j.LoggerFactory;
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class QueryParser implements IQueryParser<FilterList> {
-    
+
     private HTable table = null;
     private Configuration config;
     private String table_Users = "Users";
-    
-    
+
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(QueryParser.class);
-    
 
     public QueryParser() {
-         config = HBaseConfiguration.create();
+        config = HBaseConfiguration.create();
     }
-    
+
     @Override
     public FilterList getParsedQuery(String sExpression) {
 
@@ -107,9 +97,9 @@ public class QueryParser implements IQueryParser<FilterList> {
                     operator = CompareFilter.CompareOp.LESS;
                 } else if (cToken.equals("}")) {
                     operator = CompareFilter.CompareOp.GREATER_OR_EQUAL;
-                }else if (cToken.equals("{")) {
+                } else if (cToken.equals("{")) {
                     operator = CompareFilter.CompareOp.LESS_OR_EQUAL;
-                }else if (cToken.equals(">")) {
+                } else if (cToken.equals(">")) {
                     operator = CompareFilter.CompareOp.GREATER;
                 } else if (cToken.equals(":")) {
                     operator = CompareFilter.CompareOp.EQUAL;
