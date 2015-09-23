@@ -1072,15 +1072,68 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         }
     }
 
+    /**
+     * Update stereotypes features based on users profile
+     *
+     * @param stereotypeName The stereotype name
+     * @param clientName The client name
+     * @return The status of this action
+     */
     @Override
     public boolean updateStereotypeFeatures(String stereotypeName, String clientName) {
-        //Check if stereotype exists
+
+        //Get stereotype UID
         String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
+        //Check if stereotype exists
         if (stereotypeUID == null) {
             LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
             return false;
         }
-        return false;
+
+        //Get stereotype users
+        ArrayList<String> stereotypeUsers = new ArrayList<>();
+        stereotypeUsers.addAll(
+                getStereotypeUsers(
+                        stereotypeName,
+                        null,
+                        null,
+                        clientName));
+
+        HashMap<String, String> stereotypeFeatures = new HashMap<>();
+        HashMap<String, Integer> stereotypeFeaturesCounter = new HashMap<>();
+
+        //for each user get profile
+        for (String cUser : stereotypeUsers) {
+            Map<String, String> userFeatures = null;
+            userFeatures.putAll(getUserFeatures(cUser, null, null, clientName));
+
+            //for each feature 
+            for (String cFeature : userFeatures.keySet()) {
+                //if feature contains to stereotype list
+                if (stereotypeFeatures.containsKey(cFeature)) {
+                    //update map
+                    int cValue = Integer.getInteger(stereotypeFeatures.get(cFeature));
+                    int addend = Integer.getInteger(userFeatures.get(cFeature));
+                    stereotypeFeatures.put(cFeature, Integer.toString(cValue + addend));
+                    cValue = stereotypeFeaturesCounter.get(cFeature);
+                    stereotypeFeaturesCounter.put(cFeature, cValue++);
+                } else {
+                    //add to list and counter map
+                    stereotypeFeatures.put(cFeature, userFeatures.get(cFeature));
+                    stereotypeFeaturesCounter.put(cFeature, 1);
+                }
+            }
+        }
+
+        //for each feature in the map divene the value with the counter value
+        for (String cFeature : stereotypeFeatures.keySet()) {
+            //update map
+            int cValue = Integer.getInteger(stereotypeFeatures.get(cFeature));
+            int divisor = stereotypeFeaturesCounter.get(cFeature);
+            stereotypeFeatures.put(cFeature, Integer.toString(cValue / divisor));
+        }
+
+        return setStereotypeFeatures(stereotypeName, stereotypeFeatures, clientName);
     }
 
     /**
@@ -1909,11 +1962,39 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         return users;
     }
 
+    /**
+     * Get the rule of the stereotype
+     * @param stereotypeUID The stereotype UID
+     * @return The rule
+     */
     private String getStereoypeRule(String stereotypeUID) {
-        String rule = "";
 
-        //TODO: implement get rule
-        return rule;
+        HTable table = null;
+
+        try {
+            table = new HTable(config, table_Stereotypes);
+        } catch (IOException ex) {
+            LOGGER.error("Can't load table " + table_Stereotypes, ex);
+            return null;
+        }
+
+        Get get = new Get(Bytes.toBytes(stereotypeUID));
+        get.addFamily(family_Info);
+
+        Result result = null;
+
+        try {
+            result = table.get(get);
+        } catch (IOException ex) {
+            LOGGER.error("Error on get from table", ex);
+            return null;
+        }
+
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return Bytes.toString(result.getValue(family_Info, qualifier_Rule));
     }
 
     //=================== Stereotype Mode =====================================
@@ -2144,5 +2225,4 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     //=================== Administration ======================================
     //=================== Test functions ======================================
-
 }
