@@ -41,6 +41,7 @@ public class Actions {
         personalActions.put("aGetUsers", new Action("Personal.GetUsers"));
 
         //PServer stereotype actions
+        stereotypeActions.put("aGetSystemAttributes", new Action("Stereotype.GetSystemAttributes"));
         stereotypeActions.put("aAddStereotype", new Action("Stereotype.AddStereotype"));
         stereotypeActions.put("aDeleteStereotypes", new Action("Stereotype.DeleteStereotypes"));
         stereotypeActions.put("aGetStereotypes", new Action("Stereotype.GetStereotypes"));

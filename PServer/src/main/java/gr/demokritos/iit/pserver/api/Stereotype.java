@@ -55,33 +55,50 @@ public class Stereotype {
         this.security = security;
     }
 
-    
     /**
-     * 
+     *
+     * @return
+     */
+    public Set<String> getSystemAttributes() {
+
+        //Check permission
+        if (!getPermissionFor(actions.get("aGetSystemAttributes"), "R")) {
+            LOGGER.error("Premission Denied");
+            return null;
+        }
+
+        //Update Authenticated time
+        psClient.updateAuthenticatedTimestamp();
+
+        //Call storage getSystemAttributes to get PServer attributes
+        return dbStereotype.getSystemAttributes(psClient.username);
+    }
+
+    /**
+     *
      * @param stereotypeName
      * @param rule
-     * @return 
+     * @return
      */
     public boolean addStereotype(String stereotypeName, String rule) {
-        
+
         //Check permission
         if (!getPermissionFor(actions.get("aAddStereotype"), "W")) {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //Update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-        
+
         //Call storage AddStereotype to create stereotype on PServer 
         return dbStereotype.addStereotype(stereotypeName, rule, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param pattern
-     * @return 
+     * @return
      */
     public boolean deleteStereotypes(String pattern) {
 
@@ -90,7 +107,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //Update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -98,12 +115,11 @@ public class Stereotype {
         return dbStereotype.deleteStereotypes(pattern, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param pattern
      * @param page
-     * @return 
+     * @return
      */
     public Set<String> getStereotypes(String pattern, Integer page) {
 
@@ -112,25 +128,24 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return null;
         }
-        
+
         //Check if page is null or page <1
         if (page == null || page < 1) {
             //set page null to return single page
             page = null;
         }
-        
+
         //Update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-        
+
         //Call storage getStereotypes to get PServer stereotypes
         return dbStereotype.getStereotypes(pattern, page, psClient.username).keySet();
     }
-    
-    
+
     /**
-     * 
+     *
      * @param stereotypeName
-     * @return 
+     * @return
      */
     public boolean remakeStereotype(String stereotypeName) {
 
@@ -139,7 +154,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -147,11 +162,10 @@ public class Stereotype {
         return dbStereotype.remakeStereotype(stereotypeName, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
-     * @return 
+     * @return
      */
     public boolean updateStereotypeFeatures(String stereotypeName) {
 
@@ -160,7 +174,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -168,11 +182,10 @@ public class Stereotype {
         return dbStereotype.updateStereotypeFeatures(stereotypeName, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
-     * @return 
+     * @return
      */
     public boolean updateStereotypeUsers(String stereotypeName) {
 
@@ -181,7 +194,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -189,11 +202,10 @@ public class Stereotype {
         return dbStereotype.updateStereotypeUsers(stereotypeName, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
-     * @return 
+     * @return
      */
     public boolean findStereotypeUsers(String stereotypeName) {
 
@@ -202,7 +214,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -210,11 +222,10 @@ public class Stereotype {
         return dbStereotype.findStereotypeUsers(stereotypeName, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
-     * @return 
+     * @return
      */
     public boolean checkStereotypeUsers(String stereotypeName) {
 
@@ -223,7 +234,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -232,14 +243,13 @@ public class Stereotype {
         return dbStereotype.checkStereotypeUsers(stereotypeName, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
      * @param features
-     * @return 
+     * @return
      */
-    public boolean setStereotypeFeatures(String stereotypeName, 
+    public boolean setStereotypeFeatures(String stereotypeName,
             Map<String, String> features) {
 
         //Check permission
@@ -247,7 +257,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -256,12 +266,11 @@ public class Stereotype {
         return dbStereotype.setStereotypeFeatures(stereotypeName, features, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
      * @param features
-     * @return 
+     * @return
      */
     public boolean modifyStereotypeFeatures(String stereotypeName,
             Map<String, String> features) {
@@ -271,22 +280,21 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-        
+
         //Call modifyStereotypeFeatures from storage 
         //to increase or decrease feature values on stereotype profile
         return dbStereotype.modifyStereotypeFeatures(stereotypeName, features, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
      * @param pattern
      * @param page
-     * @return 
+     * @return
      */
     public Map<String, String> getStereotypeFeatures(String stereotypeName,
             String pattern, Integer page) {
@@ -296,13 +304,13 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return null;
         }
-        
+
         //Check if page is null or page <1
         if (page == null || page < 1) {
             //set page null to return single page
             page = null;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -310,12 +318,11 @@ public class Stereotype {
         return dbStereotype.getStereotypeFeatures(stereotypeName, pattern, page, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
      * @param pattern
-     * @return 
+     * @return
      */
     public boolean deleteStereotypeFeatures(String stereotypeName, String pattern) {
 
@@ -324,21 +331,20 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-        
+
         //Call deleteStereotypeFeatures to remove features from Stereotype Profile
         return dbStereotype.deleteStereotypeFeatures(stereotypeName, pattern, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param stereotypeName
      * @param pattern
      * @param page
-     * @return 
+     * @return
      */
     public List<String> getStereotypeUsers(String stereotypeName, String pattern,
             Integer page) {
@@ -348,27 +354,26 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return null;
         }
-        
+
         //Check if page is null or page <1
         if (page == null || page < 1) {
             //set page null to return single page
             page = null;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-        
+
         //Call storage getStereotypeUsers to get a list with users who belongs to stereotype
         return dbStereotype.getStereotypeUsers(stereotypeName, pattern, page, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param username
      * @param pattern
      * @param page
-     * @return 
+     * @return
      */
     public List<String> getUserStereotypes(String username, String pattern,
             Integer page) {
@@ -378,13 +383,13 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return null;
         }
-        
+
         //Check if page is null or page <1
         if (page == null || page < 1) {
             //set page null to return single page
             page = null;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -392,12 +397,11 @@ public class Stereotype {
         return dbStereotype.getUserStereotypes(username, pattern, page, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param username
      * @param stereotypeName
-     * @return 
+     * @return
      */
     public boolean addUserOnStereotype(String username, String stereotypeName) {
 
@@ -406,7 +410,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -414,12 +418,11 @@ public class Stereotype {
         return dbStereotype.addUserOnStereotype(username, stereotypeName, psClient.username);
     }
 
-    
     /**
-     * 
+     *
      * @param username
      * @param stereotypeName
-     * @return 
+     * @return
      */
     public boolean DeleteUserFromStereotype(String username, String stereotypeName) {
 
@@ -428,7 +431,7 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-        
+
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -436,7 +439,6 @@ public class Stereotype {
         return dbStereotype.deleteUserFromStereotype(username, stereotypeName, psClient.username);
     }
 
-    
     /**
      * Get the permission for the given action and client
      *

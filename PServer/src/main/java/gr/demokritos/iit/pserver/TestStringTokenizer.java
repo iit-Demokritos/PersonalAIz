@@ -16,6 +16,7 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
@@ -32,13 +33,13 @@ public class TestStringTokenizer {
 
         HTable table = null;
         
+//TestUser2 --> {country=en, gender=male, oc=1, age=2}
+//TestUser4 --> {country=gr, gender=male, oc=2, age=24}
 //TestUser0 --> {country=en, gender=male, oc=1, age=33}
-//TestUser1 --> {country=en, gender=male, oc=0, age=31}
-//TestUser2 --> {country=en, gender=male, oc=2, age=43}
-//TestUser3 --> {country=gr, gender=female, oc=0, age=35}
-//TestUser4 --> {country=en, gender=male, oc=1, age=2}
+//TestUser1 --> {country=en, gender=male, oc=2, age=43}
+//TestUser3 --> {country=en, gender=female, oc=2, age=44}
 
-        String rule = "(age>3|AND|gender:male)|OR|country:gr";
+        String rule = "(age>30|AND|gender:female)|OR|country:el";
         System.out.println("Rule --> " + rule);
 
         String tmp = rule.replaceAll("\\|AND\\|", "&");
@@ -156,7 +157,7 @@ public class TestStringTokenizer {
                             Bytes.toBytes("Attributes"),
                             Bytes.toBytes(operant1),
                             operator,
-                            Bytes.toBytes(operant2)
+                            new BinaryComparator(Bytes.toBytes(operant2))
                     );
 //                    if (operant2.matches("[0-9]+")) {
 //                        

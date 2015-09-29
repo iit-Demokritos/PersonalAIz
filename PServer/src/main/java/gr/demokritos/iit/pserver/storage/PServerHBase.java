@@ -778,6 +778,42 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     //=================== Personal Mode =======================================
     //=================== Stereotype Mode =====================================
+   
+    /**
+     * Get a set with system attributes
+     *
+     * @param clientName The client name
+     * @return A set with attribute names
+     */
+    @Override
+    public Set<String> getSystemAttributes(String clientName) {
+
+        HashSet<String> attributes = new HashSet<>();
+
+        //get all clients users
+        HashSet<String> users = new HashSet<>();
+        try {
+            users.addAll(getUsers(null, null, clientName).keySet());
+        } catch (Exception e) {
+            LOGGER.error("Failed to get Users", e);
+            return null;
+        }
+
+        //for each user
+        for (String cUser : users) {
+            try {
+                //Get user attributes and added it on the list
+                attributes.addAll(
+                        getUserAttributes(cUser, null, null, clientName).keySet());
+            } catch (Exception e) {
+                LOGGER.error("Failed to get User attributes" + cUser, e);
+                return null;
+            }
+        }
+
+        return attributes;
+    }
+
     /**
      * Add new stereotype on HBase storage
      *
@@ -1964,6 +2000,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     /**
      * Get the rule of the stereotype
+     *
      * @param stereotypeUID The stereotype UID
      * @return The rule
      */

@@ -7,12 +7,15 @@ package gr.demokritos.iit.pserver.storage.interfaces;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IStereotypeStorage {
+    
+    Set<String> getSystemAttributes(String clientName);
     
     boolean addStereotype(String stereotypeName, String rule, String clientName);
     boolean deleteStereotypes(String pattern, String clientName);

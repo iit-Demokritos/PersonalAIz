@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
@@ -139,12 +140,20 @@ public class QueryParser implements IQueryParser<FilterList> {
                     // Use the name as a second operand
                     operant2 = cToken;
                     SingleColumnValueFilter filter;
+//                    filter = new SingleColumnValueFilter(
+//                            Bytes.toBytes("Attributes"),
+//                            Bytes.toBytes(operant1),
+//                            operator,
+//                            Bytes.toBytes(operant2)
+//                    );
                     filter = new SingleColumnValueFilter(
                             Bytes.toBytes("Attributes"),
                             Bytes.toBytes(operant1),
                             operator,
-                            Bytes.toBytes(operant2)
+                            new BinaryComparator(Bytes.toBytes(operant2))
                     );
+                    
+                    
 
                     // Push to current filter list
                     currentState.getList().addFilter(filter);
