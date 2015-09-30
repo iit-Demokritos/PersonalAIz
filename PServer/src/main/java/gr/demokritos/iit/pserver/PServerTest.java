@@ -39,7 +39,6 @@ public class PServerTest {
 //         admin.addClient("root", "root", info);
 //        String userJSON ="{\"attributes\":{\"gender\":\"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr3\": \"3\",\"ftr5\": \"4\"}}";
 
-
 //        User user = new User("panagiotis");
 //        user.userCreator(userJSON);
 //        System.out.println(user.getFeatures());
@@ -50,7 +49,6 @@ public class PServerTest {
 //        System.out.println(ad.addClient("pnewDlient", "123", clientInfo));
 //        System.out.println(ad.getClients());
 //        System.out.println(ad.deleteClient("newClient"));
-
 //        Personal ps = new Personal(db);
 //        System.out.println(ps.addUsers("{\"test1\":{\"attributes\":{\"gender\": \"male\",\"age\": \"18\"},\"features\": {\"ftr1\": \"34\",\"ftr33\": \"3\",\"ftr5\": \"4\"}}}"));
 //        System.out.println(ps.addUsers("{\"testko\":{},\"testko2\":{}ZZ,\"testko3\":{}}"));
@@ -74,13 +72,67 @@ public class PServerTest {
         Random r = new Random(50);
         ArrayList<User> usersList = new ArrayList<>();
 
+        //Create new User
+        String username = "TestUser5";
+        User user = new User(username);
+
+        HashMap<String, String> attributes = new HashMap<>();
+
+        attributes.put("gender", "male");
+        attributes.put("age", Integer.toString(-15));
+        attributes.put("country", "en");
+
+        HashMap<String, String> info = new HashMap<>();
+        info.put("Username", username);
+        user.setInfo(info);
+
+        attributes.put("oc", Integer.toString(r.nextInt(3)));
+
+        user.setAttributes(attributes);
+
+        HashMap<String, String> features = new HashMap<>();
+        features.put("category.sport", Integer.toString(r.nextInt(30)));
+        features.put("category.eco", Integer.toString(r.nextInt(30)));
+        features.put("txt.basket", Integer.toString(r.nextInt(50)));
+        features.put("txt.hellas", Integer.toString(r.nextInt(50)));
+        user.setFeatures(features);
+        System.out.println(username + " --> " + attributes);
+        usersList.add(user);
+        
+        //Create new User
+        username = "TestUser6";
+        user = new User(username);
+
+        attributes = new HashMap<>();
+
+        attributes.put("gender", "male");
+        attributes.put("age", Integer.toString(-5));
+        attributes.put("country", "gr");
+
+        info = new HashMap<>();
+        info.put("Username", username);
+        user.setInfo(info);
+
+        attributes.put("oc", Integer.toString(r.nextInt(3)));
+
+        user.setAttributes(attributes);
+
+        features = new HashMap<>();
+        features.put("category.sport", Integer.toString(r.nextInt(30)));
+        features.put("category.eco", Integer.toString(r.nextInt(30)));
+        features.put("txt.basket", Integer.toString(r.nextInt(50)));
+        features.put("txt.hellas", Integer.toString(r.nextInt(50)));
+        user.setFeatures(features);
+        System.out.println(username + " --> " + attributes);
+        usersList.add(user);
+
         for (int i = 0; i < 5; i++) {
 
             //Create new User
-            String username = "TestUser" + i;
-            User user = new User(username);
+            username = "TestUser" + i;
+            user = new User(username);
 
-            HashMap<String, String> attributes = new HashMap<>();
+            attributes = new HashMap<>();
 
             if (r.nextBoolean()) {
                 attributes.put("gender", "male");
@@ -93,8 +145,8 @@ public class PServerTest {
             } else {
                 attributes.put("country", "gr");
             }
-            
-            HashMap<String, String> info = new HashMap<>();
+
+            info = new HashMap<>();
             info.put("Username", username);
             user.setInfo(info);
 
@@ -102,7 +154,7 @@ public class PServerTest {
 
             user.setAttributes(attributes);
 
-            HashMap<String, String> features = new HashMap<>();
+            features = new HashMap<>();
             features.put("category.sport", Integer.toString(r.nextInt(30)));
             features.put("category.eco", Integer.toString(r.nextInt(30)));
             features.put("txt.basket", Integer.toString(r.nextInt(50)));
@@ -111,14 +163,12 @@ public class PServerTest {
             System.out.println(username + " --> " + attributes);
             usersList.add(user);
         }
-            instance.addUsers(usersList);
+        instance.addUsers(usersList);
 
         System.out.println("===============================================");
     }
 
 }
-
-
 
 //TestUser2 --> {country=en, gender=male, oc=1, age=2}
 //TestUser4 --> {country=gr, gender=male, oc=2, age=24} -

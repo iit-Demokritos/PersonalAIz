@@ -778,7 +778,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     //=================== Personal Mode =======================================
     //=================== Stereotype Mode =====================================
-   
     /**
      * Get a set with system attributes
      *
@@ -1135,41 +1134,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                         null,
                         clientName));
 
-        HashMap<String, String> stereotypeFeatures = new HashMap<>();
-        HashMap<String, Integer> stereotypeFeaturesCounter = new HashMap<>();
-
-        //for each user get profile
-        for (String cUser : stereotypeUsers) {
-            Map<String, String> userFeatures = null;
-            userFeatures.putAll(getUserFeatures(cUser, null, null, clientName));
-
-            //for each feature 
-            for (String cFeature : userFeatures.keySet()) {
-                //if feature contains to stereotype list
-                if (stereotypeFeatures.containsKey(cFeature)) {
-                    //update map
-                    int cValue = Integer.getInteger(stereotypeFeatures.get(cFeature));
-                    int addend = Integer.getInteger(userFeatures.get(cFeature));
-                    stereotypeFeatures.put(cFeature, Integer.toString(cValue + addend));
-                    cValue = stereotypeFeaturesCounter.get(cFeature);
-                    stereotypeFeaturesCounter.put(cFeature, cValue++);
-                } else {
-                    //add to list and counter map
-                    stereotypeFeatures.put(cFeature, userFeatures.get(cFeature));
-                    stereotypeFeaturesCounter.put(cFeature, 1);
-                }
-            }
-        }
-
-        //for each feature in the map divene the value with the counter value
-        for (String cFeature : stereotypeFeatures.keySet()) {
-            //update map
-            int cValue = Integer.getInteger(stereotypeFeatures.get(cFeature));
-            int divisor = stereotypeFeaturesCounter.get(cFeature);
-            stereotypeFeatures.put(cFeature, Integer.toString(cValue / divisor));
-        }
-
-        return setStereotypeFeatures(stereotypeName, stereotypeFeatures, clientName);
+        return setStereotypeFeatures(stereotypeName,
+                createFeatureCentroid(stereotypeUsers, clientName), clientName);
     }
 
     /**
@@ -2261,5 +2227,87 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
     //=================== Administration ======================================
+    //=================== Generic functions ======================================
+    private Map<String, String> createFeatureCentroid(
+            List<String> users, String clientName) {
+
+        HashMap<String, String> stereotypeFeatures = new HashMap<>();
+        HashMap<String, String> numericFeatures = new HashMap<>();
+        HashMap<String, HashMap<String, Integer>> alphaFeatures = new HashMap<>();
+
+        //for each user get profile
+        for (String cUser : users) {
+            Map<String, String> userFeatures = null;
+            userFeatures.putAll(getUserFeatures(cUser, null, null, clientName));
+
+            //for each feature 
+            for (String cFeature : userFeatures.keySet()) {
+                //if feature is numeric
+                if (cFeature.matches("[0-9]+")) {
+
+                    //if feature contains to numeric stereotype list
+                    if (numericFeatures.containsKey(cFeature)) {
+                        //update map
+                        int cValue = Integer.getInteger(numericFeatures.get(cFeature));
+                        int addend = Integer.getInteger(userFeatures.get(cFeature));
+                        numericFeatures.put(cFeature,
+                                Integer.toString(cValue + addend));
+                    } else {
+                        //add feature to list
+                        numericFeatures.put(cFeature, userFeatures.get(cFeature));
+                    }
+                } else {
+                    //if feature contains to alphastereotype list
+                    if (alphaFeatures.containsKey(cFeature)) {
+                        HashMap<String, Integer> alphaFeature = new HashMap<>();
+                        alphaFeature.putAll(alphaFeatures.get(cFeature));
+
+                        //check if value contains on map
+                        if (alphaFeature.containsKey(userFeatures.get(cFeature))) {
+                            int oldValue = alphaFeature.get(userFeatures.get(cFeature));
+                            alphaFeature.put(userFeatures.get(cFeature), oldValue++);
+                        } else {
+                            //if not add new value on map
+                            alphaFeature.put(userFeatures.get(cFeature), 1);
+                        }
+                    } else {
+                        HashMap<String, Integer> newAlphaFeature = new HashMap<>();
+                        newAlphaFeature.put(userFeatures.get(cFeature), 1);
+                        //add to list and counter map
+                        alphaFeatures.put(cFeature, newAlphaFeature);
+                    }
+                }
+            }
+        }
+
+        //for each numeric feature in the map divene the value with users size
+        for (String cFeature : numericFeatures.keySet()) {
+            //update map
+            int cValue = Integer.getInteger(stereotypeFeatures.get(cFeature));
+            stereotypeFeatures.put(
+                    cFeature, Integer.toString(cValue / users.size()));
+        }
+
+        //for each alphafeature add on feature list the alpha value with max value
+        for (String cFeature : alphaFeatures.keySet()) {
+
+            HashMap<String, Integer> alphaFeature = new HashMap<>();
+            alphaFeature.putAll(alphaFeatures.get(cFeature));
+            String value = "";
+            int frequency = 0;
+            for (String cAlphaFeatureValue : alphaFeature.keySet()) {
+                int cFrequency = alphaFeature.get(cAlphaFeatureValue);
+                if (frequency < cFrequency) {
+                    frequency = cFrequency;
+                    value = cAlphaFeatureValue;
+                }
+            }
+            stereotypeFeatures.put(cFeature, value);
+        }
+
+        return stereotypeFeatures;
+    }
+
+    //=================== Generic functions ======================================
     //=================== Test functions ======================================
 }

@@ -70,7 +70,7 @@ public class QueryParser implements IQueryParser<FilterList> {
 
             // Read next token
             String cToken = st.nextToken();
-            System.out.println(cToken);
+            LOGGER.debug("Netxt Token on query parser "+cToken);
             // If token is an opening parenthesis
             if (cToken.equals("(")) {
                 // Create new FilterList
