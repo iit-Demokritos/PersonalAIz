@@ -172,7 +172,7 @@ public class Personal {
      * @return A boolean status true/false if setUserAttributes complete or not
      */
     public boolean setUserAttributes(String username,
-            HashMap<String, String> attributes) {
+            Map<String, String> attributes) {
 
         //Check permission
         if (!getPermissionFor(actions.get("aSetUserAttributes"), "W")) {
@@ -238,7 +238,7 @@ public class Personal {
      * @return A boolean status true/false if setUserFeatures complete or not
      */
     public boolean setUserFeatures(String username,
-            HashMap<String, String> features) {
+            Map<String, String> features) {
 
         //Check permission
         if (!getPermissionFor(actions.get("aSetUserFeatures"), "W")) {
@@ -268,7 +268,7 @@ public class Personal {
      * @return A boolean status true/false if setUserFeatures complete or not
      */
     public boolean modifyUserFeatures(String username,
-            HashMap<String, String> features) {
+            Map<String, String> features) {
 
         //Check permission
         if (!getPermissionFor(actions.get("aModifyUserFeatures"), "W")) {

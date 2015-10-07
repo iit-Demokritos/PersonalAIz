@@ -18,6 +18,7 @@ public class Actions {
     private final HashMap<String, Action> personalActions = new HashMap<>();
     private final HashMap<String, Action> stereotypeActions = new HashMap<>();
     private final HashMap<String, Action> communityActions = new HashMap<>();
+    private final HashMap<String, Action> recommendationActions = new HashMap<>();
 
     public Actions() {
 
@@ -59,6 +60,12 @@ public class Actions {
         stereotypeActions.put("aAddUserOnStereotype", new Action("Stereotype.AddUserOnStereotype"));
         stereotypeActions.put("aDeleteUserFromStereotype", new Action("Stereotype.DeleteUserFromStereotype"));
         
+        //Recommendation actions
+        recommendationActions.put("aFeed", new Action("Recommendation.Feed"));
+        recommendationActions.put("aGetRecommendations", new Action("Recommendation.GeRecommendations"));
+        recommendationActions.put("aAddUser", new Action("Recommendation.AddUser"));
+        recommendationActions.put("aDeleteUser", new Action("Recommendation.DeleteUser"));
+        
     }
 
     
@@ -93,6 +100,15 @@ public class Actions {
     public Map<String, Action> getCommunityActions() {
         return communityActions;
     }
+
+    
+    /**
+     * Get recommendation actions
+     * @return A map with String:Action pairs
+     */
+    public HashMap<String, Action> getRecommendationActions() {
+        return recommendationActions;
+    }
     
     /**
      * Get All PServer actions
@@ -104,6 +120,7 @@ public class Actions {
         actions.putAll(personalActions);
         actions.putAll(stereotypeActions);
         actions.putAll(communityActions);
+        actions.putAll(recommendationActions);
         return actions;
     }
     
