@@ -3,20 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.recommendationengine.converters;
+package gr.demokritos.iit.recommendationengine;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public interface IConverter {
+public class RecommendationTest {
     
-    
-    
-    
-    
-    
-    
-    
-    
+    public static void main(String[] args) {
+        
+        
+        
+        
+        
+        
+        
+    }
 }

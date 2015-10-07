@@ -3,12 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.recommendationengine.rankers;
+package gr.demokritos.iit.recommendationengine.converters;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public interface IRanker {
+public class TextConverter implements IConverter{
+    
+    
+    
+        //TODO: Implement Text Converter
+    
+    
+    
+    
+    
+    
     
 }
