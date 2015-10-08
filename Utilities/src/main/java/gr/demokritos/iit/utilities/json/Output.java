@@ -5,7 +5,7 @@
  */
 package gr.demokritos.iit.utilities.json;
 
-import gr.demokritos.iit.utilities.utils.Util;
+import gr.demokritos.iit.utilities.utils.Utilities;
 
 
 /**
@@ -28,7 +28,7 @@ public class Output {
      * @param outputCode The output code if functions run properly
      */
     public void setOutputCode(Integer outputCode) {
-        Util u = new Util();
+        Utilities u = new Utilities();
         this.outputMessage = u.getMessageCode(outputCode);
         this.outputCode = outputCode;
     }

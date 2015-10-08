@@ -11,7 +11,7 @@ import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.ICommunityStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IStereotypeStorage;
-import gr.demokritos.iit.utilities.utils.Util;
+import gr.demokritos.iit.utilities.utils.Utilities;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
@@ -772,7 +772,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         String clientUID = getClientUID(clientName);
 
         //Create new UUID
-        UUID = Util.getUUID(clientUID + "-" + username).toString();
+        UUID = Utilities.getUUID(clientUID + "-" + username).toString();
         return UUID;
     }
 
@@ -1907,7 +1907,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         String clientUID = getClientUID(clientName);
 
         //Create new StereotypeID
-        UUID = Util.getUUID(clientUID + "-" + stereotypeName).toString();
+        UUID = Utilities.getUUID(clientUID + "-" + stereotypeName).toString();
         return UUID;
     }
 
@@ -2212,7 +2212,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
             if (result == null) {
                 //Create new UUID
-                UID = Util.getUUID("admin" + "-" + clientName).toString();
+                UID = Utilities.getUUID("admin" + "-" + clientName).toString();
             } else {
                 UID = Bytes.toString(
                         result.getRow()

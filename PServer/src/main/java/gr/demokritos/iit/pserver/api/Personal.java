@@ -53,6 +53,22 @@ public class Personal {
         //Update logging level 
         Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
     }
+    
+    /**
+     * The constructor of personal mode.
+     *
+     * @param dbPersonal
+     * @param psClient
+     * @param configurationFileName
+     */
+    public Personal(IPersonalStorage dbPersonal, Client psClient,String configurationFileName) {
+        this.psConfig = new PServerConfiguration(configurationFileName);
+        this.dbPersonal = dbPersonal;
+        this.psClient = psClient;
+
+        //Update logging level 
+        Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
+    }
 
     /**
      * Set security control for user authorization

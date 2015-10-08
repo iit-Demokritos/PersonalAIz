@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.recommendationengine.comparators;
+package gr.demokritos.iit.pserver.computationaltools;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public interface IComparator {
+public class OfflineComputations {
     
 }

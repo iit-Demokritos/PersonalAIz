@@ -6,6 +6,7 @@
 package gr.demokritos.iit.recommendationengine.api;
 
 import gr.demokritos.iit.pserver.api.Personal;
+import gr.demokritos.iit.pserver.computationaltools.similaritymetrics.CosineSimilarity;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.PServerHBase;
@@ -14,13 +15,20 @@ import gr.demokritos.iit.recommendationengine.converters.category.CategoryConver
 import gr.demokritos.iit.recommendationengine.converters.tag.TagConverter;
 import gr.demokritos.iit.recommendationengine.converters.text.TextConverter;
 import gr.demokritos.iit.recommendationengine.onologies.FeedObject;
-import gr.demokritos.iit.recommendationengine.onologies.RecommendationObject;
 import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
 import gr.demokritos.iit.security.authorization.Actions;
+import gr.demokritos.iit.utilities.configuration.RecommendationConfiguration;
+import gr.demokritos.iit.utilities.utils.Utilities;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,14 +39,36 @@ import org.slf4j.LoggerFactory;
 public class RecommendationEngine {
 
     private final Client psClient;
-    public static final Logger LOGGER = LoggerFactory.getLogger(RecommendationEngine.class);
+    public static final Logger LOGGER
+            = LoggerFactory.getLogger(RecommendationEngine.class);
     private SecurityLayer security = new SecurityLayer();
-    private Personal personal;
+    private final Personal personal;
     private final IPersonalStorage db;
-    private final HashMap<String, Action> actions = new HashMap<>(new Actions().getRecommendationActions());
+    private final HashMap<String, Action> actions
+            = new HashMap<>(new Actions().getRecommendationActions());
+    private final Utilities utilities = new Utilities();
+    private final RecommendationConfiguration config;
 
+    /**
+     *
+     * @param psClient
+     */
     public RecommendationEngine(Client psClient) {
+        this.config = new RecommendationConfiguration();
+        this.psClient = psClient;
+        //TODO: change hardcoded HBsase storage with generic storage
+        this.db = new PServerHBase();
+        //Create PServer2 Personal mode Instance
+        this.personal = new Personal(db, psClient);
 
+    }
+
+    /**
+     *
+     * @param psClient
+     */
+    public RecommendationEngine(Client psClient, String configurationFileName) {
+        this.config = new RecommendationConfiguration(configurationFileName);
         this.psClient = psClient;
         //TODO: change hardcoded HBsase storage with generic storage
         this.db = new PServerHBase();
@@ -108,7 +138,8 @@ public class RecommendationEngine {
     }
 
     /**
-     * Feed User's profile with given object 
+     * Feed User's profile with given object
+     *
      * @param username The username
      * @param object The feed object
      * @return The action Status
@@ -125,16 +156,17 @@ public class RecommendationEngine {
         //Convert object to features  and call setUserFeatures 
         //to update user profile
         return personal.setUserFeatures(username,
-                mapValueIntegerToString(objectHandler(object)));
+                utilities.mapValueIntegerToString(objectHandler(object)));
     }
 
     /**
      * Rank a FeedObject List based on user's profile
+     *
      * @param username The username
      * @param recommendationList The FeedObject List
      * @return A shorted map with object id and score
      */
-    public Map<String, Integer> getRecommendation(String username,
+    public LinkedHashMap getRecommendation(String username,
             List<FeedObject> recommendationList) {
         //Check permission
         if (!getPermissionFor(actions.get("aGetRecommendations"), "R")) {
@@ -143,84 +175,176 @@ public class RecommendationEngine {
         }
 
         //Get user profile
-        HashMap<String, Integer> userProfile = new HashMap<>(
-                mapValueStringToInteger(
+        final HashMap<String, Integer> userProfile = new HashMap<>(
+                utilities.mapValueStringToInteger(
                         personal.getUserFeatures(username, null, null)));
-        
+
         //Generate RecommendationObjects Map
-        HashMap<String,RecommendationObject> recommendationObjects = new HashMap<>();
+        final Map<String, Double> recommendationObjects
+                = Collections.synchronizedMap(
+                        new HashMap<String, Double>());
+
+        //Create executor service with a thread pool with all available processors
+        ExecutorService ex = Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors());
+
+        //Get weights
+        final HashMap<String, Double> objectWeights
+                = new HashMap<>(config.getPServerModesWeights());
         //For each FeedObject
-        for(FeedObject cObject : recommendationList){
-            RecommendationObject reObj = new RecommendationObject(
-                    cObject.getId(), 
-                    cObject.getLanguage(), 
-                    cObject.isRecommended(), 
-                    cObject.getTimestamp());
-            
-            reObj.setFeatures(objectHandler(cObject));
-            
-            recommendationObjects.put(cObject.getId(), reObj);
+        for (final FeedObject cObject : recommendationList) {
+
+            ex.submit(new Runnable() {
+
+                HashMap<String, Double> weights;
+
+                @Override
+                public void run() {
+                    this.weights = objectWeights;
+                    //Get object features
+                    Map<String, Integer> objFeatures
+                            = new HashMap<>(objectHandler(cObject));
+
+                    //Get object score
+                    double score = getScore(objFeatures, userProfile);
+
+                    //add objectId and score on recommendationObjects map
+                    synchronized (recommendationObjects) {
+                        recommendationObjects.put(cObject.getId(), score);
+                    }
+                }
+
+                /**
+                 * Get the recommendation score between user's profile and
+                 * object
+                 *
+                 * @param objFeatures the object features
+                 * @param userFeatures the user's profile
+                 * @return the score of the similarity
+                 */
+                private double getScore(Map<String, Integer> objFeatures,
+                        HashMap<String, Integer> userFeatures) {
+
+                    //create new similarity object
+                    CosineSimilarity cs = new CosineSimilarity();
+
+                    HashSet<String> featureUnion = new HashSet<>();
+                    featureUnion.addAll(objFeatures.keySet());
+                    featureUnion.addAll(userFeatures.keySet());
+
+                    double[] userVector = new double[featureUnion.size()];
+                    double[] objectVector = new double[featureUnion.size()];
+
+                    int pointer = 0;
+                    for (String cFeature : featureUnion) {
+
+                        if (userFeatures.containsKey(cFeature)) {
+                            //manipulate weights
+                            if (cFeature.contains(".text.")) {
+                                //get user feature value and add it on vector
+                                userVector[pointer]
+                                        = userFeatures.get(cFeature)
+                                        * weights.get("text");
+                            } else if (cFeature.contains(".category.")) {
+                                //get user feature value and add it on vector
+                                userVector[pointer]
+                                        = userFeatures.get(cFeature)
+                                        * weights.get("category");
+                            } else if (cFeature.contains(".tag.")) {
+                                //get user feature value and add it on vector
+                                userVector[pointer]
+                                        = userFeatures.get(cFeature)
+                                        * weights.get("tag");
+                            } else if (cFeature.contains(".boolean.")) {
+                                //get user feature value and add it on vector
+                                userVector[pointer]
+                                        = userFeatures.get(cFeature)
+                                        * weights.get("boolean");
+                            }
+                        } else {
+                            //set value 0
+                            userVector[pointer] = 0;
+                        }
+
+                        if (objFeatures.containsKey(cFeature)) {
+                            //manipulate weights
+                            if (cFeature.contains(".text.")) {
+                                //get object feature value and add it on vector
+                                objectVector[pointer]
+                                        = objFeatures.get(cFeature)
+                                        * weights.get("text");
+                            } else if (cFeature.contains(".category.")) {
+                                //get object feature value and add it on vector
+                                objectVector[pointer]
+                                        = objFeatures.get(cFeature)
+                                        * weights.get("category");
+                            } else if (cFeature.contains(".tag.")) {
+                                //get object feature value and add it on vector
+                                objectVector[pointer]
+                                        = objFeatures.get(cFeature)
+                                        * weights.get("tag");
+                            } else if (cFeature.contains(".boolean.")) {
+                                //get object feature value and add it on vector
+                                objectVector[pointer]
+                                        = objFeatures.get(cFeature)
+                                        * weights.get("boolean");
+                            }
+                        } else {
+                            //set value 0
+                            objectVector[pointer] = 0;
+                        }
+
+                        //update pointer
+                        pointer++;
+                    }
+
+                    //Get similarity score and return score
+                    return cs.getSimilarity(objectVector, userVector);
+                }
+            });
         }
-        
-        //TODO: take score for each object
-        
-        
-        return null;
+
+        //Shutdown threads
+        ex.shutdown();
+        try {
+            //Await an hour until terminates all threads if not complete executable
+            ex.awaitTermination((long) 1.0, TimeUnit.HOURS);
+        } catch (InterruptedException ex1) {
+            LOGGER.error("Error on awaiting thread", ex1);
+            return null;
+        }
+
+        return utilities.sortHashMapByDoubleValues(recommendationObjects);
     }
 
     /**
+     * Get a FeedObject and return a Map with export feature names and values
      *
-     * @param obj
-     * @return
+     * @param obj The given object
+     * @return The feature map
      */
     private Map<String, Integer> objectHandler(FeedObject obj) {
 
         HashMap<String, Integer> features = new HashMap<>();
 
         if (obj.getTexts() != null) {
-            TextConverter tc = new TextConverter(obj.getLanguage(), false);
+            //if contains text call text converter
+            TextConverter tc = new TextConverter(obj.getLanguage(), true);
+            //Add features to feature map
             features.putAll(tc.getFeatures(obj.getTexts()));
         } else if (obj.getCategories() != null) {
+            //if contains categories call category converter
             CategoryConverter cc = new CategoryConverter(obj.getLanguage());
+            //Add features to feature map
             features.putAll(cc.getFeatures(obj.getCategories()));
         } else if (obj.getTags() != null) {
+            //if contains tags call tag converter
             TagConverter tgc = new TagConverter(obj.getLanguage());
+            //Add features to feature map
             features.putAll(tgc.getFeatures(obj.getTags()));
         }
 
         return features;
-    }
-
-    /**
-     * Convert Map<String,String> to Map<String,Integer>
-     *
-     * @param map
-     * @return
-     */
-    private Map<String, Integer> mapValueStringToInteger(Map<String, String> map) {
-        HashMap<String, Integer> returnMap = new HashMap<>();
-
-        for (String cKey : map.keySet()) {
-            returnMap.put(cKey, Integer.parseInt(map.get(cKey)));
-        }
-
-        return returnMap;
-    }
-
-    /**
-     * Convert Map<String,Integer> to Map<String,String>
-     *
-     * @param map
-     * @return
-     */
-    private Map<String, String> mapValueIntegerToString(Map<String, Integer> map) {
-        HashMap<String, String> returnMap = new HashMap<>();
-
-        for (String cKey : map.keySet()) {
-            returnMap.put(cKey, map.get(cKey).toString());
-        }
-
-        return returnMap;
     }
 
     /**
