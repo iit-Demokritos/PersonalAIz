@@ -52,15 +52,22 @@ public class Utilities {
      * Short a Map with Double values
      *
      * @param passedMap
+     * @param reverseOrder
      * @return
      */
-    public LinkedHashMap sortHashMapByDoubleValues(Map<String, Double> passedMap) {
+    public LinkedHashMap<String, Double> sortHashMapByDoubleValues(Map<String, Double> passedMap,
+            boolean reverseOrder) {
         List mapKeys = new ArrayList(passedMap.keySet());
         List mapValues = new ArrayList(passedMap.values());
-        Collections.sort(mapValues);
-        Collections.sort(mapKeys);
+        if (reverseOrder) {
+            Collections.sort(mapValues, Collections.reverseOrder());
+            Collections.sort(mapKeys, Collections.reverseOrder());
+        } else {
+            Collections.sort(mapValues);
+            Collections.sort(mapKeys);
+        }
 
-        LinkedHashMap sortedMap = new LinkedHashMap();
+        LinkedHashMap<String, Double> sortedMap = new LinkedHashMap();
 
         Iterator valueIt = mapValues.iterator();
         while (valueIt.hasNext()) {

@@ -152,11 +152,22 @@ public class RecommendationEngine {
             return false;
         }
 
+        if(!object.isValidObject()){
+            LOGGER.error("No valid object: "+ object.toString());
+            return false;
+        }
         //TODO: Call evaluation method to store user's actions
+        
         //Convert object to features  and call setUserFeatures 
-        //to update user profile
-        return personal.setUserFeatures(username,
+        HashMap<String, String> features = new HashMap<>(
                 utilities.mapValueIntegerToString(objectHandler(object)));
+        //update user profile
+        if (features.isEmpty()) {
+            LOGGER.error("No features to update");
+            return false;
+        } else {
+            return personal.modifyUserFeatures(username, features);
+        }
     }
 
     /**
@@ -166,7 +177,7 @@ public class RecommendationEngine {
      * @param recommendationList The FeedObject List
      * @return A shorted map with object id and score
      */
-    public LinkedHashMap getRecommendation(String username,
+    public LinkedHashMap<String, Double> getRecommendation(String username,
             List<FeedObject> recommendationList) {
         //Check permission
         if (!getPermissionFor(actions.get("aGetRecommendations"), "R")) {
@@ -190,9 +201,14 @@ public class RecommendationEngine {
 
         //Get weights
         final HashMap<String, Double> objectWeights
-                = new HashMap<>(config.getPServerModesWeights());
+                = new HashMap<>(config.getObjectWeights());
         //For each FeedObject
         for (final FeedObject cObject : recommendationList) {
+            
+            //if object is not valid continue
+            if(!cObject.isValidObject()){
+                continue;
+            }
 
             ex.submit(new Runnable() {
 
@@ -244,22 +260,22 @@ public class RecommendationEngine {
                                 //get user feature value and add it on vector
                                 userVector[pointer]
                                         = userFeatures.get(cFeature)
-                                        * weights.get("text");
+                                        * weights.get("TextWeight");
                             } else if (cFeature.contains(".category.")) {
                                 //get user feature value and add it on vector
                                 userVector[pointer]
                                         = userFeatures.get(cFeature)
-                                        * weights.get("category");
+                                        * weights.get("CategoryWeight");
                             } else if (cFeature.contains(".tag.")) {
                                 //get user feature value and add it on vector
                                 userVector[pointer]
                                         = userFeatures.get(cFeature)
-                                        * weights.get("tag");
+                                        * weights.get("TagWeight");
                             } else if (cFeature.contains(".boolean.")) {
                                 //get user feature value and add it on vector
                                 userVector[pointer]
                                         = userFeatures.get(cFeature)
-                                        * weights.get("boolean");
+                                        * weights.get("BooleanWeight");
                             }
                         } else {
                             //set value 0
@@ -272,22 +288,22 @@ public class RecommendationEngine {
                                 //get object feature value and add it on vector
                                 objectVector[pointer]
                                         = objFeatures.get(cFeature)
-                                        * weights.get("text");
+                                        * weights.get("TextWeight");
                             } else if (cFeature.contains(".category.")) {
                                 //get object feature value and add it on vector
                                 objectVector[pointer]
                                         = objFeatures.get(cFeature)
-                                        * weights.get("category");
+                                        * weights.get("CategoryWeight");
                             } else if (cFeature.contains(".tag.")) {
                                 //get object feature value and add it on vector
                                 objectVector[pointer]
                                         = objFeatures.get(cFeature)
-                                        * weights.get("tag");
+                                        * weights.get("TagWeight");
                             } else if (cFeature.contains(".boolean.")) {
                                 //get object feature value and add it on vector
                                 objectVector[pointer]
                                         = objFeatures.get(cFeature)
-                                        * weights.get("boolean");
+                                        * weights.get("BooleanWeight");
                             }
                         } else {
                             //set value 0
@@ -314,7 +330,7 @@ public class RecommendationEngine {
             return null;
         }
 
-        return utilities.sortHashMapByDoubleValues(recommendationObjects);
+        return utilities.sortHashMapByDoubleValues(recommendationObjects, true);
     }
 
     /**
@@ -332,12 +348,16 @@ public class RecommendationEngine {
             TextConverter tc = new TextConverter(obj.getLanguage(), true);
             //Add features to feature map
             features.putAll(tc.getFeatures(obj.getTexts()));
-        } else if (obj.getCategories() != null) {
+        }
+
+        if (obj.getCategories() != null) {
             //if contains categories call category converter
             CategoryConverter cc = new CategoryConverter(obj.getLanguage());
             //Add features to feature map
             features.putAll(cc.getFeatures(obj.getCategories()));
-        } else if (obj.getTags() != null) {
+        }
+
+        if (obj.getTags() != null) {
             //if contains tags call tag converter
             TagConverter tgc = new TagConverter(obj.getLanguage());
             //Add features to feature map
