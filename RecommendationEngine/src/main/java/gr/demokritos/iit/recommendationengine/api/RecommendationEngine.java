@@ -7,6 +7,7 @@ package gr.demokritos.iit.recommendationengine.api;
 
 import gr.demokritos.iit.pserver.api.Personal;
 import gr.demokritos.iit.pserver.computationaltools.similaritymetrics.CosineSimilarity;
+import gr.demokritos.iit.pserver.computationaltools.similaritymetrics.IVectorSimilarity;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.PServerHBase;
@@ -225,8 +226,11 @@ public class RecommendationEngine {
                     Map<String, Integer> objFeatures
                             = new HashMap<>(objectHandler(cObject));
 
+                    //TODO: Make it global to load Similarity from configuration
+                    //create new similarity object
+                    IVectorSimilarity cs = new CosineSimilarity();
                     //Get object score
-                    double score = getScore(objFeatures, userProfile);
+                    double score = getScore(objFeatures, userProfile,cs);
 
                     //add objectId and score on recommendationObjects map
                     synchronized (recommendationObjects) {
@@ -243,10 +247,11 @@ public class RecommendationEngine {
                  * @return the score of the similarity
                  */
                 private double getScore(Map<String, Integer> objFeatures,
-                        HashMap<String, Integer> userFeatures) {
-
+                        HashMap<String, Integer> userFeatures,
+                        IVectorSimilarity cs) {
+                    
                     //create new similarity object
-                    CosineSimilarity cs = new CosineSimilarity();
+//                    IVectorSimilarity cs = new CosineSimilarity();
 
                     HashSet<String> featureUnion = new HashSet<>();
                     featureUnion.addAll(objFeatures.keySet());
