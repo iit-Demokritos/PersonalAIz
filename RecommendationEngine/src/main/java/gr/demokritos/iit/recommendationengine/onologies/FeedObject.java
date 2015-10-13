@@ -31,6 +31,8 @@ public class FeedObject {
     private List<String> booleans;
     @SerializedName("numeric")
     private List<String> numerics;
+    @SerializedName("alphanumeric")
+    private List<String> alphanumerics;
 
     public FeedObject(String objectID,
             String lang,
@@ -101,6 +103,16 @@ public class FeedObject {
         this.numerics = numerics;
     }
 
+    public List<String> getAlphanumerics() {
+        return alphanumerics;
+    }
+
+    public void setAlphanumerics(List<String> alphanumerics) {
+        this.alphanumerics = alphanumerics;
+    }
+    
+    
+
     public boolean isValidObject() {
         return id != null
                 && language != null
@@ -108,7 +120,8 @@ public class FeedObject {
                 || categories != null
                 || tags != null
                 || booleans != null
-                || numerics != null);
+                || numerics != null
+                || alphanumerics != null);
 
     }
 
@@ -132,7 +145,16 @@ public class FeedObject {
 
     @Override
     public String toString() {
-        return "FeedObject{" + "id=" + id + ", language=" + language + ", recommended=" + recommended + ", timestamp=" + timestamp + ", texts=" + texts + ", categories=" + categories + ", tags=" + tags + ", booleans=" + booleans + ", numerics=" + numerics + '}';
+        return "FeedObject{" + "id=" + id 
+                + ", language=" + language 
+                + ", recommended=" + recommended 
+                + ", timestamp=" + timestamp 
+                + ", texts=" + texts 
+                + ", categories=" + categories 
+                + ", tags=" + tags 
+                + ", booleans=" + booleans 
+                + ", numerics=" + numerics 
+                + ", alpharethmetics=" + alphanumerics + '}';
     }
 
 }

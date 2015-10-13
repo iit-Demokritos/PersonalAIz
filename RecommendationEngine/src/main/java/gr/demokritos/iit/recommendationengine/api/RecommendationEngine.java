@@ -11,7 +11,10 @@ import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.PServerHBase;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
+import gr.demokritos.iit.recommendationengine.converters.alphanumeric.AlphanumericConverter;
+import gr.demokritos.iit.recommendationengine.converters.booleans.BooleanConverter;
 import gr.demokritos.iit.recommendationengine.converters.category.CategoryConverter;
+import gr.demokritos.iit.recommendationengine.converters.numeric.NumericConverter;
 import gr.demokritos.iit.recommendationengine.converters.tag.TagConverter;
 import gr.demokritos.iit.recommendationengine.converters.text.TextConverter;
 import gr.demokritos.iit.recommendationengine.onologies.FeedObject;
@@ -66,6 +69,7 @@ public class RecommendationEngine {
     /**
      *
      * @param psClient
+     * @param configurationFileName
      */
     public RecommendationEngine(Client psClient, String configurationFileName) {
         this.config = new RecommendationConfiguration(configurationFileName);
@@ -362,6 +366,30 @@ public class RecommendationEngine {
             TagConverter tgc = new TagConverter(obj.getLanguage());
             //Add features to feature map
             features.putAll(tgc.getFeatures(obj.getTags()));
+        }
+        
+        
+        if (obj.getBooleans() != null) {
+            //if contains booleans call boolean converter
+            BooleanConverter bc = new BooleanConverter(obj.getLanguage());
+            //Add features to feature map
+            features.putAll(bc.getFeatures(obj.getBooleans()));
+        }
+        
+        
+        if (obj.getNumerics() != null) {
+            //if contains Numerics call numeric converter
+            NumericConverter nc = new NumericConverter(obj.getLanguage());
+            //Add features to feature map
+            features.putAll(nc.getFeatures(obj.getNumerics()));
+        }
+      
+        
+        if (obj.getAlphanumerics()!= null) {
+            //if contains Alphanumerics call Alphanumeric converter
+            AlphanumericConverter ac = new AlphanumericConverter(obj.getLanguage());
+            //Add features to feature map
+            features.putAll(ac.getFeatures(obj.getNumerics()));
         }
 
         return features;

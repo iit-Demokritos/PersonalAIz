@@ -28,12 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Implements the REST API to expose the recommendation engine module
  * @author Giotis Panagiotis <giotis.p@gmail.com>
- */
-/**
- *
- * Root resource (exposed at "recengine/:credentials/" path)
  */
 @Path("recengine/{userAuthe}/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -46,6 +42,15 @@ public class RecommendationEngineRest {
     private RecommendationEngine re;
     private final RecommendationConfiguration config = new RecommendationConfiguration();
 
+    
+    
+    /**
+     * Add user on Recommendation Engine
+     * @param userAuthe The Client Credentials
+     * @param username The username
+     * @param JSONUser The User attributes or information 
+     * @return A JSON with process result
+     */
     @Path("user/{username}")
     @POST
     public String addUser(
@@ -125,6 +130,12 @@ public class RecommendationEngineRest {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Delete a user from Recommendation Engine
+     * @param userAuthe The client credentials
+     * @param username The username
+     * @return A JSON with process result
+     */
     @Path("user/delete/{username}")
     @POST
     public String deleteUser(
@@ -179,6 +190,13 @@ public class RecommendationEngineRest {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Feed recommendation engine with user preferences
+     * @param userAuthe The client credentials
+     * @param username The username
+     * @param JSONObject The feed object that user click on it
+     * @return A JSON with process result
+     */
     @Path("feed/{username}")
     @POST
     public String feed(
@@ -246,6 +264,13 @@ public class RecommendationEngineRest {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Get recommendation, Rank the given object list based on user profile.
+     * @param userAuthe The client credentials
+     * @param username Th username
+     * @param JSONObjectList A object list that we want to recommend on user
+     * @return A JSON with process result and ranked object list
+     */
     @Path("getRecommendation/{username}")
     @POST
     public String getRecommendation(

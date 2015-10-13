@@ -16,7 +16,7 @@
 
     <servlet-mapping>
         <servlet-name>PersonalAIz API</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
     
     <context-param>
@@ -26,7 +26,7 @@
 
     <context-param>
         <param-name>resteasy.servlet.mapping.prefix</param-name>
-        <param-value>/</param-value>
+        <param-value>/api/</param-value>
     </context-param>
 
 </web-app>
