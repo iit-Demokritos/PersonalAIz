@@ -48,7 +48,6 @@ public class StereotypeTest {
         Set<String> expResult = null;
         Set<String> result = instance.getSystemAttributes();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -63,7 +62,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.addStereotype(stereotypeName, rule);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -77,7 +75,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.deleteStereotypes(pattern);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -92,7 +89,6 @@ public class StereotypeTest {
         Set<String> expResult = null;
         Set<String> result = instance.getStereotypes(pattern, page);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -106,7 +102,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.remakeStereotype(stereotypeName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -120,7 +115,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.updateStereotypeFeatures(stereotypeName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -134,7 +128,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.updateStereotypeUsers(stereotypeName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -148,7 +141,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.findStereotypeUsers(stereotypeName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -162,7 +154,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.checkStereotypeUsers(stereotypeName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -177,7 +168,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.setStereotypeFeatures(stereotypeName, features);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -192,7 +182,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.modifyStereotypeFeatures(stereotypeName, features);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -208,7 +197,6 @@ public class StereotypeTest {
         Map<String, String> expResult = null;
         Map<String, String> result = instance.getStereotypeFeatures(stereotypeName, pattern, page);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -223,7 +211,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.deleteStereotypeFeatures(stereotypeName, pattern);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -239,7 +226,6 @@ public class StereotypeTest {
         List<String> expResult = null;
         List<String> result = instance.getStereotypeUsers(stereotypeName, pattern, page);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -255,7 +241,6 @@ public class StereotypeTest {
         List<String> expResult = null;
         List<String> result = instance.getUserStereotypes(username, pattern, page);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -270,7 +255,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.addUserOnStereotype(username, stereotypeName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
@@ -285,7 +269,6 @@ public class StereotypeTest {
         boolean expResult = false;
         boolean result = instance.DeleteUserFromStereotype(username, stereotypeName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
