@@ -43,7 +43,7 @@ public class QueryParser implements IQueryParser<FilterList> {
         sExpression = tmp.replaceAll("\\|OR\\|", "\\|");
         sExpression = tmp.replaceAll(">:", "}");
         sExpression = tmp.replaceAll("<:", "{");
-        StringTokenizer st = new StringTokenizer(sExpression, "(\\|&)<>:!", true);
+        StringTokenizer st = new StringTokenizer(sExpression, "(\\|&)<>:!}{", true);
 
         //Help variables
         CompareFilter.CompareOp operator = null;

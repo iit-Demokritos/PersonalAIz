@@ -107,7 +107,12 @@ public class Stereotype {
             LOGGER.error("Premission Denied");
             return false;
         }
-
+        if (pattern != null) {
+            if (pattern.isEmpty()) {
+                LOGGER.error("Wrong pattern");
+                return false;
+            }
+        }
         //Update Authenticated time
         psClient.updateAuthenticatedTimestamp();
 
@@ -177,7 +182,10 @@ public class Stereotype {
 
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-
+        if (!dbStereotype.deleteStereotypeFeatures(stereotypeName, null, psClient.username)) {
+            LOGGER.error("Error on delete stereotype features");
+            return false;
+        }
         //Call storage updateStereotypeFeatures to update all Stereotypes features
         return dbStereotype.updateStereotypeFeatures(stereotypeName, psClient.username);
     }
@@ -424,7 +432,7 @@ public class Stereotype {
      * @param stereotypeName
      * @return
      */
-    public boolean DeleteUserFromStereotype(String username, String stereotypeName) {
+    public boolean deleteUserFromStereotype(String username, String stereotypeName) {
 
         //Check permission
         if (!getPermissionFor(actions.get("aDeleteUserFromStereotype"), "X")) {

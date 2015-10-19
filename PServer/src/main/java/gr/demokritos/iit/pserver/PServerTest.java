@@ -67,7 +67,7 @@ public class PServerTest {
 //        cl.setAuthenticatedTimestamp(new Date().getTime());
 ////        //Create new personal instance
 //        Personal instance = new Personal(new PServerHBase(), cl);
-////        instance.deleteUsers(null);
+//        instance.deleteUsers(null);
 //
 //        Random r = new Random(50);
 //        ArrayList<User> usersList = new ArrayList<>();
@@ -170,8 +170,10 @@ public class PServerTest {
 
 }
 
-//TestUser2 --> {country=en, gender=male, oc=1, age=2}
-//TestUser4 --> {country=gr, gender=male, oc=2, age=24} -
-//TestUser0 --> {country=en, gender=male, oc=1, age=33} -
-//TestUser1 --> {country=en, gender=male, oc=2, age=43} -
+//TestUser5 --> {country=en, gender=male, oc=1, age=-15}
+//TestUser6 --> {country=gr, gender=male, oc=1, age=-5}
+//TestUser0 --> {country=gr, gender=male, oc=2, age=2}
+//TestUser1 --> {country=en, gender=male, oc=0, age=7}
+//TestUser2 --> {country=en, gender=male, oc=2, age=20}
+//TestUser4 --> {country=gr, gender=male, oc=1, age=20}
 //TestUser3 --> {country=en, gender=female, oc=2, age=44}

@@ -32,14 +32,14 @@ public class TestStringTokenizer {
     public static void main(String[] args) throws IOException {
 
         HTable table = null;
-        
+
 //TestUser2 --> {country=en, gender=male, oc=1, age=2}
 //TestUser4 --> {country=gr, gender=male, oc=2, age=24}
 //TestUser0 --> {country=en, gender=male, oc=1, age=33}
 //TestUser1 --> {country=en, gender=male, oc=2, age=43}
 //TestUser3 --> {country=en, gender=female, oc=2, age=44}
-
-        String rule = "(age>30|AND|gender:female)|OR|country:el";
+//        String rule = "(age<-1|AND|gender:male)|OR|country:el";
+        String rule = "age<0";
         System.out.println("Rule --> " + rule);
 
         String tmp = rule.replaceAll("\\|AND\\|", "&");
@@ -207,17 +207,17 @@ public class TestStringTokenizer {
         Scan scan = new Scan();
 
         scan.setFilter(currentState.getList());
-        
+
         ResultScanner scanner = table.getScanner(scan);
 
         for (Result cResult : scanner) {
             String cName = Bytes.toString(
                     cResult.getValue(Bytes.toBytes("Info"), Bytes.toBytes("Username"))
             );
-            
-             String cUID = Bytes.toString(
-                        cResult.getRow()
-                );
+
+            String cUID = Bytes.toString(
+                    cResult.getRow()
+            );
 
 
             System.out.println(cName);

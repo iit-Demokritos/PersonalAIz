@@ -304,11 +304,13 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         usersForDelete = new HashMap<>(getUsers(pattern, null, clientName));
 
         // Delete users form the client table
-        Delete clientUsersDelete = new Delete(Bytes.toBytes(getClientUID(clientName)));
+        Delete clientUsersDelete = new Delete(
+                Bytes.toBytes(getClientUID(clientName)));
 
         //For eash user delete them from the table
         for (String cUserName : usersForDelete.keySet()) {
-            Delete deleteUser = new Delete(Bytes.toBytes(usersForDelete.get(cUserName)));
+            Delete deleteUser = new Delete(
+                    Bytes.toBytes(usersForDelete.get(cUserName)));
 
             try {
 
@@ -321,7 +323,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             }
 
             //add delete column record for the current user
-            clientUsersDelete.deleteColumn(family_ClientUsers, Bytes.toBytes(cUserName));
+            clientUsersDelete.deleteColumn(family_ClientUsers, 
+                    Bytes.toBytes(cUserName));
         }
 
         try {
@@ -936,15 +939,20 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         }
 
         //get all stereotypes based on pattern
-        stereotypesForDelete = new HashMap<>(getStereotypes(pattern, null, clientName));
+        stereotypesForDelete = new HashMap<>(
+                getStereotypes(pattern, null, clientName));
 
         // Delete stereotypes form the client table
-        Delete clientStereotypesDelete = new Delete(Bytes.toBytes(getClientUID(clientName)));
+        Delete clientStereotypesDelete = new Delete(
+                Bytes.toBytes(getClientUID(clientName)));
 
         //For eash stereotype delete them from the table
         for (String cSterName : stereotypesForDelete.keySet()) {
 
-            Delete stereotypeDelete = new Delete(Bytes.toBytes(stereotypesForDelete.get(cSterName)));
+            ArrayList<String> users = new ArrayList<>();
+            users.addAll(getStereotypeUsers(cSterName, null, null, clientName));
+            Delete stereotypeDelete = new Delete(
+                    Bytes.toBytes(stereotypesForDelete.get(cSterName)));
 
             try {
 
@@ -957,10 +965,9 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             }
 
             //add delete column record for the current stereotype
-            clientStereotypesDelete.deleteColumn(family_Stereotypes, Bytes.toBytes(cSterName));
+            clientStereotypesDelete.deleteColumn(family_Stereotypes, 
+                    Bytes.toBytes(cSterName));
 
-            ArrayList<String> users = new ArrayList<>();
-            users.addAll(getStereotypeUsers(cSterName, null, null, clientName));
 
             for (String cUser : users) {
 
@@ -1178,7 +1185,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         Boolean status = true;
 
         //Get stereotypes UID
-        String stereotypeUID = generateStereotypeUID(stereotypeName, clientName);
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
         //Check if stereotype exists
         if (stereotypeUID == null) {
             LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
@@ -1228,7 +1235,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         Boolean status = true;
 
         //Get stereotypes UID
-        String stereotypeUID = generateStereotypeUID(stereotypeName, clientName);
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
         //Check if stereotype exists
         if (stereotypeUID == null) {
             LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
@@ -1251,9 +1258,9 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         checkUsers.addAll(getUsersFromFilter(filter, clientName));
 
         //For each user in the stereotype
-        for (String cUser : checkUsers) {
+        for (String cUser : allSystemUsers) {
             //Check if exist on check users list
-            if (!allSystemUsers.contains(cUser)) {
+            if (!checkUsers.contains(cUser)) {
                 //If not exist delete username from stereotype
                 if (!deleteUserFromStereotype(cUser, stereotypeName, clientName)) {
                     LOGGER.error("Fail to delete user:" + cUser + " on Stereotype" + stereotypeName);
@@ -1480,7 +1487,16 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      */
     @Override
     public boolean deleteStereotypeFeatures(String stereotypeName, String pattern, String clientName) {
+  
 
+        //Get stereotype UID
+        String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
+        //Check if stereotype exists
+        if (stereotypeUID == null) {
+            LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
+            return false;
+        }
+        
         boolean status = true;
         HTable stereotypeTable = null;
         HashMap<String, String> featuresForDelete;
@@ -2237,19 +2253,19 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         //for each user get profile
         for (String cUser : users) {
-            Map<String, String> userFeatures = null;
+            Map<String, String> userFeatures = new HashMap<>();
             userFeatures.putAll(getUserFeatures(cUser, null, null, clientName));
 
             //for each feature 
             for (String cFeature : userFeatures.keySet()) {
                 //if feature is numeric
-                if (cFeature.matches("[0-9]+")) {
+                if (userFeatures.get(cFeature).matches("[0-9]+")) {
 
                     //if feature contains to numeric stereotype list
                     if (numericFeatures.containsKey(cFeature)) {
                         //update map
-                        int cValue = Integer.getInteger(numericFeatures.get(cFeature));
-                        int addend = Integer.getInteger(userFeatures.get(cFeature));
+                        int cValue = Integer.parseInt(numericFeatures.get(cFeature));
+                        int addend = Integer.parseInt(userFeatures.get(cFeature));
                         numericFeatures.put(cFeature,
                                 Integer.toString(cValue + addend));
                     } else {
@@ -2283,7 +2299,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         //for each numeric feature in the map divene the value with users size
         for (String cFeature : numericFeatures.keySet()) {
             //update map
-            int cValue = Integer.getInteger(stereotypeFeatures.get(cFeature));
+            int cValue = Integer.parseInt(numericFeatures.get(cFeature));
             stereotypeFeatures.put(
                     cFeature, Integer.toString(cValue / users.size()));
         }
