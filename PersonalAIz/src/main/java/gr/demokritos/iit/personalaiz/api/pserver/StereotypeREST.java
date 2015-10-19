@@ -5,16 +5,29 @@
  */
 package gr.demokritos.iit.personalaiz.api.pserver;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
+import gr.demokritos.iit.pserver.api.Stereotype;
+import gr.demokritos.iit.pserver.ontologies.Client;
+import gr.demokritos.iit.pserver.storage.PServerHBase;
+import gr.demokritos.iit.pserver.storage.interfaces.IStereotypeStorage;
+import gr.demokritos.iit.security.SecurityLayer;
+import gr.demokritos.iit.utilities.configuration.PersonalAIzConfiguration;
+import gr.demokritos.iit.utilities.json.JSon;
+import gr.demokritos.iit.utilities.json.Output;
+import gr.demokritos.iit.utilities.logging.Logging;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the Stereotype mode API
@@ -24,269 +37,997 @@ import javax.ws.rs.core.MediaType;
 /**
  * Root resource (exposed at "pserver/:credentials/stereotype" path)
  */
-@Path("{clientKey}/stereotype")
+@Path("pserver/{userAuthe}/stereotype/")
 @Produces(MediaType.APPLICATION_JSON)
 public class StereotypeREST {
 
-    /**
-     * Method handling HTTP GET requests. The returned object will be sent to
-     * the client as "text/plain" media type.
-     *
-     * @return String that will be returned as a text/plain response.
-     */
-  
+    private static final Logger LOGGER = LoggerFactory.getLogger(StereotypeREST.class);
+    //TODO: Change HBase with something global to change storage from settings
+    private final IStereotypeStorage db = new PServerHBase();
+    private Stereotype stereotype;
+    private Client cl;
+    private final SecurityLayer security = new SecurityLayer();
+    private Output output = new Output();
+    private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
-//  Implement Add Stereotypes
-// POST /:steretoypeName | Add new stereotype on the platform
-    @Path("/{steretoypeName}")
+    @Path("attributes")
+    @GET
+    public String getSystemAttributes(
+            @PathParam("userAuthe") String userAuthe) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        Set<String> attributes = stereotype.getSystemAttributes();
+
+        if (attributes != null) {
+            LOGGER.info("Complete Get Sytem Attributes");
+            output.setOutput(attributes);
+            output.setCustomOutputMessage("Get System Attributes Complete");
+        } else {
+            LOGGER.info("Failed Get System Attributes");
+            output.setCustomOutputMessage("Get System Attributes Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}")
     @POST
     public String addStereotype(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("steretoypeName") String steretoypeName,
-            @DefaultValue("null") @QueryParam("rule") String rule
-    ) {
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName,
+            @FormParam("rule") String rule) {
 
-     return null;
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (rule == null) {
+            LOGGER.info("Failed to add stereotype: No rule");
+            output.setCustomOutputMessage("AddStereotype Failed: No Rule");
+
+            return JSon.jsonize(output, Output.class);
+        } else {
+            if (stereotype.addStereotype(stereotypeName, rule)) {
+                LOGGER.info("Complete Add stereotype: " + stereotypeName);
+                output.setCustomOutputMessage("Add Stereotype Complete");
+            } else {
+                LOGGER.info("Failed Add Stereotype: " + stereotypeName);
+                output.setCustomOutputMessage("Add Stereotype Failed");
+            }
+        }
+
+        return JSon.jsonize(output, Output.class);
     }
-    
-//  Implement Get stereotypes
-// GET /  | Get a list with all stereotype names in the platform
+
+    @Path("delete")
+    @POST
+    public String deleteStereotypes(
+            @PathParam("userAuthe") String userAuthe,
+            @FormParam("pattern") String pattern) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.deleteStereotypes(pattern)) {
+            LOGGER.info("Complete delete stereotypes with pattern: " + pattern);
+            output.setCustomOutputMessage("Delete stereotypes Complete");
+        } else {
+            LOGGER.info("Failed delete stereotypes with pattern: " + pattern);
+            output.setCustomOutputMessage("Delete stereotypes Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
     @GET
     public String getStereotypes(
-            @PathParam("clientKey") String clientKey,
-            @DefaultValue("*") @QueryParam("pattern") String pattern,
-            @DefaultValue("*") @QueryParam("page") String page
-    ) {
+            @PathParam("userAuthe") String userAuthe,
+            @FormParam("pattern") String pattern,
+            @FormParam("page") String page) {
 
-     return null;
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        int pageParam = -1;
+        if (page != null) {
+            pageParam = Integer.parseInt(page);
+        }
+
+        Set<String> users = stereotype.getStereotypes(pattern, pageParam);
+
+        if (users != null) {
+            LOGGER.info("Complete Get Stereotypes");
+            output.setOutput(users);
+            output.setCustomOutputMessage("Get Stereotypes Complete");
+        } else {
+            LOGGER.info("Failed Get Stereotypes");
+            output.setCustomOutputMessage("Get Stereotypes Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
     }
-    
-//  Implement Delete stereotypes
-// DELETE /  | Delete stereotype from the platform. If no pattern remove all the stereotypes
-    @DELETE
-    public String deleteStereotypes(
-            @PathParam("clientKey") String clientKey,
-            @DefaultValue("*") @QueryParam("pattern") String pattern
-    ) {
 
-     return null;
-    }
-
-
-//  Implement Remake stereotype
-// PUT /:stereotypeName  | Remake stereotype of the given stereotype Name
-    @Path("{stereotypeName}")
-    @PUT
+    @Path("{stereotypeName}/remake")
+    @POST
     public String remakeStereotype(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("stereotypeName") String stereotypeName
-    ) {
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName) {
 
-     return null;
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.remakeStereotype(stereotypeName)) {
+            LOGGER.info("Complete remake stereotype: " + stereotypeName);
+            output.setCustomOutputMessage("Remake stereotype Complete");
+        } else {
+            LOGGER.info("Failed remake stereotype: " + stereotypeName);
+            output.setCustomOutputMessage("Remake stereotype Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
     }
 
+    @Path("{stereotypeName}/features/update")
+    @POST
+    public String updateStereotypeFeatures(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName) {
 
-//  Implement Get stereotype users
-// GET /:stereotypeName/users  | Get a list with users that belongs to the given stereotype name
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.updateStereotypeFeatures(stereotypeName)) {
+            LOGGER.info("Complete update stereotype features: " + stereotypeName);
+            output.setCustomOutputMessage("Update stereotype features Complete");
+        } else {
+            LOGGER.info("Failed update stereotype features: " + stereotypeName);
+            output.setCustomOutputMessage("Update stereotype features Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}/users/update")
+    @POST
+    public String updateStereotypeUsers(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.updateStereotypeUsers(stereotypeName)) {
+            LOGGER.info("Complete update stereotype users: " + stereotypeName);
+            output.setCustomOutputMessage("Update stereotype users Complete");
+        } else {
+            LOGGER.info("Failed update stereotype users: " + stereotypeName);
+            output.setCustomOutputMessage("Update stereotype users Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}/users/find")
+    @POST
+    public String findStereotypeUsers(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.findStereotypeUsers(stereotypeName)) {
+            LOGGER.info("Complete find stereotype users: " + stereotypeName);
+            output.setCustomOutputMessage("Find stereotype users Complete");
+        } else {
+            LOGGER.info("Failed find stereotype users: " + stereotypeName);
+            output.setCustomOutputMessage("Find stereotype users Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}/users/check")
+    @POST
+    public String checkStereotypeUsers(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.checkStereotypeUsers(stereotypeName)) {
+            LOGGER.info("Complete check stereotype users: " + stereotypeName);
+            output.setCustomOutputMessage("Check stereotype users Complete");
+        } else {
+            LOGGER.info("Failed check stereotype users: " + stereotypeName);
+            output.setCustomOutputMessage("Check stereotype users Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}/features/set")
+    @POST
+    public String setStereotypeFeatures(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName,
+            @FormParam("JSONStereotypeFeatures") String JSONStereotypeFeatures) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        HashMap<String, String> features = new HashMap<>();
+        if (JSONStereotypeFeatures != null) {
+            features.putAll(JSon.unjsonize(JSONStereotypeFeatures, HashMap.class));
+        } else {
+            LOGGER.info("No given features: " + JSONStereotypeFeatures);
+            output.setCustomOutputMessage("No features given");
+            return JSon.jsonize(output, Output.class);
+        }
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.setStereotypeFeatures(stereotypeName, features)) {
+            LOGGER.info("Complete set Stereotype Features " + features.toString());
+            output.setCustomOutputMessage("Set Stereotype Features Complete");
+        } else {
+            LOGGER.info("Failed set Stereotype Features " + features.toString());
+            output.setCustomOutputMessage("Set Stereotype Features Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}/features/modify")
+    @POST
+    public String modifyStereotypeFeatures(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName,
+            @FormParam("JSONStereotypeFeatures") String JSONStereotypeFeatures) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        HashMap<String, String> features = new HashMap<>();
+        if (JSONStereotypeFeatures != null) {
+            features.putAll(JSon.unjsonize(JSONStereotypeFeatures, HashMap.class));
+        } else {
+            LOGGER.info("No given features: " + JSONStereotypeFeatures);
+            output.setCustomOutputMessage("No features given");
+            return JSon.jsonize(output, Output.class);
+        }
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.modifyStereotypeFeatures(stereotypeName, features)) {
+            LOGGER.info("Complete modify Stereotype Features " + features.toString());
+            output.setCustomOutputMessage("modify Stereotype Features Complete");
+        } else {
+            LOGGER.info("Failed modify Stereotype Features " + features.toString());
+            output.setCustomOutputMessage("modify Stereotype Features Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}/features")
+    @GET
+    public String getStereotypeFeatures(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName,
+            @FormParam("pattern") String pattern,
+            @FormParam("page") String page) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        int pageParam = -1;
+        if (page != null) {
+            pageParam = Integer.parseInt(page);
+        }
+
+        Map<String, String> features = stereotype.getStereotypeFeatures(
+                stereotypeName, pattern, pageParam);
+
+        if (features != null) {
+            LOGGER.info("Complete Get Stereotype Features");
+            output.setOutput(features);
+            output.setCustomOutputMessage("Get Stereotype Features Complete");
+        } else {
+            LOGGER.info("Failed Get Stereotype Features");
+            output.setCustomOutputMessage("Get Stereotype Features Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
+    @Path("{stereotypeName}/features/delete")
+    @POST
+    public String deleteStereotypeFeatures(
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("stereotypeName") String stereotypeName,
+            @FormParam("pattern") String pattern) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.deleteStereotypeFeatures(stereotypeName, pattern)) {
+            LOGGER.info("Complete Delete stereotype " + stereotypeName
+                    + " features with pattern " + pattern);
+            output.setCustomOutputMessage("Delete stereotype features Complete");
+        } else {
+            LOGGER.info("Failed Delete stereotype " + stereotypeName
+                    + " features with pattern " + pattern);
+            output.setCustomOutputMessage("Delete stereotype features Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+
     @Path("{stereotypeName}/users")
     @GET
     public String getStereotypeUsers(
-            @PathParam("clientKey") String clientKey,
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("stereotypeName") String stereotypeName,
-            @DefaultValue("*") @QueryParam("pattern") String pattern,
-            @DefaultValue("*") @QueryParam("page") String page
-    ) {
+            @FormParam("pattern") String pattern,
+            @FormParam("page") String page) {
 
-     return null;
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        int pageParam = -1;
+        if (page != null) {
+            pageParam = Integer.parseInt(page);
+        }
+
+        List<String> users = stereotype.getStereotypeUsers(stereotypeName,
+                pattern, pageParam);
+
+        if (users != null) {
+            LOGGER.info("Complete Get Stereotype Users");
+            output.setOutput(users);
+            output.setCustomOutputMessage("Get Stereotype Users Complete");
+        } else {
+            LOGGER.info("Failed Get Stereotype Users");
+            output.setCustomOutputMessage("Get Stereotype Users Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
     }
-    
-//  Implement Get stereotype profile
-// GET /:stereotypeName/profile  | Get stereotype profile for the given stereotype name
-    @Path("{stereotypeName}/profile")
-    @GET
-    public String getStereotypeProfile(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("stereotypeName") String stereotypeName,
-            @DefaultValue("*") @QueryParam("pattern") String pattern,
-            @DefaultValue("*") @QueryParam("page") String page
-    ) {
 
-     return null;
-    }
-    
-    
-
-// ===========================================   
-//  Implement Add user on stereotype
-// POST /users/:username/:stereotypeNameObject | Add a user on a stereotype with association degree
-    @Path("users/{username}/{stereotypeNameObject}")
-    @POST
-    public String addUserStereotype(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("username") String username,
-            @PathParam("stereotypeNameObject") String stereotypeNameObject
-    ) {
-
-     return null;
-    }
-
-//  Implement Get user’s stereotypes
-// GET /users/:username | Get a list with stereotypes that user belongs
-    @Path("users/{username}")
+    @Path("user/{usernameName}/stereotypes")
     @GET
     public String getUserStereotypes(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("username") String username,
-            @DefaultValue("*") @QueryParam("pattern") String pattern,
-            @DefaultValue("*") @QueryParam("page") String page
-    ) {
+            @PathParam("userAuthe") String userAuthe,
+            @PathParam("usernameName") String usernameName,
+            @FormParam("pattern") String pattern,
+            @FormParam("page") String page) {
 
-     return null;
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        int pageParam = -1;
+        if (page != null) {
+            pageParam = Integer.parseInt(page);
+        }
+
+        List<String> stereotypes = stereotype.getUserStereotypes(usernameName,
+                pattern, pageParam);
+
+        if (stereotypes != null) {
+            LOGGER.info("Complete Get User Stereotypes");
+            output.setOutput(stereotypes);
+            output.setCustomOutputMessage("Get User Stereotypes Complete");
+        } else {
+            LOGGER.info("Failed Get User Stereotypes");
+            output.setCustomOutputMessage("Get User Stereotypes Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
     }
 
-//  Implement Set user’s stereotype degrees
-// PUT /users/:userName/:stereotypeNameObject | Set new association degree for a stereotype
-    @Path("users/{userName}/{stereotypeNameObject}")
-    @PUT
-    public String setUserStereotypes(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("userName") String userName,
-            @PathParam("stereotypeNameObject") String stereotypeNameObject
-    ) {
-
-     return null;
-    }
-    
-//  Implement Modify user’s stereotype degrees
-// PUT /users/:userName/modify/:stereotypeNameObject | Modify association degree (increase/decrease) for a stereotype
-    @Path("users/{userName}/modify/{stereotypeNameObject}")
-    @PUT
-    public String modifyUserStereotypes(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("userName") String userName,
-            @PathParam("stereotypeNameObject") String stereotypeNameObject
-    ) {
-
-     return null;
-    }
-
-//  Implement Delete user from stereotype
-// DELETE /users/:username/:stereotypeNameObject | Delete user from stereotypes
-    @Path("users/{username}/{stereotypeNameObject}")
-    @DELETE
-    public String deleteUserStereotype(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("username") String username,
-            @PathParam("stereotypeNameObject") String stereotypeNameObject
-    ) {
-
-     return null;
-    }
-    
-//  Implement Update stereotype users
-// PUT /users/:stereotypeName/update | Removes all users not matching the stereotypes rule and inserts any new users that do match
-    @Path("users/{stereotypeName}/update")
-    @PUT
-    public String updateStereotypeUsers(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("stereotypeName") String stereotypeName
-    ) {
-
-     return null;
-    }
-    
-//  Implement Check stereotype users
-// PUT /users/:stereotypeName/check | Removes any current users that do not match the stereotypes rule
-    @Path("users/{stereotypeName}/check")
-    @PUT
-    public String checkStereotypeUsers(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("stereotypeName") String stereotypeName
-    ) {
-
-     return null;
-    }
-    
-//  Implement Find stereotype users
-// PUT /users/:stereotypeName/find | Finds and adds to the stereotype all users matching its rule
-    @Path("users/{stereotypeName}/find")
-    @PUT
-    public String findStereotypeUsers(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("stereotypeName") String stereotypeName
-    ) {
-
-     return null;
-    }
-    
-    
-    
-// ===========================================   
-//  Implement Add features on stereotype
-// POST /features/:stereotypeName/:featureNameObject | Add a list of feature names and value on a stereotype
-    @Path("features/{stereotypeName}/{featureNameObject}")
+    @Path("{stereotypeName}/user/add/{username}")
     @POST
-    public String addFeatureStereotype(
-            @PathParam("clientKey") String clientKey,
+    public String addUserOnStereotype(
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("stereotypeName") String stereotypeName,
-            @PathParam("featureNameObject") String featureNameObject
-    ) {
+            @PathParam("username") String username) {
 
-     return null;
-    }
-    
-//  Implement Delete feature from stereotypes
-// DELETE /features/:featureName/:stereotypeNameObject | Delete feature from stereotypes
-    @Path("features/{featureName}/{stereotypeNameObject}")
-    @DELETE
-    public String deleteFeatureStereotype(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("featureName") String featureName,
-            @PathParam("stereotypeNameObject") String stereotypeNameObject
-    ) {
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
 
-     return null;
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.addUserOnStereotype(username, stereotypeName)) {
+            LOGGER.info("Complete Add user " + username + " on stereotype " + stereotypeName);
+            output.setCustomOutputMessage("Add user on stereotype Complete");
+        } else {
+            LOGGER.info("Failed Add user " + username + " on stereotype " + stereotypeName);
+            output.setCustomOutputMessage("Add user on stereotype Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
     }
-    
-//  Implement Set features on stereotype
-// PUT /features/:stereotypeName/:featureNameObject | set a list of feature names and value on a stereotype
-    @Path("features/{stereotypeName}/{featureNameObject}")
-    @PUT
-    public String setFeatureStereotypes(
-            @PathParam("clientKey") String clientKey,
+
+    @Path("{stereotypeName}/user/delete/{username}")
+    @POST
+    public String deleteUserFromStereotype(
+            @PathParam("userAuthe") String userAuthe,
             @PathParam("stereotypeName") String stereotypeName,
-            @PathParam("featureNameObject") String featureNameObject
-    ) {
+            @PathParam("username") String username) {
 
-     return null;
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            //Create PServer Stereotype instance
+            stereotype = new Stereotype(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(StereotypeREST.class, config.getLogLevel());
+
+        //set security layer on PServer Stereotype
+        stereotype.setSecurity(security);
+
+        if (stereotype.deleteUserFromStereotype(username, stereotypeName)) {
+            LOGGER.info("Complete Delete user " + username + " from stereotype " + stereotypeName);
+            output.setCustomOutputMessage("Delete user from stereotype Complete");
+        } else {
+            LOGGER.info("Failed Delete user " + username + " from stereotype " + stereotypeName);
+            output.setCustomOutputMessage("Delete user from stereotype Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
     }
-    
-//  Implement Modify features on stereotype
-// PUT /features/:stereotypeName/modify/:featureNameObject | Modify a list of feature names and value on a stereotype
-    @Path("features/{stereotypeName}/modify/{featureNameObject}")
-    @PUT
-    public String modifyFeatureStereotypes(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("stereotypeName") String stereotypeName,
-            @PathParam("featureNameObject") String featureNameObject
-    ) {
-
-     return null;
-    }
-    
-//  Implement Update stereotype features
-// PUT /features/:stereotypeName/update | Removes all features from the stereotype 
-//    and then adds and sets all features as needed based on the stereotypes current users and their degrees
-    @Path("features/{stereotypeName}/update")
-    @PUT
-    public String updateStereotypeFeatures(
-            @PathParam("clientKey") String clientKey,
-            @PathParam("stereotypeName") String stereotypeName
-    ) {
-
-     return null;
-    }
-
-
 
 }
