@@ -42,7 +42,7 @@ public class AdminREST {
     private Admin admin;
     private Client cl;
     private final SecurityLayer security = new SecurityLayer();
-    private Output output=new Output();
+    private Output output = new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
     /**
@@ -121,6 +121,7 @@ public class AdminREST {
      * @param clientName The client username that i want to delete
      * @return
      */
+    //FIXME: Make it POST method
     @Path("client/{clientName}")
     @DELETE
     public String deleteClient(

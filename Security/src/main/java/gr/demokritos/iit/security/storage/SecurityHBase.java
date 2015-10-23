@@ -51,6 +51,10 @@ public class SecurityHBase implements ISecurityStorage {
     public SecurityHBase() {
         //Create new HBase configuration
         config = HBaseConfiguration.create();
+        //FIXME: enable remote HBase before deployed build
+//        config.set("hbase.master", "master:60000");
+//        config.set("hbase.zookeeper.quorum", "master"); 
+//        config.set("hbase.zookeeper.property.clientPort", "2181");
     }
 
     //========================== Authentication ================================

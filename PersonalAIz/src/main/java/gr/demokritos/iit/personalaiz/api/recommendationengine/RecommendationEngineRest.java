@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implements the REST API to expose the recommendation engine module
+ *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 @Path("recengine/{userAuthe}/")
@@ -42,13 +42,12 @@ public class RecommendationEngineRest {
     private RecommendationEngine re;
     private final RecommendationConfiguration config = new RecommendationConfiguration();
 
-    
-    
     /**
      * Add user on Recommendation Engine
+     *
      * @param userAuthe The Client Credentials
      * @param username The username
-     * @param JSONUser The User attributes or information 
+     * @param JSONUser The User attributes or information
      * @return A JSON with process result
      */
     @Path("user/{username}")
@@ -100,7 +99,7 @@ public class RecommendationEngineRest {
 
         if (JSONUser != null) {
 
-            HashMap<String, HashMap<String,String>> userMap;
+            HashMap<String, HashMap<String, String>> userMap;
             userMap = new HashMap<>(
                     JSon.unjsonize(JSONUser, HashMap.class));
 
@@ -132,6 +131,7 @@ public class RecommendationEngineRest {
 
     /**
      * Delete a user from Recommendation Engine
+     *
      * @param userAuthe The client credentials
      * @param username The username
      * @return A JSON with process result
@@ -192,6 +192,7 @@ public class RecommendationEngineRest {
 
     /**
      * Feed recommendation engine with user preferences
+     *
      * @param userAuthe The client credentials
      * @param username The username
      * @param JSONObject The feed object that user click on it
@@ -250,7 +251,7 @@ public class RecommendationEngineRest {
 
             return JSon.jsonize(output, Output.class);
         } else {
-            fo=FeedObject.fromJSON(JSONObject);
+            fo = FeedObject.fromJSON(JSONObject);
         }
 
         if (re.feed(username, fo)) {
@@ -266,6 +267,7 @@ public class RecommendationEngineRest {
 
     /**
      * Get recommendation, Rank the given object list based on user profile.
+     *
      * @param userAuthe The client credentials
      * @param username Th username
      * @param JSONObjectList A object list that we want to recommend on user
@@ -317,7 +319,7 @@ public class RecommendationEngineRest {
 
         //Create feed object
         ArrayList<FeedObject> recommendationObjectList = new ArrayList<>();
-        
+
         //[
         //    {
         //        "id": "1",
@@ -372,7 +374,6 @@ public class RecommendationEngineRest {
         //        ]
         //    }
         //]
-
         if (JSONObjectList == null) {
             LOGGER.info("Failed to get recommendation: No object list");
             output.setCustomOutputMessage("Get recommendation Failed: No object list");
