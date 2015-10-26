@@ -9,8 +9,35 @@ and open the template in the editor.
         <title>PersonalAIz</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Load CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/personalaiz.css" rel="stylesheet">
+
     </head>
     <body>
-        <div>PersonalAIz manager panel</div>
+
+        <div class="container">
+
+            <h2 class="text-center">Welcome to PersonalAIz</h2>
+            <form class="form-signin" onsubmit="checkCredentials()">
+                <h3 class="form-signin-heading">Please sign in</h3>
+                <label for="inputUsername" class="sr-only">Username</label>
+                <input type="text" id="inputUsername" class="form-control" 
+                       placeholder="Username" required autofocus>
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" id="inputPassword" class="form-control" 
+                       placeholder="Password" required>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">
+                    Sign in</button>
+            </form>
+
+        </div> <!-- /container -->
+
+        <!-- Bootstrap core JavaScript
+   ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/personalaiz.js"></script>
     </body>
 </html>
