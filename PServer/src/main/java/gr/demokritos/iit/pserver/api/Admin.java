@@ -206,6 +206,28 @@ public class Admin {
         adminClient.updateAuthenticatedTimestamp();
         return psConfig.commit();
     }
+    
+    /**
+     * Set PServer setting
+     *
+     * @param name
+     * @param value
+     * @return the status of this action
+     */
+    public boolean setSetting(String name, String value) {
+
+        //Check permission
+        if (!getPermissionFor(actions.get("aSetSettings"), "W")) {
+            LOGGER.error("Premission Denied");
+            return false;
+        }
+
+        // Call set settings function and return the status 
+        psConfig.setProperty(name, value);
+        //update Authenticated time
+        adminClient.updateAuthenticatedTimestamp();
+        return psConfig.commit();
+    }
 
     /**
      * Get the permission for the given action and client

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>PersonalAIz Dashboard</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/personalaiz.css" rel="stylesheet">
+
+        <script src="js/jquery-2.1.4.min.js"></script>
+
+    </head>
+    <body onload='dashboardLoad()'>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="dashboard.html">PersonalAIz</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a id='username' href="#" class="dropdown-toggle" 
+                               data-toggle="dropdown" role="button" aria-haspopup="true" 
+                               aria-expanded="false">
+                                <script>$("#username").html(window.sessionStorage.
+                                            getItem("PersonalAIz.Username")
+                                            + '<span class="caret"></span>')
+                                </script>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" onclick="logout()">logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+
+
+
+
+
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar">
+                    <h2 class="page-header">Dashboard Menu</h2>
+                    <ul id="MenuTabs" class="nav nav-sidebar" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#clients" id="clients-tab" role="tab" 
+                               data-toggle="tab" 
+                               aria-controls="clients" aria-expanded="true">Clients
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#settings" role="tab" id="settings-tab" data-toggle="tab" 
+                               aria-controls="settings">Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+                    <div id="TabContents" class="tab-content">
+
+                        <div role="tabpanel" class="tab-pane active" 
+                             id="clients" aria-labelledBy="clients-tab">
+
+                            <h1 class="page-header">Clients</h1>
+                            <div class="row">
+                                <div class="col-md-3 col-md-offset-1">
+                                    <h2 class="sub-header">Add Client</h2>
+                                    <form id="addClientForm">
+                                        <div class="form-group">
+                                            <label for="inputClientName">Client Name</label>
+                                            <input type="text" class="form-control" 
+                                                   id="inputClientName" placeholder="Client Name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputClientPassword">Password</label>
+                                            <input type="password" class="form-control" 
+                                                   id="inputClientPassword" placeholder="Password">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputClientRPassword">Retype Password</label>
+                                            <input type="password" class="form-control" 
+                                                   id="inputClientRPassword" placeholder="Retype Password">
+                                        </div>
+                                        <button type="submit" class="btn btn-default">Add</button>
+                                        <span id="ClientsFormOutput"></span>
+                                    </form>
+                                </div>
+                                <div class="col-md-3 col-md-offset-1">
+                                    <h2 class="sub-header">Client List</h2>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="clientsTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="settings" 
+                             aria-labelledBy="settings-tab">
+                            <h1 class="page-header">Settings</h1>
+
+                            <div class="row">
+                                <div class="col-md-3 col-md-offset-1">
+                                    <h2 class="sub-header">Edit Setting</h2>
+                                    <form id="editSettingForm">
+                                        <div class="form-group">
+                                            <label for="inputSettingName">Setting Name</label>
+                                            <input type="text" class="form-control" 
+                                                   id="inputSettingName" placeholder="Setting Name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputSettingValue">Setting Value</label>
+                                            <input type="text" class="form-control" 
+                                                   id="inputSettingValue" placeholder="Setting Value">
+                                        </div>
+                                        <button type="submit" class="btn btn-default">Edit</button>
+                                        <span id="SettingFormOutput"></span>
+                                    </form>
+                                </div>
+                                <div class="col-md-3 col-md-offset-1">
+                                    <h2 class="sub-header">Settings List</h2>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="settingsTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap core JavaScript
+           ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/personalaiz.js"></script>
+    </body>
+</html>

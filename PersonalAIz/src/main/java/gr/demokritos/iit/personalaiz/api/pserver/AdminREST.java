@@ -121,9 +121,8 @@ public class AdminREST {
      * @param clientName The client username that i want to delete
      * @return
      */
-    //FIXME: Make it POST method
-    @Path("client/{clientName}")
-    @DELETE
+    @Path("client/delete/{clientName}")
+    @POST
     public String deleteClient(
             @PathParam("userAuthe") String userAuthe,
             @PathParam("clientName") String clientName
@@ -302,6 +301,75 @@ public class AdminREST {
         } else {
             LOGGER.info("Failed Set PServer settings: " + settings.toString());
             output.setCustomOutputMessage("Set PServer settings failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
+    /**
+     * Set PServer settings
+     *
+     * @param userAuthe The user API Key or Username - pass credentials
+     * @param settingName
+     * @param settingValue
+     * @return
+     */
+    @Path("setting")
+    @POST
+    public String setSetting(
+            @PathParam("userAuthe") String userAuthe,
+            @FormParam("name") String settingName,
+            @FormParam("value") String settingValue
+    ) {
+
+        //Check if user Authentication is with username pass or api key
+        if (userAuthe.contains("|")) {
+            // Check the username - pass Credentials
+            String[] credentials = userAuthe.split("\\|");
+
+            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+                LOGGER.info("No valid Username: " + credentials[0]
+                        + " and pass: " + credentials[1]);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(credentials[0], credentials[1]);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
+        } else {
+            // Check the api key Credentials
+            if (!security.authe.checkCredentials(userAuthe)) {
+                LOGGER.info("No valid API Key: " + userAuthe);
+                output.setCustomOutputMessage("Security Authentication Failed");
+                return JSon.jsonize(output, Output.class);
+            }
+            //Create new client and set auth time
+            cl = new Client(userAuthe);
+            cl.setAuthenticatedTimestamp(new Date().getTime());
+            // Create PServer Admin instance
+            admin = new Admin(db, cl);
+        }
+
+        //Update logging level 
+        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
+
+        //set security layer on PServer Admin
+        admin.setSecurity(security);
+
+        if (settingName == null || settingValue == null) {
+            LOGGER.info("Empty variable settings");
+            output.setCustomOutputMessage("Set PServer settings failed. Empty settings");
+            return JSon.jsonize(output, Output.class);
+        }
+
+
+        if (admin.setSetting(settingName,settingValue)) {
+            LOGGER.info("Complete Set PServer settings: " + settingName+" "+ settingValue);
+            output.setCustomOutputMessage("Set PServer setting complete");
+        } else {
+            LOGGER.info("Failed Set PServer settings: " + settingName+" "+ settingValue);
+            output.setCustomOutputMessage("Set PServer setting failed");
         }
 
         return JSon.jsonize(output, Output.class);
