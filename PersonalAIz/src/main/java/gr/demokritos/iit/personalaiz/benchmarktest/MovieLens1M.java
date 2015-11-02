@@ -3,12 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.personalaiz.crashtest;
+package gr.demokritos.iit.personalaiz.benchmarktest;
 
 /**
  *
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
-public class CrashTest {
+public class MovieLens1M  implements ILoadDataset{
+    
+    
+    
+    
     
 }
