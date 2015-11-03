@@ -5,13 +5,17 @@
  */
 package gr.demokritos.iit.personalaiz.benchmarktest;
 
+import java.util.List;
+
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface ILoadDataset {
-    
-    
-    
-    
+
+    String getNextUser();
+    String getNextUserModification();
+    List<String> getUsernamesList();
+    String getRandomUsername();
+
 }

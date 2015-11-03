@@ -7,7 +7,9 @@ package gr.demokritos.iit.personalaiz.benchmarktest;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -19,6 +21,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
 
 /**
  *
@@ -33,10 +36,13 @@ public class Scheduler {
     private final Random r = new Random();
     private final int fromPointer;
     private final int getPointer;
+    private final Logger LOGGER;
+    private final Date date = new Date();
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     //Constructor
     public Scheduler(ILoadDataset dataset, IStroreResults warehouse,
-            int threadsPerMinute, String scenario2GetPropability) {
+            int threadsPerMinute, String scenario2GetPropability, Logger LOGGER) {
 
         //Set settings
         this.dataset = dataset;
@@ -45,7 +51,7 @@ public class Scheduler {
         String[] tmp = scenario2GetPropability.split("/");
         this.getPointer = Integer.parseInt(tmp[0]);
         this.fromPointer = Integer.parseInt(tmp[1]);
-
+        this.LOGGER = LOGGER;
     }
 
     /**
@@ -54,10 +60,17 @@ public class Scheduler {
     public void executeScenario1() {
 
         //Add users 
+         LOGGER.info("#Start Add Users: "
+                + dateFormat.format(date.getTime()));
+
         //----------------------------------------------------------------------
         //Modify users profile
+         LOGGER.info("#Start Modify Users Profile: "
+                + dateFormat.format(date.getTime()));
         //----------------------------------------------------------------------
         //Get users profile
+         LOGGER.info("#Start Get Users Profile: "
+                + dateFormat.format(date.getTime()));
     }
 
     /**

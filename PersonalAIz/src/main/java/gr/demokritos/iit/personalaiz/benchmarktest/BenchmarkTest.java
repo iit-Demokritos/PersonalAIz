@@ -7,12 +7,16 @@ package gr.demokritos.iit.personalaiz.benchmarktest;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
 public class BenchmarkTest {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(BenchmarkTest.class);
 
     public static void main(String[] args) {
 
@@ -27,50 +31,78 @@ public class BenchmarkTest {
 
         //----------------------------------------------------------------------
         //Create scheduler 2 request / min
-        System.out.println("#Start Book Crossing experiment: "
+       LOGGER.info("#Create scheduler with 2 request/min: "
                 + dateFormat.format(date.getTime()));
 
         scheduler = new Scheduler(dataset, warehouse,
-                2, scenario2GetPropability);
+                2, scenario2GetPropability, LOGGER);
         //execute senario 1
+        LOGGER.info("#Execute Scenario 1: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario1();
         //execute senario 2
+        LOGGER.info("#Execute Scenario 2: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario2();
 
         //----------------------------------------------------------------------
         //Create scheduler 4 request / min
+        LOGGER.info("#Create scheduler with 4 request/min: "
+                + dateFormat.format(date.getTime()));
         scheduler = new Scheduler(dataset, warehouse,
-                4, scenario2GetPropability);
+                4, scenario2GetPropability, LOGGER);
         //execute senario 1
+        LOGGER.info("#Execute Scenario 1: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario1();
         //execute senario 2
+        LOGGER.info("#Execute Scenario 2: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario2();
 
         //----------------------------------------------------------------------
         //Create scheduler 8 request / min
+        LOGGER.info("#Create scheduler with 8 request/min: "
+                + dateFormat.format(date.getTime()));
         scheduler = new Scheduler(dataset, warehouse,
-                8, scenario2GetPropability);
+                8, scenario2GetPropability, LOGGER);
         //execute senario 1
+        LOGGER.info("#Execute Scenario 1: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario1();
         //execute senario 2
+        LOGGER.info("#Execute Scenario 2: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario2();
 
         //----------------------------------------------------------------------
         //Create scheduler 16 request / min
+        LOGGER.info("#Create scheduler with 16 request/min: "
+                + dateFormat.format(date.getTime()));
         scheduler = new Scheduler(dataset, warehouse,
-                16, scenario2GetPropability);
+                16, scenario2GetPropability, LOGGER);
         //execute senario 1
+        LOGGER.info("#Execute Scenario 1: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario1();
         //execute senario 2
+        LOGGER.info("#Execute Scenario 2: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario2();
 
         //----------------------------------------------------------------------
         //Create scheduler 32 request / min
+        LOGGER.info("#Create scheduler with 32 request/min: "
+                + dateFormat.format(date.getTime()));
         scheduler = new Scheduler(dataset, warehouse,
-                32, scenario2GetPropability);
+                32, scenario2GetPropability, LOGGER);
         //execute senario 1
+        LOGGER.info("#Execute Scenario 1: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario1();
         //execute senario 2
+        LOGGER.info("#Execute Scenario 2: "
+                + dateFormat.format(date.getTime()));
         scheduler.executeScenario2();
 
     }
