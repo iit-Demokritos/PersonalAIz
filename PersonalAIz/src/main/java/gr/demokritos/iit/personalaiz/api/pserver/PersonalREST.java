@@ -15,6 +15,7 @@ import gr.demokritos.iit.utilities.configuration.PersonalAIzConfiguration;
 import gr.demokritos.iit.utilities.json.JSon;
 import gr.demokritos.iit.utilities.json.Output;
 import gr.demokritos.iit.utilities.logging.Logging;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,6 +53,11 @@ public class PersonalREST {
     private Output output = new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
+    
+     Date date = new Date();
+     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    
+    
     /**
      * Method handling HTTP GET requests. The returned object will be sent to
      * the client as "text/plain" media type.
@@ -68,7 +74,8 @@ public class PersonalREST {
             @PathParam("userAuthe") String userAuthe,
             @FormParam("JSONUsers") String JSONUsers
     ) {
-
+        String startTime=dateFormat.format(date.getTime());
+        
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
             // Check the username - pass Credentials
@@ -146,6 +153,8 @@ public class PersonalREST {
             output.setCustomOutputMessage("Add Users Failed");
         }
 
+        String stopTime=dateFormat.format(date.getTime());
+        System.out.println("add#"+startTime+"#"+stopTime);
         return JSon.jsonize(output, Output.class);
     }
 
@@ -432,6 +441,7 @@ public class PersonalREST {
             @PathParam("user") String user,
             @FormParam("JSONUserFeatures") String JSONUserFeatures
     ) {
+        String startTime=dateFormat.format(date.getTime());
 
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
@@ -480,6 +490,8 @@ public class PersonalREST {
             output.setCustomOutputMessage("Modify User Features Failed");
         }
 
+        String stopTime=dateFormat.format(date.getTime());
+        System.out.println("modify#"+startTime+"#"+stopTime);
         return JSon.jsonize(output, Output.class);
     }
 
@@ -500,6 +512,7 @@ public class PersonalREST {
             @FormParam("pattern") String pattern,
             @FormParam("page") String page
     ) {
+        String startTime=dateFormat.format(date.getTime());
 
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
@@ -553,6 +566,8 @@ public class PersonalREST {
             output.setCustomOutputMessage("User not exist");
         }
 
+        String stopTime=dateFormat.format(date.getTime());
+        System.out.println("get#"+startTime+"#"+stopTime);
         return JSon.jsonize(output, Output.class);
     }
 

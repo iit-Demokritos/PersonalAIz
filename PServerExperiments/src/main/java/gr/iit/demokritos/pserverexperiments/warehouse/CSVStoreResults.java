@@ -3,12 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.personalaiz.benchmarktest;
+package gr.iit.demokritos.pserverexperiments.warehouse;
+
+import gr.iit.demokritos.pserverexperiments.interfaces.IStroreResults;
 
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public interface IStroreResults {
+public class CSVStoreResults implements IStroreResults{
+    
+    
+    
     
 }

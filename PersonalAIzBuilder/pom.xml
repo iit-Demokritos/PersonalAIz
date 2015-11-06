@@ -12,6 +12,7 @@
         <module>../RecommendationEngine</module>
         <module>../Security</module>
         <module>../Utilities</module>
+        <module>../PServerExperiments</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

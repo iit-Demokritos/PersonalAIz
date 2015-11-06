@@ -121,7 +121,12 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         //for each user
         for (User user : users) {
-            String userID = generateUserUID(user.getUsername(), clientName);
+            String userID = getUserUID(user.getUsername(), clientName);
+            if (userID != null) {
+                LOGGER.error("User exists");
+                return false;
+            }
+            userID = generateUserUID(user.getUsername(), clientName);
             //Create put method with row key
             Put put = new Put(Bytes.toBytes(userID));
 

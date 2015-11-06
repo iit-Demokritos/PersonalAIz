@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gr.demokritos.iit.personalaiz.benchmarktest;
+package gr.iit.demokritos.pserverexperiments.interfaces;
 
 import java.util.List;
 
@@ -14,7 +14,9 @@ import java.util.List;
 public interface ILoadDataset {
 
     String getNextUser();
+    boolean userHasNext();
     String getNextUserModification();
+    boolean userModificationHasNext();
     List<String> getUsernamesList();
     String getRandomUsername();
 
