@@ -312,8 +312,8 @@ public class Scheduler {
         LOGGER.info("#Start Add Users: "
                 + dateFormat.format(date.getTime()));
 
-        //DEBUG LINES
-        int addUsersCount = 0;
+//        //DEBUG LINES
+//        int addUsersCount = 0;
 
         int batchCounter = 0;
         String JSONUsers = "{";
@@ -358,17 +358,17 @@ public class Scheduler {
 
             batchCounter++;
 
-            //DEBUG LINES
-            addUsersCount++;
-            if (addUsersCount == 25) {
-                break;
-            }
+//            //DEBUG LINES
+//            addUsersCount++;
+//            if (addUsersCount == 25) {
+//                break;
+//            }
         }
 
-        //DEBUG LINES
-        if (JSONUsers.endsWith(",")) {
-            JSONUsers = JSONUsers.substring(0, JSONUsers.length() - 1);
-        }
+//        //DEBUG LINES
+//        if (JSONUsers.endsWith(",")) {
+//            JSONUsers = JSONUsers.substring(0, JSONUsers.length() - 1);
+//        }
 
         //If there is users to add call adduser
         if (JSONUsers.length() > 2) {
@@ -391,8 +391,9 @@ public class Scheduler {
         LOGGER.info("#Start Modify Users Profile with probability to get user: "
                 + dateFormat.format(date.getTime()));
 
-        //DEBUG LINES
-        int userMofificationsCounter = 0;
+//        //DEBUG LINES
+//        int userMofificationsCounter = 0;
+        
         while (dataset.userModificationHasNext()) {
 
             String modificationRedord = dataset.getNextUserModification();
@@ -447,11 +448,11 @@ public class Scheduler {
                 }
             });
 
-            //DEBUG LINES
-            userMofificationsCounter++;
-            if (userMofificationsCounter > 50) {
-                break;
-            }
+//            //DEBUG LINES
+//            userMofificationsCounter++;
+//            if (userMofificationsCounter > 50) {
+//                break;
+//            }
 
         }
 
@@ -471,8 +472,9 @@ public class Scheduler {
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
-        //DEBUG LINES
-        int getUsersCounter = 0;
+//        //DEBUG LINES
+//        int getUsersCounter = 0;
+        
         for (String cUsername : users) {
 
             final String finalRecord = cUsername;
@@ -504,11 +506,11 @@ public class Scheduler {
                 LOGGER.error("Get Users Failed", ex);
             }
 
-            //DEBUG LINES
-            getUsersCounter++;
-            if (getUsersCounter > 25) {
-                break;
-            }
+//            //DEBUG LINES
+//            getUsersCounter++;
+//            if (getUsersCounter > 25) {
+//                break;
+//            }
         }
 
         //Shutdown threads
