@@ -42,11 +42,11 @@ public class BenchmarkTest {
         //execute senario 1
         LOGGER.info("#Execute Scenario 1: "
                 + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario1();
+        scheduler.executeScenario1();
         //execute senario 2
         LOGGER.info("#Execute Scenario 2: "
                 + dateFormat.format(date.getTime()));
-        scheduler.executeScenario2();
+//        scheduler.executeScenario2();
 
 //        //----------------------------------------------------------------------
 //        //Create scheduler 4 request / min

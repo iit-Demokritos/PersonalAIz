@@ -18,6 +18,7 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -37,7 +38,7 @@ public class Scheduler {
     //variables
     private final ILoadDataset dataset;
     private final IStroreResults warehouse;
-    private final int threadsPerMinute;
+    private final int requestPerMinute;
     private final Random r = new Random();
     private final int fromPointer;
     private final int getPointer;
@@ -54,16 +55,17 @@ public class Scheduler {
     private HashMap<String, String> putParams;
     private HashMap<String, String> getParams;
     private final int batch;
+    private final long timeSleep = 10000;
 
     //Constructor
     public Scheduler(ILoadDataset dataset, IStroreResults warehouse,
-            int threadsPerMinute, String scenario2GetPropability, Logger LOGGER, int batch) {
+            int requestPerMinute, String scenario2GetPropability, Logger LOGGER, int batch) {
 
         //Set settings
         this.batch = batch;
         this.dataset = dataset;
         this.warehouse = warehouse;
-        this.threadsPerMinute = threadsPerMinute;
+        this.requestPerMinute = requestPerMinute;
         String[] tmp = scenario2GetPropability.split("/");
         this.getPointer = Integer.parseInt(tmp[0]);
         this.fromPointer = Integer.parseInt(tmp[1]);
@@ -99,9 +101,7 @@ public class Scheduler {
         LOGGER.info("#Start Add Users: "
                 + dateFormat.format(date.getTime()));
 
-//        //DEBUG LINES
-//        int addUsersCount = 0;
-
+        int requestCounter = 1;
         int batchCounter = 0;
         String JSONUsers = "{";
         while (dataset.userHasNext()) {
@@ -125,13 +125,18 @@ public class Scheduler {
                             String addURL = URL + "users";
                             postParams = new HashMap<>();
                             postParams.put("JSONUsers", JSONUsers);
+                            startTime = date.getTime();
                             execPost(addURL, postParams);
+                            endTime = date.getTime();
                         } catch (Exception ex) {
                             LOGGER.error("Add Users Failed", ex);
                         }
-                        //                    synchronized (addUserResultTimes) {
-                        //                        addUserResultTimes.add(Long.toString(startTime-endTime));
-                        //                    }
+                        System.out.println("scenario1::"
+                                + "adduser::"
+                                + requestPerMinute + "::"
+                                + startTime + "::"
+                                + endTime);
+
                     }
                 });
                 batchCounter = 0;
@@ -143,10 +148,19 @@ public class Scheduler {
                 }
             }
 
+            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
+                try {
+                    //sleep for 10 sec
+                    Thread.sleep(timeSleep);
+                } catch (InterruptedException ex) {
+                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
             batchCounter++;
+            requestCounter++;
 
 //            //DEBUG LINES
-//            addUsersCount++;
 //            if (addUsersCount == 25) {
 //                break;
 //            }
@@ -156,7 +170,6 @@ public class Scheduler {
 //        if (JSONUsers.endsWith(",")) {
 //            JSONUsers = JSONUsers.substring(0, JSONUsers.length() - 1);
 //        }
-
         //If there is users to add call adduser
         if (JSONUsers.length() > 2) {
             JSONUsers = JSONUsers + "}";
@@ -178,8 +191,7 @@ public class Scheduler {
         LOGGER.info("#Start Modify Users Profile: "
                 + dateFormat.format(date.getTime()));
 
-//        //DEBUG LINES
-//        int userMofificationsCounter = 0;
+        requestCounter = 1;
         while (dataset.userModificationHasNext()) {
 
             String modificationRedord = dataset.getNextUserModification();
@@ -198,22 +210,36 @@ public class Scheduler {
                         String modifyURL = URL + "users/" + splitedRecord[0] + "/features/modify";
                         putParams = new HashMap<>();
                         putParams.put("JSONUserFeatures", splitedRecord[1]);
+                        startTime = date.getTime();
                         execPut(modifyURL, putParams);
+                        endTime = date.getTime();
                     } catch (Exception ex) {
-                        LOGGER.error("Add Users Failed", ex);
+                        LOGGER.error("Modify Users Failed", ex);
                     }
-                    //                    synchronized (addUserResultTimes) {
-                    //                        addUserResultTimes.add(Long.toString(startTime-endTime));
-                    //                    }
+
+                    System.out.println("scenario1::"
+                            + "modifyuser::"
+                            + requestPerMinute + "::"
+                            + startTime + "::"
+                            + endTime);
                 }
             });
 
+            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
+                try {
+                    //sleep for 10 sec
+                    Thread.sleep(timeSleep);
+                } catch (InterruptedException ex) {
+                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            requestCounter++;
+
 //            //DEBUG LINES
-//            userMofificationsCounter++;
 //            if (userMofificationsCounter > 50) {
 //                break;
 //            }
-
         }
 
         //Shutdown threads
@@ -232,8 +258,8 @@ public class Scheduler {
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
-//        //DEBUG LINES
-//        int getUsersCounter = 0;
+        requestCounter = 1;
+
         for (String cUsername : users) {
 
             final String finalRecord = cUsername;
@@ -248,13 +274,18 @@ public class Scheduler {
                     long startTime = 0, endTime = 0;
                     try {
                         String getURL = URL + "users/" + username + "/features";
+                        startTime = date.getTime();
                         execGet(getURL, getParams);
+                        endTime = date.getTime();
                     } catch (Exception ex) {
                         LOGGER.error("Get Users Failed", ex);
                     }
-                    //                    synchronized (addUserResultTimes) {
-                    //                        addUserResultTimes.add(Long.toString(startTime-endTime));
-                    //                    }
+
+                    System.out.println("scenario1::"
+                            + "getuser::"
+                            + requestPerMinute + "::"
+                            + startTime + "::"
+                            + endTime);
                 }
             });
 
@@ -265,8 +296,18 @@ public class Scheduler {
                 LOGGER.error("Get Users Failed", ex);
             }
 
+            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
+                try {
+                    //sleep for 10 sec
+                    Thread.sleep(timeSleep);
+                } catch (InterruptedException ex) {
+                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            requestCounter++;
+
 //            //DEBUG LINES
-//            getUsersCounter++;
 //            if (getUsersCounter > 25) {
 //                break;
 //            }
@@ -312,11 +353,10 @@ public class Scheduler {
         LOGGER.info("#Start Add Users: "
                 + dateFormat.format(date.getTime()));
 
-//        //DEBUG LINES
-//        int addUsersCount = 0;
-
+        int requestCounter = 1;
         int batchCounter = 0;
         String JSONUsers = "{";
+
         while (dataset.userHasNext()) {
 
             if (batchCounter == batch) {
@@ -356,10 +396,19 @@ public class Scheduler {
                 }
             }
 
+            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
+                try {
+                    //sleep for 10 sec
+                    Thread.sleep(timeSleep);
+                } catch (InterruptedException ex) {
+                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
             batchCounter++;
+            requestCounter++;
 
 //            //DEBUG LINES
-//            addUsersCount++;
 //            if (addUsersCount == 25) {
 //                break;
 //            }
@@ -369,7 +418,6 @@ public class Scheduler {
 //        if (JSONUsers.endsWith(",")) {
 //            JSONUsers = JSONUsers.substring(0, JSONUsers.length() - 1);
 //        }
-
         //If there is users to add call adduser
         if (JSONUsers.length() > 2) {
             JSONUsers = JSONUsers + "}";
@@ -391,9 +439,8 @@ public class Scheduler {
         LOGGER.info("#Start Modify Users Profile with probability to get user: "
                 + dateFormat.format(date.getTime()));
 
-//        //DEBUG LINES
-//        int userMofificationsCounter = 0;
-        
+        requestCounter = 1;
+
         while (dataset.userModificationHasNext()) {
 
             String modificationRedord = dataset.getNextUserModification();
@@ -401,6 +448,8 @@ public class Scheduler {
 
             //if Propability execute get user
             if (r.nextInt(fromPointer) <= getPointer) {
+                requestCounter++;
+
                 final String finalGetUser = dataset.getRandomUsername();
                 modifyUsersEx.submit(new Runnable() {
 
@@ -448,12 +497,21 @@ public class Scheduler {
                 }
             });
 
+            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
+                try {
+                    //sleep for 10 sec
+                    Thread.sleep(timeSleep);
+                } catch (InterruptedException ex) {
+                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            requestCounter++;
+
 //            //DEBUG LINES
-//            userMofificationsCounter++;
 //            if (userMofificationsCounter > 50) {
 //                break;
 //            }
-
         }
 
         //Shutdown threads
@@ -472,9 +530,7 @@ public class Scheduler {
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
-//        //DEBUG LINES
-//        int getUsersCounter = 0;
-        
+        requestCounter = 1;
         for (String cUsername : users) {
 
             final String finalRecord = cUsername;
@@ -506,8 +562,18 @@ public class Scheduler {
                 LOGGER.error("Get Users Failed", ex);
             }
 
+            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
+                try {
+                    //sleep for 10 sec
+                    Thread.sleep(timeSleep);
+                } catch (InterruptedException ex) {
+                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            requestCounter++;
+
 //            //DEBUG LINES
-//            getUsersCounter++;
 //            if (getUsersCounter > 25) {
 //                break;
 //            }
