@@ -28,17 +28,16 @@ public class BenchmarkTest {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         ILoadDataset dataset = new MovieLens1M(LOGGER);
-        IStroreResults warehouse = new CSVStoreResults();
+        IStroreResults warehouse;
         Scheduler scheduler;
         String scenario2GetPropability = "1/10";
 
         //----------------------------------------------------------------------
-        //Create scheduler 2 request / min
+        //Create scheduler no limit on request / min
         LOGGER.info("#Create scheduler with 2 request/min: "
                 + dateFormat.format(date.getTime()));
 
-        scheduler = new Scheduler(dataset, warehouse,
-                2, scenario2GetPropability, LOGGER, 20);
+        scheduler = new Scheduler(dataset,0, scenario2GetPropability, LOGGER, 20);
         //execute senario 1
         LOGGER.info("#Execute Scenario 1: "
                 + dateFormat.format(date.getTime()));
@@ -46,6 +45,22 @@ public class BenchmarkTest {
         //execute senario 2
         LOGGER.info("#Execute Scenario 2: "
                 + dateFormat.format(date.getTime()));
+//        scheduler.executeScenario2();
+        
+//        //----------------------------------------------------------------------
+//        //Create scheduler 2 request / min
+//        LOGGER.info("#Create scheduler with 2 request/min: "
+//                + dateFormat.format(date.getTime()));
+//
+//        scheduler = new Scheduler(dataset, warehouse,
+//                2, scenario2GetPropability, LOGGER, 20);
+//        //execute senario 1
+//        LOGGER.info("#Execute Scenario 1: "
+//                + dateFormat.format(date.getTime()));
+//        scheduler.executeScenario1();
+//        //execute senario 2
+//        LOGGER.info("#Execute Scenario 2: "
+//                + dateFormat.format(date.getTime()));
 //        scheduler.executeScenario2();
 
 //        //----------------------------------------------------------------------

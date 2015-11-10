@@ -7,6 +7,7 @@ package gr.iit.demokritos.pserverexperiments;
 
 import gr.iit.demokritos.pserverexperiments.interfaces.ILoadDataset;
 import gr.iit.demokritos.pserverexperiments.interfaces.IStroreResults;
+import gr.iit.demokritos.pserverexperiments.warehouse.CSVStoreResults;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +38,8 @@ public class Scheduler {
 
     //variables
     private final ILoadDataset dataset;
-    private final IStroreResults warehouse;
+    private final IStroreResults warehouseScenario1;
+    private final IStroreResults warehouseScenario2;
     private final int requestPerMinute;
     private final Random r = new Random();
     private final int fromPointer;
@@ -55,21 +57,25 @@ public class Scheduler {
     private HashMap<String, String> putParams;
     private HashMap<String, String> getParams;
     private final int batch;
-    private final long timeSleep = 10000;
+    private final long timeSleep = 60000;
 
     //Constructor
-    public Scheduler(ILoadDataset dataset, IStroreResults warehouse,
-            int requestPerMinute, String scenario2GetPropability, Logger LOGGER, int batch) {
+    public Scheduler(ILoadDataset dataset, int requestPerMinute,
+            String scenario2GetPropability, Logger LOGGER, int batch) {
 
         //Set settings
         this.batch = batch;
         this.dataset = dataset;
-        this.warehouse = warehouse;
         this.requestPerMinute = requestPerMinute;
         String[] tmp = scenario2GetPropability.split("/");
         this.getPointer = Integer.parseInt(tmp[0]);
         this.fromPointer = Integer.parseInt(tmp[1]);
         this.LOGGER = LOGGER;
+
+        this.warehouseScenario1 = new CSVStoreResults("scenario1_"
+                + requestPerMinute + "_" + batch);
+        this.warehouseScenario2 = new CSVStoreResults("scenario2_"
+                + requestPerMinute + "_" + batch + "_" + scenario2GetPropability);
     }
 
     /**
@@ -100,6 +106,7 @@ public class Scheduler {
         //Add users 
         LOGGER.info("#Start Add Users: "
                 + dateFormat.format(date.getTime()));
+        addUserResultTimes.add("#Start Add Users:" + date.getTime());
 
         int requestCounter = 1;
         int batchCounter = 0;
@@ -133,9 +140,14 @@ public class Scheduler {
                         }
                         System.out.println("scenario1::"
                                 + "adduser::"
-                                + requestPerMinute + "::"
                                 + startTime + "::"
                                 + endTime);
+                        synchronized (addUserResultTimes) {
+                            addUserResultTimes.add("scenario1::"
+                                    + "adduser::"
+                                    + startTime + "::"
+                                    + endTime);
+                        }
 
                     }
                 });
@@ -148,12 +160,14 @@ public class Scheduler {
                 }
             }
 
-            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
-                try {
-                    //sleep for 10 sec
-                    Thread.sleep(timeSleep);
-                } catch (InterruptedException ex) {
-                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+            if (requestPerMinute != 0) {
+                if ((requestCounter % requestPerMinute) == 0) {
+                    try {
+                        //sleep for 1 min
+                        Thread.sleep(timeSleep);
+                    } catch (InterruptedException ex) {
+                        java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -172,9 +186,16 @@ public class Scheduler {
 //        }
         //If there is users to add call adduser
         if (JSONUsers.length() > 2) {
+            long startTime = 0, endTime = 0;
             JSONUsers = JSONUsers + "}";
             LOGGER.debug(JSONUsers);
+            startTime = date.getTime();
             addUsers(JSONUsers);
+            endTime = date.getTime();
+            addUserResultTimes.add("scenario1::"
+                    + "adduser::"
+                    + startTime + "::"
+                    + endTime);
         }
 
         //Shutdown threads
@@ -186,10 +207,18 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        LOGGER.info("#End Add Users: "
+                + dateFormat.format(date.getTime()));
+        //Add End time of this phase
+        addUserResultTimes.add("#End Add Users:" + date.getTime());
+        //Store results for add user
+        warehouseScenario1.storeData(addUserResultTimes);
+
         //----------------------------------------------------------------------
         //Modify users profile
         LOGGER.info("#Start Modify Users Profile: "
                 + dateFormat.format(date.getTime()));
+        modifyUserResultTimes.add("#Start Modify Users Profile:" + date.getTime());
 
         requestCounter = 1;
         while (dataset.userModificationHasNext()) {
@@ -219,18 +248,25 @@ public class Scheduler {
 
                     System.out.println("scenario1::"
                             + "modifyuser::"
-                            + requestPerMinute + "::"
                             + startTime + "::"
                             + endTime);
+                    synchronized (modifyUserResultTimes) {
+                        modifyUserResultTimes.add("scenario1::"
+                                + "modifyuser::"
+                                + startTime + "::"
+                                + endTime);
+                    }
                 }
             });
 
-            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
-                try {
-                    //sleep for 10 sec
-                    Thread.sleep(timeSleep);
-                } catch (InterruptedException ex) {
-                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+            if (requestPerMinute != 0) {
+                if ((requestCounter % requestPerMinute) == 0) {
+                    try {
+                        //sleep for 10 sec
+                        Thread.sleep(timeSleep);
+                    } catch (InterruptedException ex) {
+                        java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -251,10 +287,17 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        LOGGER.info("#End Modify Users Profile: "
+                + dateFormat.format(date.getTime()));
+        //Add end time of Modify users and store times
+        modifyUserResultTimes.add("#End Modify Users Profile:" + date.getTime());
+        warehouseScenario1.storeData(modifyUserResultTimes);
+
         //----------------------------------------------------------------------
         //Get users profile
         LOGGER.info("#Start Get Users Profile: "
                 + dateFormat.format(date.getTime()));
+        getUserResultTimes.add("#Start Get Users Profile: " + date.getTime());
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
@@ -283,9 +326,14 @@ public class Scheduler {
 
                     System.out.println("scenario1::"
                             + "getuser::"
-                            + requestPerMinute + "::"
                             + startTime + "::"
                             + endTime);
+                    synchronized (getUserResultTimes) {
+                        getUserResultTimes.add("scenario1::"
+                                + "getuser::"
+                                + startTime + "::"
+                                + endTime);
+                    }
                 }
             });
 
@@ -296,12 +344,14 @@ public class Scheduler {
                 LOGGER.error("Get Users Failed", ex);
             }
 
-            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
-                try {
-                    //sleep for 10 sec
-                    Thread.sleep(timeSleep);
-                } catch (InterruptedException ex) {
-                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+            if (requestPerMinute != 0) {
+                if ((requestCounter % requestPerMinute) == 0) {
+                    try {
+                        //sleep for 10 sec
+                        Thread.sleep(timeSleep);
+                    } catch (InterruptedException ex) {
+                        java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -321,6 +371,13 @@ public class Scheduler {
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
+
+        LOGGER.info("#End Get Users Profile: "
+                + dateFormat.format(date.getTime()));
+        //Add end time of get users profile and store times
+        getUserResultTimes.add("#End Get Users Profile:" + date.getTime());
+        warehouseScenario1.storeData(getUserResultTimes);
+
     }
 
     /**
@@ -352,6 +409,7 @@ public class Scheduler {
         //Add users 
         LOGGER.info("#Start Add Users: "
                 + dateFormat.format(date.getTime()));
+        addUserResultTimes.add("#Start Add Users:" + date.getTime());
 
         int requestCounter = 1;
         int batchCounter = 0;
@@ -378,13 +436,23 @@ public class Scheduler {
                             String addURL = URL + "users";
                             postParams = new HashMap<>();
                             postParams.put("JSONUsers", JSONUsers);
+                            startTime = date.getTime();
                             execPost(addURL, postParams);
+                            endTime = date.getTime();
                         } catch (Exception ex) {
                             LOGGER.error("Add Users Failed", ex);
                         }
-                        //                    synchronized (addUserResultTimes) {
-                        //                        addUserResultTimes.add(Long.toString(startTime-endTime));
-                        //                    }
+                        System.out.println("scenario2::"
+                                + "adduser::"
+                                + startTime + "::"
+                                + endTime);
+                        synchronized (addUserResultTimes) {
+                            addUserResultTimes.add("scenario2::"
+                                    + "adduser::"
+                                    + startTime + "::"
+                                    + endTime);
+                        }
+
                     }
                 });
                 batchCounter = 0;
@@ -396,12 +464,15 @@ public class Scheduler {
                 }
             }
 
-            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
-                try {
-                    //sleep for 10 sec
-                    Thread.sleep(timeSleep);
-                } catch (InterruptedException ex) {
-                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+            if (requestPerMinute != 0) {
+
+                if ((requestCounter % requestPerMinute) == 0) {
+                    try {
+                        //sleep for 10 sec
+                        Thread.sleep(timeSleep);
+                    } catch (InterruptedException ex) {
+                        java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -420,9 +491,16 @@ public class Scheduler {
 //        }
         //If there is users to add call adduser
         if (JSONUsers.length() > 2) {
+            long startTime = 0, endTime = 0;
             JSONUsers = JSONUsers + "}";
             LOGGER.debug(JSONUsers);
+            startTime = date.getTime();
             addUsers(JSONUsers);
+            endTime = date.getTime();
+            addUserResultTimes.add("scenario2::"
+                    + "adduser::"
+                    + startTime + "::"
+                    + endTime);
         }
 
         //Shutdown threads
@@ -434,10 +512,18 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        LOGGER.info("#End Add Users: "
+                + dateFormat.format(date.getTime()));
+        //Add End time of this phase
+        addUserResultTimes.add("#End Add Users:" + date.getTime());
+        //Store results for add user
+        warehouseScenario2.storeData(addUserResultTimes);
+
         //----------------------------------------------------------------------
         //Modify users profile
         LOGGER.info("#Start Modify Users Profile with probability to get user: "
                 + dateFormat.format(date.getTime()));
+        modifyUserResultTimes.add("#Start Modify Users Profile:" + date.getTime());
 
         requestCounter = 1;
 
@@ -462,13 +548,22 @@ public class Scheduler {
                         long startTime = 0, endTime = 0;
                         try {
                             String getURL = URL + "users/" + username + "/features";
+                            startTime = date.getTime();
                             execGet(getURL, getParams);
+                            endTime = date.getTime();
                         } catch (Exception ex) {
                             LOGGER.error("Get Users Failed", ex);
                         }
-                        //                    synchronized (addUserResultTimes) {
-                        //                        addUserResultTimes.add(Long.toString(startTime-endTime));
-                        //                    }
+                        System.out.println("scenario2::"
+                                + "getuseronmodify::"
+                                + startTime + "::"
+                                + endTime);
+                        synchronized (modifyUserResultTimes) {
+                            modifyUserResultTimes.add("scenario2::"
+                                    + "getuseronmodify::"
+                                    + startTime + "::"
+                                    + endTime);
+                        }
                     }
                 });
             }
@@ -487,22 +582,34 @@ public class Scheduler {
                         String modifyURL = URL + "users/" + splitedRecord[0] + "/features/modify";
                         putParams = new HashMap<>();
                         putParams.put("JSONUserFeatures", splitedRecord[1]);
+                        startTime = date.getTime();
                         execPut(modifyURL, putParams);
+                        endTime = date.getTime();
                     } catch (Exception ex) {
                         LOGGER.error("Add Users Failed", ex);
                     }
-                    //                    synchronized (addUserResultTimes) {
-                    //                        addUserResultTimes.add(Long.toString(startTime-endTime));
-                    //                    }
+                    System.out.println("scenario2::"
+                            + "modifyuser::"
+                            + startTime + "::"
+                            + endTime);
+                    synchronized (modifyUserResultTimes) {
+                        modifyUserResultTimes.add("scenario2::"
+                                + "modifyuser::"
+                                + startTime + "::"
+                                + endTime);
+                    }
                 }
             });
 
-            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
-                try {
-                    //sleep for 10 sec
-                    Thread.sleep(timeSleep);
-                } catch (InterruptedException ex) {
-                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+            if (requestPerMinute != 0) {
+
+                if ((requestCounter % requestPerMinute) == 0) {
+                    try {
+                        //sleep for 10 sec
+                        Thread.sleep(timeSleep);
+                    } catch (InterruptedException ex) {
+                        java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -523,10 +630,16 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        LOGGER.info("#End Modify Users Profile: "
+                + dateFormat.format(date.getTime()));
+        //Add end time of Modify users and store times
+        modifyUserResultTimes.add("#End Modify Users Profile:" + date.getTime());
+        warehouseScenario2.storeData(modifyUserResultTimes);
         //----------------------------------------------------------------------
         //Get users profile
         LOGGER.info("#Start Get Users Profile: "
                 + dateFormat.format(date.getTime()));
+        getUserResultTimes.add("#Start Get Users Profile: " + date.getTime());
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
@@ -545,13 +658,22 @@ public class Scheduler {
                     long startTime = 0, endTime = 0;
                     try {
                         String getURL = URL + "users/" + username + "/features";
+                        startTime = date.getTime();
                         execGet(getURL, getParams);
+                        endTime = date.getTime();
                     } catch (Exception ex) {
                         LOGGER.error("Get Users Failed", ex);
                     }
-                    //                    synchronized (addUserResultTimes) {
-                    //                        addUserResultTimes.add(Long.toString(startTime-endTime));
-                    //                    }
+                    System.out.println("scenario2::"
+                            + "getuser::"
+                            + startTime + "::"
+                            + endTime);
+                    synchronized (getUserResultTimes) {
+                        getUserResultTimes.add("scenario2::"
+                                + "getuser::"
+                                + startTime + "::"
+                                + endTime);
+                    }
                 }
             });
 
@@ -562,12 +684,14 @@ public class Scheduler {
                 LOGGER.error("Get Users Failed", ex);
             }
 
-            if ((requestCounter % requestPerMinute) == 0 && requestPerMinute != 0) {
-                try {
-                    //sleep for 10 sec
-                    Thread.sleep(timeSleep);
-                } catch (InterruptedException ex) {
-                    java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+            if (requestPerMinute != 0) {
+                if ((requestCounter % requestPerMinute) == 0) {
+                    try {
+                        //sleep for 10 sec
+                        Thread.sleep(timeSleep);
+                    } catch (InterruptedException ex) {
+                        java.util.logging.Logger.getLogger(Scheduler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -587,6 +711,12 @@ public class Scheduler {
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
+
+        LOGGER.info("#End Get Users Profile: "
+                + dateFormat.format(date.getTime()));
+        //Add end time of get users profile and store times
+        getUserResultTimes.add("#End Get Users Profile:" + date.getTime());
+        warehouseScenario2.storeData(getUserResultTimes);
     }
 
     private void addUsers(String JSONUsers) {

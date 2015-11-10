@@ -5,10 +5,15 @@
  */
 package gr.iit.demokritos.pserverexperiments.interfaces;
 
+import java.util.List;
+
 /**
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IStroreResults {
+    
+    
+    void storeData(List<String> storeList);
     
 }
