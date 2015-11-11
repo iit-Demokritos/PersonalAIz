@@ -32,7 +32,7 @@ public class CSVStoreResults implements IStroreResults {
 
         try {
 
-            pw = new PrintWriter(new FileWriter("./results/" + fileName + ".csv"));
+            pw = new PrintWriter(new FileWriter("./results/" + fileName + ".csv",true));
             for (String text : storeList) {
                 // write to file
                 pw.println(text);
