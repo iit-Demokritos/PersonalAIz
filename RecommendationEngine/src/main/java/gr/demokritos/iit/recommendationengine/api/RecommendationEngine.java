@@ -18,6 +18,8 @@ import gr.demokritos.iit.recommendationengine.converters.category.CategoryConver
 import gr.demokritos.iit.recommendationengine.converters.numeric.NumericConverter;
 import gr.demokritos.iit.recommendationengine.converters.tag.TagConverter;
 import gr.demokritos.iit.recommendationengine.converters.text.TextConverter;
+import gr.demokritos.iit.recommendationengine.evaluation.CSVEvaluation;
+import gr.demokritos.iit.recommendationengine.evaluation.IEvaluation;
 import gr.demokritos.iit.recommendationengine.onologies.FeedObject;
 import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
@@ -48,6 +50,7 @@ public class RecommendationEngine {
     private SecurityLayer security = new SecurityLayer();
     private final Personal personal;
     private final IPersonalStorage db;
+    private final IEvaluation evaluation;
     private final HashMap<String, Action> actions
             = new HashMap<>(new Actions().getRecommendationActions());
     private final Utilities utilities = new Utilities();
@@ -64,6 +67,8 @@ public class RecommendationEngine {
         this.db = new PServerHBase();
         //Create PServer2 Personal mode Instance
         this.personal = new Personal(db, psClient);
+        //TODO: load evaluation from settings
+        evaluation = new CSVEvaluation();
 
     }
 
@@ -79,6 +84,8 @@ public class RecommendationEngine {
         this.db = new PServerHBase();
         //Create PServer2 Personal mode Instance
         this.personal = new Personal(db, psClient);
+        //TODO: load evaluation from settings
+        evaluation = new CSVEvaluation();
 
     }
 
@@ -109,6 +116,10 @@ public class RecommendationEngine {
             return false;
         }
 
+        LOGGER.debug("#addUser | username: " + username
+                + " attributes: " + attributes
+                + " info: " + info);
+
         //Create the new user
         User user = new User(username);
 
@@ -138,6 +149,8 @@ public class RecommendationEngine {
             return false;
         }
 
+        LOGGER.debug("#deleteUser | username: " + username);
+
         //Call deleteUser to remove user from PServer
         return personal.deleteUsers(username);
     }
@@ -157,12 +170,17 @@ public class RecommendationEngine {
             return false;
         }
 
-        if(!object.isValidObject()){
-            LOGGER.error("No valid object: "+ object.toString());
+        if (!object.isValidObject()) {
+            LOGGER.error("No valid object: " + object.toString());
             return false;
         }
-        //TODO: Call evaluation method to store user's actions
-        
+
+        LOGGER.debug("#feed | username: " + username
+                + " FeedObject: " + object.toString());
+        //Call evaluation method to store user's actions
+        evaluation.storeEntry(username, object.getId(), object.isRecommended(),
+                object.getTimestamp(),psClient.getUsername());
+
         //Convert object to features  and call setUserFeatures 
         HashMap<String, String> features = new HashMap<>(
                 utilities.mapValueIntegerToString(objectHandler(object)));
@@ -209,11 +227,13 @@ public class RecommendationEngine {
                 = new HashMap<>(config.getObjectWeights());
         //For each FeedObject
         for (final FeedObject cObject : recommendationList) {
-            
+
             //if object is not valid continue
-            if(!cObject.isValidObject()){
+            if (!cObject.isValidObject()) {
                 continue;
             }
+            LOGGER.debug("#getRecommendation | username: " + username
+                    + " FeedObject: " + cObject.toString());
 
             ex.submit(new Runnable() {
 
@@ -230,7 +250,7 @@ public class RecommendationEngine {
                     //create new similarity object
                     IVectorSimilarity cs = new CosineSimilarity();
                     //Get object score
-                    double score = getScore(objFeatures, userProfile,cs);
+                    double score = getScore(objFeatures, userProfile, cs);
 
                     //add objectId and score on recommendationObjects map
                     synchronized (recommendationObjects) {
@@ -249,10 +269,9 @@ public class RecommendationEngine {
                 private double getScore(Map<String, Integer> objFeatures,
                         HashMap<String, Integer> userFeatures,
                         IVectorSimilarity cs) {
-                    
+
                     //create new similarity object
 //                    IVectorSimilarity cs = new CosineSimilarity();
-
                     HashSet<String> featureUnion = new HashSet<>();
                     featureUnion.addAll(objFeatures.keySet());
                     featureUnion.addAll(userFeatures.keySet());
@@ -339,7 +358,12 @@ public class RecommendationEngine {
             return null;
         }
 
-        return utilities.sortHashMapByDoubleValues(recommendationObjects, true);
+            LinkedHashMap<String, Double> sortedHashMap = new LinkedHashMap<>();
+            sortedHashMap=utilities.sortHashMapByDoubleValues(recommendationObjects, true);
+       
+            LOGGER.debug("#getRecommendation | RecommendationList: " + sortedHashMap);
+            
+            return sortedHashMap;
     }
 
     /**
@@ -372,25 +396,22 @@ public class RecommendationEngine {
             //Add features to feature map
             features.putAll(tgc.getFeatures(obj.getTags()));
         }
-        
-        
+
         if (obj.getBooleans() != null) {
             //if contains booleans call boolean converter
             BooleanConverter bc = new BooleanConverter(obj.getLanguage());
             //Add features to feature map
             features.putAll(bc.getFeatures(obj.getBooleans()));
         }
-        
-        
+
         if (obj.getNumerics() != null) {
             //if contains Numerics call numeric converter
             NumericConverter nc = new NumericConverter(obj.getLanguage());
             //Add features to feature map
             features.putAll(nc.getFeatures(obj.getNumerics()));
         }
-      
-        
-        if (obj.getAlphanumerics()!= null) {
+
+        if (obj.getAlphanumerics() != null) {
             //if contains Alphanumerics call Alphanumeric converter
             AlphanumericConverter ac = new AlphanumericConverter(obj.getLanguage());
             //Add features to feature map

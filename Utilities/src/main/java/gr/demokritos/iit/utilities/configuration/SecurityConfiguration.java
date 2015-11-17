@@ -11,14 +11,11 @@ package gr.demokritos.iit.utilities.configuration;
  */
 public class SecurityConfiguration extends Configuration {
 
-    public static String SECURITY_PROPERTIES = "Security.properties";
-
     public SecurityConfiguration(String configurationFileName) {
-        super(configurationFileName);
+        CONFIGURATION_FILE_NAME=configurationFileName;
     }
     
     public SecurityConfiguration(){
-        super(SECURITY_PROPERTIES);
     }
     
     /**

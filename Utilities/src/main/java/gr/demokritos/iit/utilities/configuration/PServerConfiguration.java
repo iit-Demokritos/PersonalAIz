@@ -11,13 +11,10 @@ package gr.demokritos.iit.utilities.configuration;
  */
 public class PServerConfiguration extends Configuration {
 
-    public static String PSERVER_PROPERTIES = "PServer.properties";
-
     public PServerConfiguration(String configurationFileName) {
-        super(configurationFileName);
+       CONFIGURATION_FILE_NAME=configurationFileName;
     }
     public PServerConfiguration() {
-        super(PSERVER_PROPERTIES);
     }
 
     /**
@@ -31,8 +28,8 @@ public class PServerConfiguration extends Configuration {
         return properties.getProperty("LogLevel", "info");
     }
 
-    public String getPropertyName() {
-        return properties.getProperty("PropertyName");
-    }
+//    public String getPropertyName() {
+//        return properties.getProperty("PropertyName");
+//    }
 
 }

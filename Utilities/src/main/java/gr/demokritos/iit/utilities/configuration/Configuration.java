@@ -25,20 +25,20 @@ public class Configuration {
 
     private static final String EXTERNAL_PROPERTIES_PATH = "./data/configuration/";
     public static final String DEFAULT_ENCODING = "UTF-8";
+    public String CONFIGURATION_FILE_NAME = "platform.properties";
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
 
     /**
      * Constructor of the configuration file
      *
-     * @param configurationFileName The properties file to load
      */
-    public Configuration(String configurationFileName) {
+    public Configuration() {
         // Create new file from the external path
-        this.pFile = new File(EXTERNAL_PROPERTIES_PATH + configurationFileName);
+        this.pFile = new File(EXTERNAL_PROPERTIES_PATH + CONFIGURATION_FILE_NAME);
         //If not exist the external file then load the default file inside the resources
         if (!this.pFile.exists()) {
             this.pFile = new File(getClass().getResource("/configuration/"
-                    + configurationFileName).getPath());
+                    + CONFIGURATION_FILE_NAME).getPath());
         }
         this.properties = new Properties();
         //load the properties
