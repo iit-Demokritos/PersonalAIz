@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-@Path("security/{userAuthe}/")
+@Path("security/")
 @Produces(MediaType.APPLICATION_JSON)
 public class SecurityREST {
 
@@ -36,29 +36,28 @@ public class SecurityREST {
     @Path("check/credentials")
     @POST
     public String checkCredentials(
-            @PathParam("userAuthe") String userAuthe,
             @FormParam("username") String username,
             @FormParam("password") String password) {
 
-        //Check if user Authentication is with username pass or api key
-        if (userAuthe.contains("|")) {
-            // Check the username - pass Credentials
-            String[] credentials = userAuthe.split("\\|");
-
-            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
-                LOGGER.info("No valid Username: " + credentials[0]
-                        + " and pass: " + credentials[1]);
-                output.setCustomOutputMessage("Security Authentication Failed");
-                return JSon.jsonize(output, Output.class);
-            }
-        } else {
-            // Check the api key Credentials
-            if (!security.authe.checkCredentials(userAuthe)) {
-                LOGGER.info("No valid API Key: " + userAuthe);
-                output.setCustomOutputMessage("Security Authentication Failed");
-                return JSon.jsonize(output, Output.class);
-            }
-        }
+//        //Check if user Authentication is with username pass or api key
+//        if (userAuthe.contains("|")) {
+//            // Check the username - pass Credentials
+//            String[] credentials = userAuthe.split("\\|");
+//
+//            if (!security.authe.checkCredentials(credentials[0], credentials[1])) {
+//                LOGGER.info("No valid Username: " + credentials[0]
+//                        + " and pass: " + credentials[1]);
+//                output.setCustomOutputMessage("Security Authentication Failed");
+//                return JSon.jsonize(output, Output.class);
+//            }
+//        } else {
+//            // Check the api key Credentials
+//            if (!security.authe.checkCredentials(userAuthe)) {
+//                LOGGER.info("No valid API Key: " + userAuthe);
+//                output.setCustomOutputMessage("Security Authentication Failed");
+//                return JSon.jsonize(output, Output.class);
+//            }
+//        }
 
         //Update logging level 
         Logging.updateLoggerLevel(SecurityREST.class, config.getLogLevel());

@@ -17,6 +17,7 @@ import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -44,6 +45,29 @@ public class AdminREST {
     private final SecurityLayer security = new SecurityLayer();
     private Output output = new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
+
+    @Path("initialization/{password}")
+    @GET
+    public String initPlatform(@PathParam("password") String clientPass) {
+
+        //Update logging level 
+        Logging.updateLoggerLevel(AdminREST.class, config.getLogLevel());
+
+        // Create PServer Admin instance
+        admin = new Admin(db, cl);
+        //set security layer on PServer Admin
+        admin.setSecurity(security);
+
+        if (admin.initPlatform(clientPass)) {
+            LOGGER.info("Complete Platform initialization");
+            output.setCustomOutputMessage("Complete Platform initialization with username root");
+        } else {
+            LOGGER.info("Failed Platform initialization");
+            output.setCustomOutputMessage("Platform initialization Failed");
+        }
+
+        return JSon.jsonize(output, Output.class);
+    }
 
     /**
      *
@@ -223,8 +247,8 @@ public class AdminREST {
         //set security layer on PServer Admin
         admin.setSecurity(security);
 
-        HashSet<String> clients = new HashSet<>(admin.getClients());
-        if (clients.isEmpty()) {
+        Set<String> clients = admin.getClients();
+        if (clients == null) {
             LOGGER.info("Security Authorization Failed");
             output.setCustomOutputMessage("Security Authorization Failed");
         } else {
@@ -305,6 +329,7 @@ public class AdminREST {
 
         return JSon.jsonize(output, Output.class);
     }
+
     /**
      * Set PServer settings
      *
@@ -363,12 +388,11 @@ public class AdminREST {
             return JSon.jsonize(output, Output.class);
         }
 
-
-        if (admin.setSetting(settingName,settingValue)) {
-            LOGGER.info("Complete Set PServer settings: " + settingName+" "+ settingValue);
+        if (admin.setSetting(settingName, settingValue)) {
+            LOGGER.info("Complete Set PServer settings: " + settingName + " " + settingValue);
             output.setCustomOutputMessage("Set PServer setting complete");
         } else {
-            LOGGER.info("Failed Set PServer settings: " + settingName+" "+ settingValue);
+            LOGGER.info("Failed Set PServer settings: " + settingName + " " + settingValue);
             output.setCustomOutputMessage("Set PServer setting failed");
         }
 

@@ -19,12 +19,14 @@ import gr.demokritos.iit.recommendationengine.converters.numeric.NumericConverte
 import gr.demokritos.iit.recommendationengine.converters.tag.TagConverter;
 import gr.demokritos.iit.recommendationengine.converters.text.TextConverter;
 import gr.demokritos.iit.recommendationengine.evaluation.CSVEvaluation;
+import gr.demokritos.iit.recommendationengine.evaluation.HBaseEvaluation;
 import gr.demokritos.iit.recommendationengine.evaluation.IEvaluation;
 import gr.demokritos.iit.recommendationengine.onologies.FeedObject;
 import gr.demokritos.iit.security.SecurityLayer;
 import gr.demokritos.iit.security.authorization.Action;
 import gr.demokritos.iit.security.authorization.Actions;
 import gr.demokritos.iit.utilities.configuration.RecommendationConfiguration;
+import gr.demokritos.iit.utilities.logging.Logging;
 import gr.demokritos.iit.utilities.utils.Utilities;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,14 +64,14 @@ public class RecommendationEngine {
      */
     public RecommendationEngine(Client psClient) {
         this.config = new RecommendationConfiguration();
+        //Update logging level 
+        Logging.updateLoggerLevel(RecommendationEngine.class, config.getLogLevel());
         this.psClient = psClient;
-        //TODO: change hardcoded HBsase storage with generic storage
         this.db = new PServerHBase();
         //Create PServer2 Personal mode Instance
         this.personal = new Personal(db, psClient);
         //TODO: load evaluation from settings
-        evaluation = new CSVEvaluation();
-
+        evaluation = new HBaseEvaluation();
     }
 
     /**
@@ -79,14 +81,14 @@ public class RecommendationEngine {
      */
     public RecommendationEngine(Client psClient, String configurationFileName) {
         this.config = new RecommendationConfiguration(configurationFileName);
+        //Update logging level 
+        Logging.updateLoggerLevel(RecommendationEngine.class, config.getLogLevel());
         this.psClient = psClient;
         //TODO: change hardcoded HBsase storage with generic storage
         this.db = new PServerHBase();
         //Create PServer2 Personal mode Instance
         this.personal = new Personal(db, psClient);
-        //TODO: load evaluation from settings
-        evaluation = new CSVEvaluation();
-
+        evaluation = new HBaseEvaluation();
     }
 
     /**
@@ -179,7 +181,7 @@ public class RecommendationEngine {
                 + " FeedObject: " + object.toString());
         //Call evaluation method to store user's actions
         evaluation.storeEntry(username, object.getId(), object.isRecommended(),
-                object.getTimestamp(),psClient.getUsername());
+                object.getTimestamp(), psClient.getUsername());
 
         //Convert object to features  and call setUserFeatures 
         HashMap<String, String> features = new HashMap<>(
@@ -212,6 +214,11 @@ public class RecommendationEngine {
         final HashMap<String, Integer> userProfile = new HashMap<>(
                 utilities.mapValueStringToInteger(
                         personal.getUserFeatures(username, null, null)));
+        
+        if(userProfile.isEmpty()){
+            LOGGER.error("User Profile is empty");
+            return null;
+        }
 
         //Generate RecommendationObjects Map
         final Map<String, Double> recommendationObjects
@@ -225,6 +232,8 @@ public class RecommendationEngine {
         //Get weights
         final HashMap<String, Double> objectWeights
                 = new HashMap<>(config.getObjectWeights());
+
+        LOGGER.debug("#getRecommendation | objectWeights: " + objectWeights);
         //For each FeedObject
         for (final FeedObject cObject : recommendationList) {
 
@@ -358,12 +367,12 @@ public class RecommendationEngine {
             return null;
         }
 
-            LinkedHashMap<String, Double> sortedHashMap = new LinkedHashMap<>();
-            sortedHashMap=utilities.sortHashMapByDoubleValues(recommendationObjects, true);
-       
-            LOGGER.debug("#getRecommendation | RecommendationList: " + sortedHashMap);
-            
-            return sortedHashMap;
+        LinkedHashMap<String, Double> sortedHashMap = new LinkedHashMap<>();
+        sortedHashMap = utilities.sortHashMapByDoubleValues(recommendationObjects, true);
+
+        LOGGER.debug("#getRecommendation | RecommendationList: " + sortedHashMap);
+
+        return sortedHashMap;
     }
 
     /**

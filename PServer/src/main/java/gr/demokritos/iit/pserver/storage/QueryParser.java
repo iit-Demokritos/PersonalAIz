@@ -6,11 +6,11 @@
 package gr.demokritos.iit.pserver.storage;
 
 import gr.demokritos.iit.pserver.storage.interfaces.IQueryParser;
+import gr.demokritos.iit.utilities.configuration.PersonalAIzHBaseConfiguration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
@@ -33,7 +33,7 @@ public class QueryParser implements IQueryParser<FilterList> {
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(QueryParser.class);
 
     public QueryParser() {
-        config = HBaseConfiguration.create();
+        config = new PersonalAIzHBaseConfiguration().getHBaseConfig();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class QueryParser implements IQueryParser<FilterList> {
 
             // Read next token
             String cToken = st.nextToken();
-            LOGGER.debug("Netxt Token on query parser "+cToken);
+            LOGGER.debug("Netxt Token on query parser " + cToken);
             // If token is an opening parenthesis
             if (cToken.equals("(")) {
                 // Create new FilterList
@@ -152,8 +152,6 @@ public class QueryParser implements IQueryParser<FilterList> {
                             operator,
                             new BinaryComparator(Bytes.toBytes(operant2))
                     );
-                    
-                    
 
                     // Push to current filter list
                     currentState.getList().addFilter(filter);

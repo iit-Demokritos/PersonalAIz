@@ -52,6 +52,27 @@ public class Admin {
         this.security = security;
     }
 
+    public boolean initPlatform(String password) {
+
+        Set<String> clients = dbAdmin.getClients();
+        if (clients.isEmpty()) {
+            HashMap<String, String> info = new HashMap<>();
+
+            Client client = new Client("root", password);
+            info.put("Username", "root");
+            //encrypt password before add it on the info map
+            info.put("Password", security.encryptPassword(password));
+
+            //Add info on client object 
+            client.setInfo(info);
+
+            return dbAdmin.addClient(client);
+        } else {
+            LOGGER.error("Platform is allready intitialized.");
+            return false;
+        }
+    }
+
     /**
      * Add a PServer client in storage
      *
@@ -92,7 +113,7 @@ public class Admin {
      * @return A boolean status true/false if delete complete or not
      */
     public boolean deleteClient(String clientName) {
-        
+
         //Check permission
         if (!getPermissionFor(actions.get("aDeleteClient"), "X")) {
             LOGGER.error("Premission Denied");
@@ -206,7 +227,7 @@ public class Admin {
         adminClient.updateAuthenticatedTimestamp();
         return psConfig.commit();
     }
-    
+
     /**
      * Set PServer setting
      *
