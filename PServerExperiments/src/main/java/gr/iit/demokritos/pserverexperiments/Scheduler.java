@@ -45,7 +45,6 @@ public class Scheduler {
     private final int fromPointer;
     private final int getPointer;
     private final Logger LOGGER;
-    private final Date date = new Date();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final String host = "http://localhost:8080";
     private final String clientAuth = "root2%7Croot2";
@@ -105,8 +104,8 @@ public class Scheduler {
 
         //Add users 
         LOGGER.info("#Start Add Users: "
-                + dateFormat.format(date.getTime()));
-        addUserResultTimes.add("#Start Add Users:" + date.getTime());
+                + dateFormat.format(System.currentTimeMillis()));
+        addUserResultTimes.add("#Start Add Users:" + System.currentTimeMillis());
 
         int requestCounter = 1;
         int batchCounter = 0;
@@ -124,7 +123,6 @@ public class Scheduler {
 
                     @Override
                     public void run() {
-                        Date date = new Date();
                         this.JSONUsers = finalUser;
                         long startTime = 0, endTime = 0;
 
@@ -132,9 +130,9 @@ public class Scheduler {
                             String addURL = URL + "users";
                             postParams = new HashMap<>();
                             postParams.put("JSONUsers", JSONUsers);
-                            startTime = date.getTime();
+                            startTime = System.currentTimeMillis();
                             execPost(addURL, postParams);
-                            endTime = date.getTime();
+                            endTime = System.currentTimeMillis();
                         } catch (Exception ex) {
                             LOGGER.error("Add Users Failed", ex);
                         }
@@ -189,9 +187,9 @@ public class Scheduler {
             long startTime = 0, endTime = 0;
             JSONUsers = JSONUsers + "}";
             LOGGER.debug(JSONUsers);
-            startTime = date.getTime();
+            startTime = System.currentTimeMillis();
             addUsers(JSONUsers);
-            endTime = date.getTime();
+            endTime = System.currentTimeMillis();
             addUserResultTimes.add("scenario1::"
                     + "adduser::"
                     + startTime + "::"
@@ -208,17 +206,17 @@ public class Scheduler {
         }
 
         LOGGER.info("#End Add Users: "
-                + dateFormat.format(date.getTime()));
+                + dateFormat.format(System.currentTimeMillis()));
         //Add End time of this phase
-        addUserResultTimes.add("#End Add Users:" + date.getTime());
+        addUserResultTimes.add("#End Add Users:" + System.currentTimeMillis());
         //Store results for add user
         warehouseScenario1.storeData(addUserResultTimes);
 
         //----------------------------------------------------------------------
         //Modify users profile
         LOGGER.info("#Start Modify Users Profile: "
-                + dateFormat.format(date.getTime()));
-        modifyUserResultTimes.add("#Start Modify Users Profile:" + date.getTime());
+                + dateFormat.format(System.currentTimeMillis()));
+        modifyUserResultTimes.add("#Start Modify Users Profile:" + System.currentTimeMillis());
 
         requestCounter = 1;
         while (dataset.userModificationHasNext()) {
@@ -231,7 +229,6 @@ public class Scheduler {
 
                 @Override
                 public void run() {
-                    Date date = new Date();
                     this.modificationRedord = finalRecord;
                     long startTime = 0, endTime = 0;
                     String[] splitedRecord = modificationRedord.split("\\|");
@@ -239,9 +236,9 @@ public class Scheduler {
                         String modifyURL = URL + "users/" + splitedRecord[0] + "/features/modify";
                         putParams = new HashMap<>();
                         putParams.put("JSONUserFeatures", splitedRecord[1]);
-                        startTime = date.getTime();
+                        startTime = System.currentTimeMillis();
                         execPut(modifyURL, putParams);
-                        endTime = date.getTime();
+                        endTime = System.currentTimeMillis();
                     } catch (Exception ex) {
                         LOGGER.error("Modify Users Failed", ex);
                     }
@@ -288,16 +285,16 @@ public class Scheduler {
         }
 
         LOGGER.info("#End Modify Users Profile: "
-                + dateFormat.format(date.getTime()));
+                + dateFormat.format(System.currentTimeMillis()));
         //Add end time of Modify users and store times
-        modifyUserResultTimes.add("#End Modify Users Profile:" + date.getTime());
+        modifyUserResultTimes.add("#End Modify Users Profile:" + System.currentTimeMillis());
         warehouseScenario1.storeData(modifyUserResultTimes);
 
         //----------------------------------------------------------------------
         //Get users profile
         LOGGER.info("#Start Get Users Profile: "
-                + dateFormat.format(date.getTime()));
-        getUserResultTimes.add("#Start Get Users Profile: " + date.getTime());
+                + dateFormat.format(System.currentTimeMillis()));
+        getUserResultTimes.add("#Start Get Users Profile: " + System.currentTimeMillis());
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
@@ -312,14 +309,13 @@ public class Scheduler {
 
                 @Override
                 public void run() {
-                    Date date = new Date();
                     this.username = finalRecord;
                     long startTime = 0, endTime = 0;
                     try {
                         String getURL = URL + "users/" + username + "/features";
-                        startTime = date.getTime();
+                        startTime = System.currentTimeMillis();
                         execGet(getURL, getParams);
-                        endTime = date.getTime();
+                        endTime = System.currentTimeMillis();
                     } catch (Exception ex) {
                         LOGGER.error("Get Users Failed", ex);
                     }
@@ -373,9 +369,9 @@ public class Scheduler {
         }
 
         LOGGER.info("#End Get Users Profile: "
-                + dateFormat.format(date.getTime()));
+                + dateFormat.format(System.currentTimeMillis()));
         //Add end time of get users profile and store times
-        getUserResultTimes.add("#End Get Users Profile:" + date.getTime());
+        getUserResultTimes.add("#End Get Users Profile:" + System.currentTimeMillis());
         warehouseScenario1.storeData(getUserResultTimes);
 
     }
@@ -408,8 +404,8 @@ public class Scheduler {
 
         //Add users 
         LOGGER.info("#Start Add Users: "
-                + dateFormat.format(date.getTime()));
-        addUserResultTimes.add("#Start Add Users:" + date.getTime());
+                + dateFormat.format(System.currentTimeMillis()));
+        addUserResultTimes.add("#Start Add Users:" + System.currentTimeMillis());
 
         int requestCounter = 1;
         int batchCounter = 0;
@@ -428,7 +424,6 @@ public class Scheduler {
 
                     @Override
                     public void run() {
-                        Date date = new Date();
                         this.JSONUsers = finalUser;
                         long startTime = 0, endTime = 0;
 
@@ -436,9 +431,9 @@ public class Scheduler {
                             String addURL = URL + "users";
                             postParams = new HashMap<>();
                             postParams.put("JSONUsers", JSONUsers);
-                            startTime = date.getTime();
+                            startTime = System.currentTimeMillis();
                             execPost(addURL, postParams);
-                            endTime = date.getTime();
+                            endTime = System.currentTimeMillis();
                         } catch (Exception ex) {
                             LOGGER.error("Add Users Failed", ex);
                         }
@@ -494,9 +489,9 @@ public class Scheduler {
             long startTime = 0, endTime = 0;
             JSONUsers = JSONUsers + "}";
             LOGGER.debug(JSONUsers);
-            startTime = date.getTime();
+            startTime = System.currentTimeMillis();
             addUsers(JSONUsers);
-            endTime = date.getTime();
+            endTime = System.currentTimeMillis();
             addUserResultTimes.add("scenario2::"
                     + "adduser::"
                     + startTime + "::"
@@ -513,17 +508,17 @@ public class Scheduler {
         }
 
         LOGGER.info("#End Add Users: "
-                + dateFormat.format(date.getTime()));
+                + dateFormat.format(System.currentTimeMillis()));
         //Add End time of this phase
-        addUserResultTimes.add("#End Add Users:" + date.getTime());
+        addUserResultTimes.add("#End Add Users:" + System.currentTimeMillis());
         //Store results for add user
         warehouseScenario2.storeData(addUserResultTimes);
 
         //----------------------------------------------------------------------
         //Modify users profile
         LOGGER.info("#Start Modify Users Profile with probability to get user: "
-                + dateFormat.format(date.getTime()));
-        modifyUserResultTimes.add("#Start Modify Users Profile:" + date.getTime());
+                + dateFormat.format(System.currentTimeMillis()));
+        modifyUserResultTimes.add("#Start Modify Users Profile:" + System.currentTimeMillis());
 
         requestCounter = 1;
 
@@ -543,14 +538,13 @@ public class Scheduler {
 
                     @Override
                     public void run() {
-                        Date date = new Date();
                         this.username = finalGetUser;
                         long startTime = 0, endTime = 0;
                         try {
                             String getURL = URL + "users/" + username + "/features";
-                            startTime = date.getTime();
+                            startTime = System.currentTimeMillis();
                             execGet(getURL, getParams);
-                            endTime = date.getTime();
+                            endTime = System.currentTimeMillis();
                         } catch (Exception ex) {
                             LOGGER.error("Get Users Failed", ex);
                         }
@@ -574,7 +568,6 @@ public class Scheduler {
 
                 @Override
                 public void run() {
-                    Date date = new Date();
                     this.modificationRedord = finalRecord;
                     long startTime = 0, endTime = 0;
                     String[] splitedRecord = modificationRedord.split("\\|");
@@ -582,9 +575,9 @@ public class Scheduler {
                         String modifyURL = URL + "users/" + splitedRecord[0] + "/features/modify";
                         putParams = new HashMap<>();
                         putParams.put("JSONUserFeatures", splitedRecord[1]);
-                        startTime = date.getTime();
+                        startTime = System.currentTimeMillis();
                         execPut(modifyURL, putParams);
-                        endTime = date.getTime();
+                        endTime = System.currentTimeMillis();
                     } catch (Exception ex) {
                         LOGGER.error("Add Users Failed", ex);
                     }
@@ -631,15 +624,15 @@ public class Scheduler {
         }
 
         LOGGER.info("#End Modify Users Profile: "
-                + dateFormat.format(date.getTime()));
+                + dateFormat.format(System.currentTimeMillis()));
         //Add end time of Modify users and store times
-        modifyUserResultTimes.add("#End Modify Users Profile:" + date.getTime());
+        modifyUserResultTimes.add("#End Modify Users Profile:" + System.currentTimeMillis());
         warehouseScenario2.storeData(modifyUserResultTimes);
         //----------------------------------------------------------------------
         //Get users profile
         LOGGER.info("#Start Get Users Profile: "
-                + dateFormat.format(date.getTime()));
-        getUserResultTimes.add("#Start Get Users Profile: " + date.getTime());
+                + dateFormat.format(System.currentTimeMillis()));
+        getUserResultTimes.add("#Start Get Users Profile: " + System.currentTimeMillis());
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
@@ -653,14 +646,13 @@ public class Scheduler {
 
                 @Override
                 public void run() {
-                    Date date = new Date();
                     this.username = finalRecord;
                     long startTime = 0, endTime = 0;
                     try {
                         String getURL = URL + "users/" + username + "/features";
-                        startTime = date.getTime();
+                        startTime = System.currentTimeMillis();
                         execGet(getURL, getParams);
-                        endTime = date.getTime();
+                        endTime = System.currentTimeMillis();
                     } catch (Exception ex) {
                         LOGGER.error("Get Users Failed", ex);
                     }
@@ -713,9 +705,9 @@ public class Scheduler {
         }
 
         LOGGER.info("#End Get Users Profile: "
-                + dateFormat.format(date.getTime()));
+                + dateFormat.format(System.currentTimeMillis()));
         //Add end time of get users profile and store times
-        getUserResultTimes.add("#End Get Users Profile:" + date.getTime());
+        getUserResultTimes.add("#End Get Users Profile:" + System.currentTimeMillis());
         warehouseScenario2.storeData(getUserResultTimes);
     }
 
