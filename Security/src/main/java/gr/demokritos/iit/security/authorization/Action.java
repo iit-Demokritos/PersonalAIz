@@ -6,7 +6,7 @@
 package gr.demokritos.iit.security.authorization;
 
 /**
- *
+ * The Action object
  * @author ggianna
  */
 public class Action {

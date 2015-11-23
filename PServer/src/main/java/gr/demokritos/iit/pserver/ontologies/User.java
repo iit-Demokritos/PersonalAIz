@@ -53,32 +53,67 @@ public class User {
 
     }
 
+    /**
+     * Get username
+     *
+     * @return
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Set the user information
+     *
+     * @param info
+     */
     public void setInfo(Map<String, String> info) {
         this.info = info;
     }
 
+    /**
+     * Get the user information
+     *
+     * @return
+     */
     public Map<String, String> getInfo() {
         return info;
     }
 
+    /**
+     * Set the user attributes
+     *
+     * @param attributes
+     */
     public void setAttributes(Map<String, String> attributes) {
         this.attributes.clear();
         this.attributes.putAll(attributes);
     }
 
+    /**
+     * Get the user attributes
+     *
+     * @return
+     */
     public Map<String, String> getAttributes() {
         return attributes;
     }
 
+    /**
+     * Set the user features
+     *
+     * @param features
+     */
     public void setFeatures(Map<String, String> features) {
         this.features.clear();
         this.features.putAll(features);
     }
 
+    /**
+     * get the user features
+     *
+     * @return
+     */
     public Map<String, String> getFeatures() {
         return features;
     }

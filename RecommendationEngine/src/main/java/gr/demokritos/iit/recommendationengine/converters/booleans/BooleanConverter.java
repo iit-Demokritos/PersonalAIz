@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This class implements a converter. The converter get a list of objects and
+ * generate the boolean features.
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -27,6 +29,12 @@ public class BooleanConverter implements IConverter<String> {
         this.language = language;
     }
 
+    /**
+     * Convert a list with boolean variables to boolean features.
+     *
+     * @param objects
+     * @return
+     */
     @Override
     public Map<String, Integer> getFeatures(List<String> objects) {
 

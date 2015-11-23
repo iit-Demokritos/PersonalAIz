@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This class implements a converter. The converter get a list of alphanumeric
+ * objects and generate the alphanumeric features.
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -27,6 +29,13 @@ public class AlphanumericConverter implements IConverter<String> {
         this.language = language;
     }
 
+    /**
+     * Get a list with alphanumeric features and converted on alphanumeric
+     * features.
+     *
+     * @param objects
+     * @return
+     */
     @Override
     public Map getFeatures(List<String> objects) {
 
@@ -44,8 +53,8 @@ public class AlphanumericConverter implements IConverter<String> {
                     + "."
                     + tmpSplit[1].trim();
 
-                //Add feature on Map with value 1
-                features.put(feature, 1);
+            //Add feature on Map with value 1
+            features.put(feature, 1);
         }
 
         return features;

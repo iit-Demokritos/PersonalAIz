@@ -17,6 +17,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Implements the evaluation with HBase storage system
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -42,11 +43,23 @@ public class HBaseEvaluation implements IEvaluation {
 
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(HBaseEvaluation.class);
 
+    /**
+     * HBaseEvaluation Constructor
+     */
     public HBaseEvaluation() {
         //Create new HBase configuration
         config = new PersonalAIzHBaseConfiguration().getHBaseConfig();
     }
 
+    /**
+     * Store a evaluation entry on HBsase
+     *
+     * @param username The username
+     * @param objectId The feed object id
+     * @param recommended The flag if the object is recommended
+     * @param timestamp The Feed timestamp
+     * @param clientName The client name
+     */
     @Override
     public void storeEntry(String username, String objectId,
             boolean recommended, long timestamp, String clientName) {

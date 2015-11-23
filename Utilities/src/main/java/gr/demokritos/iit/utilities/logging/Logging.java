@@ -9,11 +9,18 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
+ * This class help us to update the Logger level
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class Logging {
-    
+
+    /**
+     * Update Logger function
+     *
+     * @param className The class name
+     * @param logLevel The new logger level
+     */
     public static void updateLoggerLevel(Class className, String logLevel) {
         Logger LOGGER = Logger.getLogger(className.getName());
         switch (logLevel.trim().toLowerCase()) {

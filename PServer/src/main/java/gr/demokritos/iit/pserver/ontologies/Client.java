@@ -61,6 +61,10 @@ public class Client extends SystemUser {
         return keys;
     }
 
+    /**
+     * Get client's username
+     * @return 
+     */
     public String getUsername() {
         return username;
     }

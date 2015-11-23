@@ -6,11 +6,12 @@
 package gr.demokritos.iit.pserver.computationaltools.similaritymetrics;
 
 /**
+ * Interface for vector similarity implementations
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IVectorSimilarity {
-    
+
     double getSimilarity(double[] docVector1, double[] docVector2);
-    
+
 }

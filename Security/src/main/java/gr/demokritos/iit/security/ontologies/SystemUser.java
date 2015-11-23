@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
+ * Implements A ontology of the platform SystemUser
  *
  * @author ggianna
  * @author Giotis Panagiotis <giotis.p@gmail.com>
@@ -85,17 +86,16 @@ public class SystemUser {
         return password.equals(givenPassword);
     }
 
-    
     /**
-     * 
-     * @return 
+     * Generate a String with SystemUSer information
+     *
+     * @return
      */
-    //TODO: javadoc
     @Override
     public String toString() {
-        return "SystemUser{" + "info=" + info + ", roles=" + roles 
-                + ", username=" + username 
-                + ", authenticatedTimestamp=" + authenticatedTimestamp 
+        return "SystemUser{" + "info=" + info + ", roles=" + roles
+                + ", username=" + username
+                + ", authenticatedTimestamp=" + authenticatedTimestamp
                 + ", password=" + password + '}';
     }
 

@@ -10,6 +10,7 @@ import gr.demokritos.iit.security.interfaces.IAuthentication;
 import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 
 /**
+ * Implements the platform Authentication System
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -17,6 +18,11 @@ public class Authenticator implements IAuthentication {
 
     private final ISecurityStorage securityDB;
 
+    /**
+     * Authenticator Constructor
+     *
+     * @param securityDB
+     */
     public Authenticator(ISecurityStorage securityDB) {
         this.securityDB = securityDB;
     }
@@ -24,8 +30,8 @@ public class Authenticator implements IAuthentication {
     /**
      * Check credentials with username and password
      *
-     * @param username
-     * @param password
+     * @param username The username
+     * @param password The password
      * @return The status of the checking
      */
     @Override
@@ -38,7 +44,7 @@ public class Authenticator implements IAuthentication {
     /**
      * Check credentials with api key
      *
-     * @param apikey
+     * @param apikey The api key
      * @return The status of the checking
      */
     @Override

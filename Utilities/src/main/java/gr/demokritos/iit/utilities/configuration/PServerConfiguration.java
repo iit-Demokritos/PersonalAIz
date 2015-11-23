@@ -6,21 +6,32 @@
 package gr.demokritos.iit.utilities.configuration;
 
 /**
+ * This class extends Configuration class and create the PServerConfiguration
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class PServerConfiguration extends Configuration {
 
+    /**
+     * PServerConnfiguration Constructor with given configuration file name
+     *
+     * @param configurationFileName The new filename
+     */
     public PServerConfiguration(String configurationFileName) {
-       CONFIGURATION_FILE_NAME=configurationFileName;
+        CONFIGURATION_FILE_NAME = configurationFileName;
     }
+
+    /**
+     * The PServerConfiguration constructor with default configuration filename
+     */
     public PServerConfiguration() {
     }
 
     /**
      * Get logging level
      *
-     * @return Return the default level (Info) or (Debug) if debug mode is ON
+     * @return Return current logging level. If not exist on properties file
+     * return the default value (info)
      */
     public String getLogLevel() {
         //Default logging level is Info
@@ -31,5 +42,4 @@ public class PServerConfiguration extends Configuration {
 //    public String getPropertyName() {
 //        return properties.getProperty("PropertyName");
 //    }
-
 }

@@ -9,7 +9,7 @@ import gr.demokritos.iit.security.authorization.Action;
 import gr.demokritos.iit.security.ontologies.SystemUser;
 
 /**
- *
+ * The Interface of the security storage
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface ISecurityStorage {

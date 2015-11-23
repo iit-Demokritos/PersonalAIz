@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Interface for Personal Storage implementation
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */

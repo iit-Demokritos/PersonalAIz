@@ -21,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This converter get a list with row texts and create a feature list
+ * This class implements a converter. 
+ * The converter get a list with row texts and create a feature list
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -145,7 +146,7 @@ public class TextConverter implements IConverter<String> {
 
         //For each token check if is stopword
         for (String cToken : tokens) {
-            if (!STOPWORDS.contains(cToken)&& cToken.length()>1) {
+            if (!STOPWORDS.contains(cToken) && cToken.length() > 1) {
                 //if not then add it to list
                 tokeList.add(cToken);
             }

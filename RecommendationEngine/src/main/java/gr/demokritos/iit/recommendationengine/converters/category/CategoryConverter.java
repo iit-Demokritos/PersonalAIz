@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This converter get a list with categories and create a feature list
+ * This class implements a converter. This converter get a list with categories
+ * and create a feature list
+ *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class CategoryConverter implements IConverter<String> {
@@ -20,15 +22,16 @@ public class CategoryConverter implements IConverter<String> {
 
     /**
      * Category Converter Constructor
+     *
      * @param language The objects language
      */
     public CategoryConverter(String language) {
         this.language = language;
     }
 
-    
     /**
      * Convert a list with categories to a PServer feature List
+     *
      * @param objects A list with category names
      * @return A Map with feature name and values
      */

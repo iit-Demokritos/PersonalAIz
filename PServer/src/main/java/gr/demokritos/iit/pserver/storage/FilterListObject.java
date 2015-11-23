@@ -12,16 +12,14 @@ import org.apache.hadoop.hbase.filter.FilterList;
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class FilterListObject {
-    
+
     private boolean fOR = true;
     private FilterList list;
 
-    public FilterListObject(FilterList list,boolean fOR) {
+    public FilterListObject(FilterList list, boolean fOR) {
         this.list = list;
         this.fOR = fOR;
     }
-    
-    
 
     public FilterList getList() {
         return list;

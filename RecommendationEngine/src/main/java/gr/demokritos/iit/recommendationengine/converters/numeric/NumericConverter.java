@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This class implements a converter. The converter get a list list with objects
+ * and generate numeric features.
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -27,8 +29,14 @@ public class NumericConverter implements IConverter<String> {
         this.language = language;
     }
 
+    /**
+     * Convert a list with number variables to numeric features
+     *
+     * @param objects
+     * @return
+     */
     @Override
-    public Map getFeatures(List<String> objects) {
+    public Map<String, Integer> getFeatures(List<String> objects) {
 
         HashMap<String, Integer> features = new HashMap<>();
 

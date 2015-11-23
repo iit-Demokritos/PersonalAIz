@@ -26,7 +26,6 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Implements the REST API to expose the recommendation engine module
  *
@@ -408,7 +407,7 @@ public class RecommendationEngineRest {
             LOGGER.info("Failed get recommendation");
             output.setCustomOutputMessage("Get recommendation Failed");
         }
-        
+
         LOGGER.debug("#getRecommendation | recommendations: " + recommendations);
 
         return JSon.jsonize(output, Output.class);

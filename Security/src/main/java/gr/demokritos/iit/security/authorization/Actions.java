@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ * Implement the Action system for each functionality
+ *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class Actions {
@@ -59,18 +60,18 @@ public class Actions {
         stereotypeActions.put("aGetUserStereotypes", new Action("Stereotype.GetUserStereotypes"));
         stereotypeActions.put("aAddUserOnStereotype", new Action("Stereotype.AddUserOnStereotype"));
         stereotypeActions.put("aDeleteUserFromStereotype", new Action("Stereotype.DeleteUserFromStereotype"));
-        
+
         //Recommendation actions
         recommendationActions.put("aFeed", new Action("Recommendation.Feed"));
         recommendationActions.put("aGetRecommendations", new Action("Recommendation.GeRecommendations"));
         recommendationActions.put("aAddUser", new Action("Recommendation.AddUser"));
         recommendationActions.put("aDeleteUser", new Action("Recommendation.DeleteUser"));
-        
+
     }
 
-    
     /**
      * Get PServer Admin actions
+     *
      * @return A map with String:Action pairs
      */
     public Map<String, Action> getAdminActions() {
@@ -79,6 +80,7 @@ public class Actions {
 
     /**
      * Get PServer Personal actions
+     *
      * @return A map with String:Action pairs
      */
     public Map<String, Action> getPersonalActions() {
@@ -87,6 +89,7 @@ public class Actions {
 
     /**
      * Get PServer Stereotype actions
+     *
      * @return A map with String:Action pairs
      */
     public Map<String, Action> getStereotypeActions() {
@@ -95,24 +98,26 @@ public class Actions {
 
     /**
      * Get PServer Community actions
+     *
      * @return A map with String:Action pairs
      */
     public Map<String, Action> getCommunityActions() {
         return communityActions;
     }
 
-    
     /**
      * Get recommendation actions
+     *
      * @return A map with String:Action pairs
      */
     public HashMap<String, Action> getRecommendationActions() {
         return recommendationActions;
     }
-    
+
     /**
      * Get All PServer actions
-     * @return  A map with String:Action pairs
+     *
+     * @return A map with String:Action pairs
      */
     public Map<String, Action> getActions() {
         HashMap<String, Action> actions = new HashMap<>();
@@ -123,7 +128,5 @@ public class Actions {
         actions.putAll(recommendationActions);
         return actions;
     }
-    
-    
 
 }

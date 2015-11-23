@@ -6,9 +6,10 @@
 package gr.demokritos.iit.pserver.storage.interfaces;
 
 /**
+ * Interface for Community Storage implementation
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface ICommunityStorage {
-    
+
 }

@@ -21,6 +21,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class implement a Query Parser
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -32,10 +33,19 @@ public class QueryParser implements IQueryParser<FilterList> {
 
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(QueryParser.class);
 
+    /**
+     * Query parser constructor
+     */
     public QueryParser() {
         config = new PersonalAIzHBaseConfiguration().getHBaseConfig();
     }
 
+    /**
+     * Get the HBase filter List based on given Expression
+     *
+     * @param sExpression
+     * @return
+     */
     @Override
     public FilterList getParsedQuery(String sExpression) {
 

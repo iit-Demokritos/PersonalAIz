@@ -56,8 +56,9 @@ public class Stereotype {
     }
 
     /**
+     * Get the system attributes based on user attributes
      *
-     * @return
+     * @return A set of attribute names
      */
     public Set<String> getSystemAttributes() {
 
@@ -75,10 +76,11 @@ public class Stereotype {
     }
 
     /**
+     * Add stereotype in PServer
      *
-     * @param stereotypeName
-     * @param rule
-     * @return
+     * @param stereotypeName The stereotype name
+     * @param rule The stereotype rule
+     * @return The success status of this action
      */
     public boolean addStereotype(String stereotypeName, String rule) {
 
@@ -96,9 +98,11 @@ public class Stereotype {
     }
 
     /**
+     * Delete stereotypes from PServer
      *
-     * @param pattern
-     * @return
+     * @param pattern The stereotype name pattern. If is null delete all
+     * stereotypes
+     * @return The success status of this action
      */
     public boolean deleteStereotypes(String pattern) {
 
@@ -121,10 +125,13 @@ public class Stereotype {
     }
 
     /**
+     * Get stereotype names
      *
-     * @param pattern
-     * @param page
-     * @return
+     * @param pattern The stereotype name pattern. If is null return all the
+     * stereotypes
+     * @param page The page number. If is null return all the results on single
+     * page
+     * @return A set o stereotype names
      */
     public Set<String> getStereotypes(String pattern, Integer page) {
 
@@ -148,9 +155,10 @@ public class Stereotype {
     }
 
     /**
+     * Remake Stereotype
      *
-     * @param stereotypeName
-     * @return
+     * @param stereotypeName The stereotype name
+     * @return The success status of this action
      */
     public boolean remakeStereotype(String stereotypeName) {
 
@@ -168,9 +176,10 @@ public class Stereotype {
     }
 
     /**
+     * Update stereotype features based on user profile who belong to stereotype
      *
-     * @param stereotypeName
-     * @return
+     * @param stereotypeName The stereotype name
+     * @return The success status of this action
      */
     public boolean updateStereotypeFeatures(String stereotypeName) {
 
@@ -191,9 +200,10 @@ public class Stereotype {
     }
 
     /**
+     * Add or remove stereotype users who satisfy the stereotype rule/
      *
-     * @param stereotypeName
-     * @return
+     * @param stereotypeName The stereotype name
+     * @return The success status of this action
      */
     public boolean updateStereotypeUsers(String stereotypeName) {
 
@@ -211,9 +221,10 @@ public class Stereotype {
     }
 
     /**
+     * Find and add the users who satisfies the stereotype rule
      *
-     * @param stereotypeName
-     * @return
+     * @param stereotypeName The stereotype name
+     * @return The success status of this action
      */
     public boolean findStereotypeUsers(String stereotypeName) {
 
@@ -231,9 +242,10 @@ public class Stereotype {
     }
 
     /**
+     * Find and remove the users who not satisfies the stereotype rule
      *
-     * @param stereotypeName
-     * @return
+     * @param stereotypeName The stereotype name
+     * @return The success status of this action
      */
     public boolean checkStereotypeUsers(String stereotypeName) {
 
@@ -252,10 +264,11 @@ public class Stereotype {
     }
 
     /**
+     * Set manually the stereotype features
      *
-     * @param stereotypeName
-     * @param features
-     * @return
+     * @param stereotypeName The stereotype name
+     * @param features A map with pairs of feature name - value
+     * @return The success status of this action
      */
     public boolean setStereotypeFeatures(String stereotypeName,
             Map<String, String> features) {
@@ -275,10 +288,11 @@ public class Stereotype {
     }
 
     /**
+     * Modify manually the stereotype features
      *
-     * @param stereotypeName
-     * @param features
-     * @return
+     * @param stereotypeName The stereotype name
+     * @param features A map with pairs of feature name - value
+     * @return The success status of this action
      */
     public boolean modifyStereotypeFeatures(String stereotypeName,
             Map<String, String> features) {
@@ -298,11 +312,12 @@ public class Stereotype {
     }
 
     /**
+     * Get stereotype features
      *
-     * @param stereotypeName
-     * @param pattern
-     * @param page
-     * @return
+     * @param stereotypeName The stereotype name
+     * @param pattern The feature name pattern. If null return all the features
+     * @param page The page number. If is null return all result on single page
+     * @return A map with pairs of feature name - value
      */
     public Map<String, String> getStereotypeFeatures(String stereotypeName,
             String pattern, Integer page) {
@@ -327,10 +342,11 @@ public class Stereotype {
     }
 
     /**
+     * Delete features from stereotype
      *
-     * @param stereotypeName
-     * @param pattern
-     * @return
+     * @param stereotypeName The stereotype name
+     * @param pattern The feature name pattern. If is null delete all features
+     * @return The success status of this action
      */
     public boolean deleteStereotypeFeatures(String stereotypeName, String pattern) {
 
@@ -348,11 +364,13 @@ public class Stereotype {
     }
 
     /**
+     * Get stereotype users
      *
-     * @param stereotypeName
-     * @param pattern
-     * @param page
-     * @return
+     * @param stereotypeName The stereotype name
+     * @param pattern The username pattern. If is null return all the users
+     * @param page The page number. If page number is null return all the
+     * results on single page
+     * @return List with usernames
      */
     public List<String> getStereotypeUsers(String stereotypeName, String pattern,
             Integer page) {
@@ -377,10 +395,12 @@ public class Stereotype {
     }
 
     /**
+     * Get the stereotypes which user belongs
      *
-     * @param username
-     * @param pattern
-     * @param page
+     * @param username The username
+     * @param pattern The stereotype name pattern. If pattern is null get all
+     * stereotypes
+     * @param page The page number. If is null return the results on single page
      * @return
      */
     public List<String> getUserStereotypes(String username, String pattern,
@@ -406,10 +426,11 @@ public class Stereotype {
     }
 
     /**
+     * Ad user manually on stereotype
      *
-     * @param username
-     * @param stereotypeName
-     * @return
+     * @param username The username
+     * @param stereotypeName The stereotype name
+     * @return The success status of this action
      */
     public boolean addUserOnStereotype(String username, String stereotypeName) {
 
@@ -427,10 +448,11 @@ public class Stereotype {
     }
 
     /**
+     * Delete user manually from stereotype
      *
-     * @param username
-     * @param stereotypeName
-     * @return
+     * @param username The username
+     * @param stereotypeName The stereotype name
+     * @return The success status of this action
      */
     public boolean deleteUserFromStereotype(String username, String stereotypeName) {
 

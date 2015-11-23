@@ -6,16 +6,19 @@
 package gr.demokritos.iit.pserver.computationaltools.similaritymetrics;
 
 /**
+ * This class implements a Vector similarity method. This implementation is
+ * based on cosine similarity
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class CosineSimilarity implements IVectorSimilarity{
+public class CosineSimilarity implements IVectorSimilarity {
 
     /**
      * Method to calculate cosine similarity between two documents.
+     *
      * @param docVector1 : document vector 1 (a)
      * @param docVector2 : document vector 2 (b)
-     * @return 
+     * @return
      */
     @Override
     public double getSimilarity(double[] docVector1, double[] docVector2) {

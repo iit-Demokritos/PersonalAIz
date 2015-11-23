@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Interface for Admin Storage implementation
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -25,7 +26,6 @@ public interface IAdminStorage {
     boolean setClientRoles(String clientName, String role);
 
     List<String> getClientRoles(String clientName);
-
 
     //========================== Client =======================================
 //    //=========================== Roles =======================================

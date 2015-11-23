@@ -154,7 +154,7 @@ public class SecurityHBase implements ISecurityStorage {
 
         LOGGER.debug("#SecurityHBase | checkAccess: $systemUser"
                 + u.toString() + " $Action " + a.toString() + " $Access " + Access);
-        //TODO: checkAccess Implement read from HBase and return the status
+        //TODO: Implement access read from HBase and return the status. Now return false
         return false;
     }
 

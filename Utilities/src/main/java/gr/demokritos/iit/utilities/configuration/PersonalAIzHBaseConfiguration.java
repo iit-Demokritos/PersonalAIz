@@ -9,20 +9,40 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 
 /**
+ * This class extends Configuration class and create the
+ * PersonalAIzHBaseConfiguration
  *
- * @author Panagiotis Giotis <giotis.p@gmail.com>
+ * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class PersonalAIzHBaseConfiguration
         extends gr.demokritos.iit.utilities.configuration.Configuration {
 
+    /**
+     * PersonalAIzHBaseConfiguration Constructor with given configuration file
+     * name
+     *
+     * @param configurationFileName The new filename
+     */
     public PersonalAIzHBaseConfiguration(String configurationFileName) {
         CONFIGURATION_FILE_NAME = configurationFileName;
     }
 
+    /**
+     * The PersonalAIzHBaseConfiguration constructor with default configuration
+     * filename
+     */
     public PersonalAIzHBaseConfiguration() {
 
     }
 
+    /**
+     * Get HBase configuration based on stored settings.
+     *
+     * @return The HBase Configuration. The default values are 
+     * hbase.master= localhost:60000 
+     * hbase.zookeeper.quorum= localhost
+     * hbase.zookeeper.property.clientPort= 2181
+     */
     public Configuration getHBaseConfig() {
         Configuration hbaseConfig = HBaseConfiguration.create();
 

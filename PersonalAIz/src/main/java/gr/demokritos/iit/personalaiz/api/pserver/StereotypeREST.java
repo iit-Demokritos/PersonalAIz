@@ -30,12 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements the Stereotype mode API
+ * This class implements the Stereotype mode REST API
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
- */
-/**
- * Root resource (exposed at "pserver/:credentials/stereotype" path)
  */
 @Path("pserver/{userAuthe}/stereotype/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -50,6 +47,12 @@ public class StereotypeREST {
     private Output output = new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
+    /**
+     * Get system attributes based on user attributes
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @return
+     */
     @Path("attributes")
     @GET
     public String getSystemAttributes(
@@ -105,6 +108,14 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Add a stereotype in PServer
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @param rule The stereotype rule
+     * @return
+     */
     @Path("{stereotypeName}")
     @POST
     public String addStereotype(
@@ -166,6 +177,13 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Delete Stereotypes from PServer
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param pattern The deleting Stereotype Name pattern
+     * @return
+     */
     @Path("delete")
     @POST
     public String deleteStereotypes(
@@ -219,6 +237,15 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Get list with PServer stereotypes
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param pattern The name pattern. If pattern is null return all the
+     * stereotype names.
+     * @param page The page number. Return results to single page.
+     * @return
+     */
     @GET
     public String getStereotypes(
             @PathParam("userAuthe") String userAuthe,
@@ -280,6 +307,13 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Remake Stereotype
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @return
+     */
     @Path("{stereotypeName}/remake")
     @POST
     public String remakeStereotype(
@@ -333,6 +367,14 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Update stereotype features based on user profiles who belongs to the
+     * stereotype.
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @return
+     */
     @Path("{stereotypeName}/features/update")
     @POST
     public String updateStereotypeFeatures(
@@ -386,6 +428,14 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Update Stereotype users. Add the users who satisfy the stereotype rule
+     * and remove the users who not satisfy the rule yet.
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @return
+     */
     @Path("{stereotypeName}/users/update")
     @POST
     public String updateStereotypeUsers(
@@ -439,6 +489,13 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Find and add the users who satisfy the Stereotype rule.
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @return
+     */
     @Path("{stereotypeName}/users/find")
     @POST
     public String findStereotypeUsers(
@@ -492,6 +549,13 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Find and remove the users who not satisfy the Stereotype rule.
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @return
+     */
     @Path("{stereotypeName}/users/check")
     @POST
     public String checkStereotypeUsers(
@@ -545,6 +609,14 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Manually Set of stereotype features.
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @param JSONStereotypeFeatures A JSON with feature name - value
+     * @return
+     */
     @Path("{stereotypeName}/features/set")
     @POST
     public String setStereotypeFeatures(
@@ -608,6 +680,14 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Manually modification of stereotype features
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @param JSONStereotypeFeatures A JSON with stereotype feature name - value
+     * @return
+     */
     @Path("{stereotypeName}/features/modify")
     @POST
     public String modifyStereotypeFeatures(
@@ -674,6 +754,15 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Get stereotype profile
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name.
+     * @param pattern The feature name pattern. If null return all the features
+     * @param page The page number. If is null return results to single page
+     * @return
+     */
     @Path("{stereotypeName}/features")
     @GET
     public String getStereotypeFeatures(
@@ -738,6 +827,15 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Delete stereotype features
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @param pattern The feature name pattern to delete. If is null delete all
+     * features.
+     * @return
+     */
     @Path("{stereotypeName}/features/delete")
     @POST
     public String deleteStereotypeFeatures(
@@ -794,6 +892,15 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Get The users who belongs to stereotype
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @param pattern The username pattern. If is null return all the users.
+     * @param page The page number. If is null return results to single page.
+     * @return
+     */
     @Path("{stereotypeName}/users")
     @GET
     public String getStereotypeUsers(
@@ -858,6 +965,16 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Get the stereotypes which a user belongs
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param usernameName The username
+     * @param pattern The stereotype name pattern. If in null return all
+     * stereotypes
+     * @param page The page number. If is null return results to single page
+     * @return
+     */
     @Path("user/{usernameName}/stereotypes")
     @GET
     public String getUserStereotypes(
@@ -922,6 +1039,14 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Add user on Stereotype manually
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @param username The username
+     * @return
+     */
     @Path("{stereotypeName}/user/add/{username}")
     @POST
     public String addUserOnStereotype(
@@ -976,6 +1101,14 @@ public class StereotypeREST {
         return JSon.jsonize(output, Output.class);
     }
 
+    /**
+     * Delete user from stereotype manually
+     *
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param stereotypeName The stereotype name
+     * @param username The username
+     * @return
+     */
     @Path("{stereotypeName}/user/delete/{username}")
     @POST
     public String deleteUserFromStereotype(

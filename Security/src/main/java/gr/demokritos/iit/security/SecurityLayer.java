@@ -62,7 +62,8 @@ public class SecurityLayer {
     }
 
     /**
-     * Password encryption
+     * Password encryption. Calculates the SHA-1 digest and returns the value as
+     * a hex string.
      *
      * @param password the password that we want to encrypt
      * @return

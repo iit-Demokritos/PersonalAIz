@@ -15,6 +15,7 @@ import java.util.Properties;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class implement the genera platform configuration
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -22,15 +23,13 @@ public class Configuration {
 
     protected final Properties properties;
     private File pFile;
-
     private static final String EXTERNAL_PROPERTIES_PATH = "./data/configuration/";
     public static final String DEFAULT_ENCODING = "UTF-8";
     public String CONFIGURATION_FILE_NAME = "platform.properties";
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
 
     /**
-     * Constructor of the configuration file
-     *
+     * Constructor of the Configuration class
      */
     public Configuration() {
         // Create new file from the external path
@@ -102,7 +101,7 @@ public class Configuration {
     /**
      * Set value of the given properties name
      *
-     * @param properties
+     * @param properties A map with properties name and value
      */
     public void setProperties(Map<String, String> properties) {
         this.properties.clear();
@@ -115,13 +114,12 @@ public class Configuration {
     /**
      * Save file to Disk
      *
-     * @return
+     * @return The save status
      */
     public boolean commit() {
         boolean status = true;
         try {
             properties.store(new FileWriter(this.pFile, Boolean.FALSE), null);
-//            properties.store(new OutputStreamWriter(new FileOutputStream(p), Charset.forName("UTF-8")));
         } catch (IOException ex) {
             status = false;
             LOGGER.error("Can't commit properties file", ex);

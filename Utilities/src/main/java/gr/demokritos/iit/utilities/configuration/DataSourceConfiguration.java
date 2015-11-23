@@ -6,35 +6,38 @@
 package gr.demokritos.iit.utilities.configuration;
 
 /**
+ * This class extends Configuration class and create the DataSourceConfiguration
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class DataSourceConfiguration extends Configuration{
-    
+public class DataSourceConfiguration extends Configuration {
+
+    /**
+     * DataSourceConfiguration Constructor with given configuration file name
+     *
+     * @param configurationFileName The new filename
+     */
     public DataSourceConfiguration(String configurationFileName) {
-        CONFIGURATION_FILE_NAME=configurationFileName;
+        CONFIGURATION_FILE_NAME = configurationFileName;
     }
 
+    /**
+     * The DataSourceConfiguration constructor with default configuration
+     * filename
+     */
     public DataSourceConfiguration() {
     }
-    
+
     /**
      * Get logging level
-     * @return Return the default level (Info) or (Debug) if debug mode is ON
+     *
+     * @return Return current logging level. If not exist on properties file
+     * return the default value (info)
      */
     public String getLogLevel() {
         //Default logging level is Info
-        String logLevel="info";
-        
-        //If debug mode is true
-        if(Boolean.parseBoolean(super.properties.getProperty("LogLevel"))){
-            //set logging level as debug
-            logLevel="debug";
-        }
-        
         //Return the logging level
-        return logLevel;
+        return properties.getProperty("LogLevel", "info");
     }
-    
-    
+
 }

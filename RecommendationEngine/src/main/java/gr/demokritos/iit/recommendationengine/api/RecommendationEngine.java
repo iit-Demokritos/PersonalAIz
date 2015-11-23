@@ -18,7 +18,6 @@ import gr.demokritos.iit.recommendationengine.converters.category.CategoryConver
 import gr.demokritos.iit.recommendationengine.converters.numeric.NumericConverter;
 import gr.demokritos.iit.recommendationengine.converters.tag.TagConverter;
 import gr.demokritos.iit.recommendationengine.converters.text.TextConverter;
-import gr.demokritos.iit.recommendationengine.evaluation.CSVEvaluation;
 import gr.demokritos.iit.recommendationengine.evaluation.HBaseEvaluation;
 import gr.demokritos.iit.recommendationengine.evaluation.IEvaluation;
 import gr.demokritos.iit.recommendationengine.onologies.FeedObject;
@@ -41,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * The core of the recommendation engine API
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -59,8 +59,9 @@ public class RecommendationEngine {
     private final RecommendationConfiguration config;
 
     /**
+     * The Recommendation engine constructor.
      *
-     * @param psClient
+     * @param psClient The pserver client
      */
     public RecommendationEngine(Client psClient) {
         this.config = new RecommendationConfiguration();
@@ -75,9 +76,11 @@ public class RecommendationEngine {
     }
 
     /**
+     * The Recommendation engine constructor. With out source configuration
+     * file.
      *
-     * @param psClient
-     * @param configurationFileName
+     * @param psClient The pserver client
+     * @param configurationFileName The configuration file name
      */
     public RecommendationEngine(Client psClient, String configurationFileName) {
         this.config = new RecommendationConfiguration(configurationFileName);
@@ -214,8 +217,8 @@ public class RecommendationEngine {
         final HashMap<String, Integer> userProfile = new HashMap<>(
                 utilities.mapValueStringToInteger(
                         personal.getUserFeatures(username, null, null)));
-        
-        if(userProfile.isEmpty()){
+
+        if (userProfile.isEmpty()) {
             LOGGER.error("User Profile is empty");
             return null;
         }
@@ -368,7 +371,7 @@ public class RecommendationEngine {
         }
 
         LinkedHashMap<String, Double> sortedHashMap = new LinkedHashMap<>();
-        sortedHashMap = utilities.sortHashMapByDoubleValues(recommendationObjects, true);
+        sortedHashMap = utilities.sortMapByDoubleValues(recommendationObjects, true);
 
         LOGGER.debug("#getRecommendation | RecommendationList: " + sortedHashMap);
 

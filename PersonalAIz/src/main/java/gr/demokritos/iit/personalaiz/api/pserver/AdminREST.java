@@ -16,9 +16,7 @@ import gr.demokritos.iit.utilities.json.Output;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Implements the REST API for the PServer Admin mode.
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -46,6 +45,12 @@ public class AdminREST {
     private Output output = new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
+    /**
+     * Initialize the platform if no one client in the platform
+     *
+     * @param clientPass The client pass of the root user
+     * @return
+     */
     @Path("initialization/{password}")
     @GET
     public String initPlatform(@PathParam("password") String clientPass) {
@@ -70,6 +75,7 @@ public class AdminREST {
     }
 
     /**
+     * Add a new client in the platform
      *
      * @param userAuthe System user API Key or Username - pass credentials
      * @param clientName Client Username
@@ -139,7 +145,7 @@ public class AdminREST {
     }
 
     /**
-     * Delete a client from PServer
+     * Delete a client from the Platform
      *
      * @param userAuthe The user API Key or Username - pass credentials
      * @param clientName The client username that i want to delete
@@ -200,7 +206,7 @@ public class AdminREST {
     }
 
     /**
-     * Get the PServer clients
+     * Get the Platform clients
      *
      * @param userAuthe The user API Key or Username - pass credentials
      * @return
@@ -260,7 +266,7 @@ public class AdminREST {
     }
 
     /**
-     * Set PServer settings
+     * Set Platform settings
      *
      * @param userAuthe The user API Key or Username - pass credentials
      * @param JSONSettings A JSON with key - value pairs with the settings. e.g.
@@ -331,7 +337,7 @@ public class AdminREST {
     }
 
     /**
-     * Set PServer settings
+     * Set Platform settings
      *
      * @param userAuthe The user API Key or Username - pass credentials
      * @param settingName
@@ -400,7 +406,7 @@ public class AdminREST {
     }
 
     /**
-     * Get PServer Settings map
+     * Get Platform Settings map
      *
      * @param userAuthe The user API Key or Username - pass credentials
      * @return

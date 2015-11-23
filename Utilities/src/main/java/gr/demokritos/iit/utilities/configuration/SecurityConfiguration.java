@@ -6,22 +6,32 @@
 package gr.demokritos.iit.utilities.configuration;
 
 /**
+ * This class extends Configuration class and create the SecurityConfiguration
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class SecurityConfiguration extends Configuration {
 
+    /**
+     * SecurityConfiguration Constructor with given configuration file name
+     *
+     * @param configurationFileName The new filename
+     */
     public SecurityConfiguration(String configurationFileName) {
-        CONFIGURATION_FILE_NAME=configurationFileName;
+        CONFIGURATION_FILE_NAME = configurationFileName;
     }
-    
-    public SecurityConfiguration(){
+
+    /**
+     * The SecurityConfiguration constructor with default configuration filename
+     */
+    public SecurityConfiguration() {
     }
-    
+
     /**
      * Get logging level
      *
-     * @return Return the default level (Info) or (Debug) if debug mode is ON
+     * @return Return current logging level. If not exist on properties file
+     * return the default value (info)
      */
     public String getLogLevel() {
         //Default logging level is Info

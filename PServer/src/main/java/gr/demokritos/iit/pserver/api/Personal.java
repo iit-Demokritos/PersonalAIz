@@ -53,7 +53,7 @@ public class Personal {
         //Update logging level 
         Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
     }
-    
+
     /**
      * The constructor of personal mode.
      *
@@ -61,7 +61,7 @@ public class Personal {
      * @param psClient
      * @param configurationFileName
      */
-    public Personal(IPersonalStorage dbPersonal, Client psClient,String configurationFileName) {
+    public Personal(IPersonalStorage dbPersonal, Client psClient, String configurationFileName) {
         this.psConfig = new PServerConfiguration(configurationFileName);
         this.dbPersonal = dbPersonal;
         this.psClient = psClient;
@@ -129,7 +129,8 @@ public class Personal {
      * Delete users from PServer storage basic on given pattern. If pattern is
      * null then the function will delete all users for this client.
      *
-     * @param pattern The user pattern that we want to delete. If pattern is null then delete all user.
+     * @param pattern The user pattern that we want to delete. If pattern is
+     * null then delete all user.
      * @return A boolean status true/false if delete complete or not
      */
     public boolean deleteUsers(String pattern) {
@@ -142,7 +143,7 @@ public class Personal {
 
         //update Authenticated time
         psClient.updateAuthenticatedTimestamp();
-       
+
         //call storage delete Users function with the pattern and add the return 
         return dbPersonal.deleteUsers(pattern, psClient.username);
     }
@@ -155,8 +156,9 @@ public class Personal {
      * @param page The page number. Page number will be greater or equal than 1
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
-     * null or page<1 then return all elements in a single page. 
-     * @return A set with the usernames. If return is null then permission denied
+     * null or page<1 then return all elements in a single page. @return A set
+     * with the usernames. If
+     * return is null then permission denied
      */
     public Set<String> getUsers(String pattern, Integer page) {
 
@@ -351,12 +353,9 @@ public class Personal {
         //10 minute before
         long frame = 600;
 
-        
-        return ((security != null) 
-                && 
-                (security.autho.getAccessRights(psClient, a).get(sAccessType)) 
-                && 
-                (psClient.authenticatedTimestamp != 0));
+        return ((security != null)
+                && (security.autho.getAccessRights(psClient, a).get(sAccessType))
+                && (psClient.authenticatedTimestamp != 0));
         //If security is not null and access granted and frame is < 10minutes
         //then return true
 //        return ((security != null) && (security.autho.getAccessRights(psClient, a)

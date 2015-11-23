@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * The implementation of the Authorization System
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
@@ -23,6 +24,11 @@ public class Authorizer implements IAuthorization {
     public static final String EXECUTE = "X";
     private final ISecurityStorage securityDB;
 
+    /**
+     * The class constructor
+     *
+     * @param securityDB The security storage
+     */
     public Authorizer(ISecurityStorage securityDB) {
         this.securityDB = securityDB;
     }
@@ -36,8 +42,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public boolean hasReadAccess(SystemUser u, Action a) {
-        LOGGER.debug("#Authorizer | hasReadAccess: $SystemUser "+u.toString()
-                +" $Action "+a.toString() );
+        LOGGER.debug("#Authorizer | hasReadAccess: $SystemUser " + u.toString()
+                + " $Action " + a.toString());
         //check permission form storage
         return securityDB.checkAccess(u, a, READ);
     }
@@ -51,8 +57,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public boolean hasWriteAccess(SystemUser u, Action a) {
-        LOGGER.debug("#Authorizer | hasWriteAccess: $SystemUser "+u.toString()
-                +" $Action "+a.toString() );
+        LOGGER.debug("#Authorizer | hasWriteAccess: $SystemUser " + u.toString()
+                + " $Action " + a.toString());
         //check permission form storage
         return securityDB.checkAccess(u, a, WRITE);
     }
@@ -66,8 +72,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public boolean hasExecuteAccess(SystemUser u, Action a) {
-        LOGGER.debug("#Authorizer | hasExecuteAccess: $SystemUser "+u.toString()
-                +" $Action "+a.toString() );
+        LOGGER.debug("#Authorizer | hasExecuteAccess: $SystemUser " + u.toString()
+                + " $Action " + a.toString());
         //check permission form storage
         return securityDB.checkAccess(u, a, EXECUTE);
     }
@@ -81,8 +87,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public Map<String, Boolean> getAccessRights(SystemUser u, Action a) {
-        LOGGER.debug("#Authorizer | getAccessRights: $SystemUser "+u.toString()
-                +" $Action "+a.toString() );
+        LOGGER.debug("#Authorizer | getAccessRights: $SystemUser " + u.toString()
+                + " $Action " + a.toString());
         HashMap<String, Boolean> hmRes = new HashMap<>();
 
         if (u.username.equals("root")) {

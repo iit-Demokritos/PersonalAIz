@@ -19,8 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -37,9 +37,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-/**
- * Root resource (exposed at "pserver/:credentials/personal" path)
- */
 @Path("pserver/{userAuthe}/personal/")
 @Produces(MediaType.APPLICATION_JSON)
 public class PersonalREST {
@@ -53,29 +50,24 @@ public class PersonalREST {
     private Output output = new Output();
     private final PersonalAIzConfiguration config = new PersonalAIzConfiguration();
 
-    
-     Date date = new Date();
-     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    
-    
+    Date date = new Date();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
     /**
-     * Method handling HTTP GET requests. The returned object will be sent to
-     * the client as "text/plain" media type.
+     * Add users in PServer
      *
-     * @param userAuthe
+     * @param userAuthe System user API Key or Username - pass credentials
      * @param JSONUsers
-     * @return String that will be returned as a text/plain response.
+     * @return
      */
-    //POST users/:JSONUsers | Add new users
-//    @Path("users/{JSONUsers}")
     @Path("users")
     @POST
     public String addUsers(
             @PathParam("userAuthe") String userAuthe,
             @FormParam("JSONUsers") String JSONUsers
     ) {
-        String startTime=dateFormat.format(date.getTime());
-        
+        String startTime = dateFormat.format(date.getTime());
+
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
             // Check the username - pass Credentials
@@ -153,18 +145,18 @@ public class PersonalREST {
             output.setCustomOutputMessage("Add Users Failed");
         }
 
-        String stopTime=dateFormat.format(date.getTime());
-        System.out.println("add#"+startTime+"#"+stopTime);
+        String stopTime = dateFormat.format(date.getTime());
+        LOGGER.debug("add#" + startTime + "#" + stopTime);
         return JSon.jsonize(output, Output.class);
     }
 
     /**
+     * Delete users from PServer
      *
-     * @param userAuthe
-     * @param pattern
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param pattern The username pattern. If is null then delete all users
      * @return
      */
-    //DELETE users | Delete users
     @Path("users/delete")
     @POST
     public String deleteUsers(
@@ -220,13 +212,14 @@ public class PersonalREST {
     }
 
     /**
+     * Get PServer Users
      *
-     * @param userAuthe
-     * @param pattern
-     * @param page
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param pattern The username pattern. If is null then return all the
+     * usernames.
+     * @param page The page number. If is null return results to single page.
      * @return
      */
-    //GET users | Get list with users
     @Path("users")
     @GET
     public String getUsers(
@@ -276,32 +269,28 @@ public class PersonalREST {
             pageParam = Integer.parseInt(page);
         }
 
-        HashSet<String> users = new HashSet<>(
-                personal.getUsers(pattern, pageParam));
+        Set<String> users = personal.getUsers(pattern, pageParam);
 
-        LOGGER.info("Complete Get Users");
-        output.setCustomOutputMessage("Complete Get Users");
-        output.setOutput(users);
-//        if (users.isEmpty()) {
-//            LOGGER.info("Security Authorization Failed");
-//            output.setCustomOutputMessage("Security Authorization Failed");
-//            output.setOutput(users);
-//        } else {
-//            LOGGER.info("Complete Get Users");
-//            output.setOutput(users);
-//        }
+        if (users != null) {
+            LOGGER.info("Complete Get Users");
+            output.setOutput(users);
+            output.setCustomOutputMessage("Get Users Complete");
+        } else {
+            LOGGER.info("Failed Get Users");
+            output.setCustomOutputMessage("Get Users Failed");
+        }
 
         return JSon.jsonize(output, Output.class);
     }
 
     /**
+     * Set user attributes
      *
-     * @param userAuthe
-     * @param user
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param user The username
      * @param JSONUserAttributes {"gender":"male","age": "18"}
      * @return
      */
-    //PUT users/:User/attributes/:JSONUserAttributes | Set user’s attributes
     @Path("users/{user}/attributes")
     @PUT
     public String setUserAttributes(
@@ -361,13 +350,13 @@ public class PersonalREST {
     }
 
     /**
+     * Set user features
      *
-     * @param userAuthe
-     * @param user
-     * @param JSONUserFeatures
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param user The username
+     * @param JSONUserFeatures A json with user feature name - value
      * @return
      */
-    //PUT users/:User/features/:JSONUserFeatures | Set user’s features
     @Path("users/{user}/features")
     @PUT
     public String setUserFeatures(
@@ -427,13 +416,13 @@ public class PersonalREST {
     }
 
     /**
+     * Modify user features
      *
-     * @param userAuthe
-     * @param user
-     * @param JSONUserFeatures
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param user The username
+     * @param JSONUserFeatures A json with user feature name - value
      * @return
      */
-    //PUT users/:User/features/modify/:JSONUserFeatures | Modify (increase/decrease) user’s feature
     @Path("users/{user}/features/modify")
     @PUT
     public String modifyUserFeatures(
@@ -441,7 +430,7 @@ public class PersonalREST {
             @PathParam("user") String user,
             @FormParam("JSONUserFeatures") String JSONUserFeatures
     ) {
-        String startTime=dateFormat.format(date.getTime());
+        String startTime = dateFormat.format(date.getTime());
 
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
@@ -490,20 +479,21 @@ public class PersonalREST {
             output.setCustomOutputMessage("Modify User Features Failed");
         }
 
-        String stopTime=dateFormat.format(date.getTime());
-        System.out.println("modify#"+startTime+"#"+stopTime);
+        String stopTime = dateFormat.format(date.getTime());
+        LOGGER.debug("modify#" + startTime + "#" + stopTime);
         return JSon.jsonize(output, Output.class);
     }
 
     /**
+     * Get user profile. A map with user feature names - value
      *
-     * @param userAuthe
-     * @param user
-     * @param pattern
-     * @param page
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param user The username
+     * @param pattern The feature name pattern. If is null return all the
+     * features
+     * @param page The page number. If is null return results to single page
      * @return
      */
-    //GET users/:User/features | Get user’s profile
     @Path("users/{user}/features")
     @GET
     public String getUserProfile(
@@ -512,7 +502,7 @@ public class PersonalREST {
             @FormParam("pattern") String pattern,
             @FormParam("page") String page
     ) {
-        String startTime=dateFormat.format(date.getTime());
+        String startTime = dateFormat.format(date.getTime());
 
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
@@ -555,31 +545,32 @@ public class PersonalREST {
             pageParam = Integer.parseInt(page);
         }
 
-        try {
-            HashMap<String, String> userProfile = new HashMap<>(
-                    personal.getUserFeatures(user, pattern, pageParam));
+        Map<String, String> userProfile = personal.getUserFeatures(user, pattern, pageParam);
+
+        if (userProfile != null) {
             LOGGER.info("Complete Get User Profile");
-            output.setCustomOutputMessage("Complete Get User Profile");
             output.setOutput(userProfile);
-        } catch (Exception e) {
+            output.setCustomOutputMessage("Complete Get User Profile");
+        } else {
             LOGGER.info("User not exist");
             output.setCustomOutputMessage("User not exist");
         }
 
-        String stopTime=dateFormat.format(date.getTime());
-        System.out.println("get#"+startTime+"#"+stopTime);
+        String stopTime = dateFormat.format(date.getTime());
+        LOGGER.debug("get#" + startTime + "#" + stopTime);
         return JSon.jsonize(output, Output.class);
     }
 
     /**
+     * Get User Attributes
      *
-     * @param userAuthe
-     * @param user
-     * @param pattern
-     * @param page
+     * @param userAuthe System user API Key or Username - pass credentials
+     * @param user The username
+     * @param pattern The attribute name pattern. If is null return all the
+     * attributes
+     * @param page The page number. If is null return the results in single page
      * @return
      */
-    //GET users/:User/attributes | Get user’s attributes
     @Path("users/{user}/attributes")
     @GET
     public String getUserAttributes(
@@ -630,12 +621,16 @@ public class PersonalREST {
             pageParam = Integer.parseInt(page);
         }
 
-        HashMap<String, String> userAttributes = new HashMap<>(
-                personal.getUserAttributes(user, pattern, pageParam));
+        Map<String, String> userAttributes = personal.getUserAttributes(user, pattern, pageParam);
 
-        LOGGER.info("Complete Get User Attributes");
-        output.setCustomOutputMessage("Complete Get User Attributes");
-        output.setOutput(userAttributes);
+        if (userAttributes != null) {
+            LOGGER.info("Complete Get User Attributes");
+            output.setOutput(userAttributes);
+            output.setCustomOutputMessage("Complete Get User Attributes");
+        } else {
+            LOGGER.info("Failed Get User Attributes");
+            output.setCustomOutputMessage("Get User Attributes Failed");
+        }
 
         return JSon.jsonize(output, Output.class);
     }

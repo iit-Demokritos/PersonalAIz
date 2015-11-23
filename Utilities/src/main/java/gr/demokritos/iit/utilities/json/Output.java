@@ -7,7 +7,6 @@ package gr.demokritos.iit.utilities.json;
 
 import gr.demokritos.iit.utilities.utils.Utilities;
 
-
 /**
  * This class creates an Output object to help us jsonize the PServer output
  *

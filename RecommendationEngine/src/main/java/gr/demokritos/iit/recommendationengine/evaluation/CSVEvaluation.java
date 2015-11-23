@@ -11,11 +11,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * NOT WORKING CLASS
+ * NOT WORKING CLASS 
+ * Implements the evaluation with csv file storage system
+ *
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
 public class CSVEvaluation implements IEvaluation {
 
+    /**
+     * Store a evaluation entry on HBsase
+     *
+     * @param username The username
+     * @param objectId The feed object id
+     * @param recommended The flag if the object is recommended
+     * @param timestamp The Feed timestamp
+     * @param clientName The client name
+     */
     @Override
     public void storeEntry(String username, String objectId,
             boolean recommended, long timestamp, String clientName) {
@@ -25,7 +36,6 @@ public class CSVEvaluation implements IEvaluation {
                 + recommended + ":" + timestamp;
         PrintWriter pw = null;
 
-        
         File eFile = new File("evaluation_records.csv");
         try {
 

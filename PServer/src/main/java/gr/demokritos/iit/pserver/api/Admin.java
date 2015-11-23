@@ -52,6 +52,12 @@ public class Admin {
         this.security = security;
     }
 
+    /**
+     * Initialize the platform if not exist any client
+     *
+     * @param password The password for the root user
+     * @return The success status of this method
+     */
     public boolean initPlatform(String password) {
 
         Set<String> clients = dbAdmin.getClients();
@@ -188,7 +194,7 @@ public class Admin {
     }
 
     /**
-     * Get PServer settings
+     * Get platform settings
      *
      * @return Return a map with PServer settings. If return is null then
      * permission denied
@@ -208,7 +214,7 @@ public class Admin {
     }
 
     /**
-     * Set PServer settings
+     * Set platform settings
      *
      * @param settings A map with settings to update
      * @return the status of this action
@@ -229,10 +235,10 @@ public class Admin {
     }
 
     /**
-     * Set PServer setting
+     * Set a single platform setting
      *
-     * @param name
-     * @param value
+     * @param name The setting name
+     * @param value The setting value
      * @return the status of this action
      */
     public boolean setSetting(String name, String value) {
