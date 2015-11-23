@@ -75,7 +75,7 @@ public class Scheduler {
         this.warehouseScenario1 = new CSVStoreResults("scenario1_"
                 + requestPerMinute + "_" + batch);
         this.warehouseScenario2 = new CSVStoreResults("scenario2_"
-                + requestPerMinute + "_" + batch + "_" + scenario2GetPropability);
+                + requestPerMinute + "_" + batch+ "_" +getPointer+ "-" +fromPointer);
     }
 
     /**

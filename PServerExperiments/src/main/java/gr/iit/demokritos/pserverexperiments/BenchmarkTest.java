@@ -30,14 +30,14 @@ public class BenchmarkTest {
         ILoadDataset dataset = new MovieLens1M(LOGGER);
         IStroreResults warehouse;
         Scheduler scheduler;
-        String scenario2GetPropability = "1/10";
+        String scenario2GetPropability = "8/10";
 
         //----------------------------------------------------------------------
         //Create scheduler no limit on request / min
         LOGGER.info("#Create scheduler with 2 request/min: "
                 + dateFormat.format(date.getTime()));
 
-        scheduler = new Scheduler(dataset,0, scenario2GetPropability, LOGGER, 20);
+        scheduler = new Scheduler(dataset,0, scenario2GetPropability, LOGGER, 40);
         //execute senario 1
         LOGGER.info("#Execute Scenario 1: "
                 + dateFormat.format(date.getTime()));
