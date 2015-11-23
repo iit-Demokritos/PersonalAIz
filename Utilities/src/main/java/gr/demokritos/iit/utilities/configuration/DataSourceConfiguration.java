@@ -11,14 +11,12 @@ package gr.demokritos.iit.utilities.configuration;
  */
 public class DataSourceConfiguration extends Configuration{
     
-     public static String DATASOURCE_PROPERTIES = "DataSource.properties";
-    
+    public DataSourceConfiguration(String configurationFileName) {
+        CONFIGURATION_FILE_NAME=configurationFileName;
+    }
 
     public DataSourceConfiguration() {
-        super(DATASOURCE_PROPERTIES);
     }
-    
-    
     
     /**
      * Get logging level

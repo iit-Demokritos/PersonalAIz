@@ -7,13 +7,10 @@ package gr.demokritos.iit.recommendationengine.api;
 
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.recommendationengine.onologies.FeedObject;
-import gr.demokritos.iit.security.SecurityLayer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,7 +42,6 @@ public class RecommendationEngineTest {
     @After
     public void tearDown() {
     }
-
 
     /**
      * Test all Recommendation module

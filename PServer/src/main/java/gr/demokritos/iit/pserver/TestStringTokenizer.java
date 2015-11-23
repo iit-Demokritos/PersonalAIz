@@ -6,6 +6,7 @@
 package gr.demokritos.iit.pserver;
 
 import gr.demokritos.iit.pserver.storage.FilterListObject;
+import gr.demokritos.iit.utilities.configuration.PersonalAIzHBaseConfiguration;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -198,7 +199,8 @@ public class TestStringTokenizer {
         }
 
         System.out.println(currentState.toString());
-        Configuration config = HBaseConfiguration.create();
+//        Configuration config = HBaseConfiguration.create();
+        Configuration config=new PersonalAIzHBaseConfiguration().getHBaseConfig();
         String table_Users = "Users";
 
         //Create clients table

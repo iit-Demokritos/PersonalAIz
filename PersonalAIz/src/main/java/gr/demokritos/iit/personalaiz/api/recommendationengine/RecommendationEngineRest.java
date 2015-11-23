@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * Implements the REST API to expose the recommendation engine module
  *
@@ -57,6 +58,10 @@ public class RecommendationEngineRest {
             @PathParam("username") String username,
             @FormParam("JSONUser") String JSONUser
     ) {
+
+        LOGGER.debug("#addUser | userAuthe: " + userAuthe
+                + " username: " + username
+                + " JSONUser: " + JSONUser);
 
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
@@ -143,6 +148,9 @@ public class RecommendationEngineRest {
             @PathParam("username") String username
     ) {
 
+        LOGGER.debug("#deleteUser | userAuthe: " + userAuthe
+                + " username: " + username);
+
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
             // Check the username - pass Credentials
@@ -205,6 +213,10 @@ public class RecommendationEngineRest {
             @PathParam("username") String username,
             @FormParam("JSONObject") String JSONObject
     ) {
+
+        LOGGER.debug("#feed | userAuthe: " + userAuthe
+                + " username: " + username
+                + " JSONObject: " + JSONObject);
 
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
@@ -280,6 +292,10 @@ public class RecommendationEngineRest {
             @PathParam("username") String username,
             @FormParam("JSONObjectList") String JSONObjectList
     ) {
+
+        LOGGER.debug("#getRecommendation | userAuthe: " + userAuthe
+                + " username: " + username
+                + " JSONObjectList: " + JSONObjectList);
 
         //Check if user Authentication is with username pass or api key
         if (userAuthe.contains("|")) {
@@ -392,6 +408,8 @@ public class RecommendationEngineRest {
             LOGGER.info("Failed get recommendation");
             output.setCustomOutputMessage("Get recommendation Failed");
         }
+        
+        LOGGER.debug("#getRecommendation | recommendations: " + recommendations);
 
         return JSon.jsonize(output, Output.class);
     }

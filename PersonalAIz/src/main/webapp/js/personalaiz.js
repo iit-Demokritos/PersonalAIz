@@ -5,13 +5,12 @@
  */
 var host = "http://localhost:8080/";
 //var host = "http://gsoft.gr:8080/";
-var userAuthe = "root|root";
 
 $(document).ready(function () {
 
     $("#loginForm").submit(function (event) {
 
-        var url = host + "PersonalAIz/api/security/" + userAuthe + "/check/credentials";
+        var url = host + "PersonalAIz/api/security/check/credentials";
         var username = $("#inputUsername").val();
         var password = $("#inputPassword").val();
         event.preventDefault();
@@ -23,6 +22,7 @@ $(document).ready(function () {
                     } else {
                         window.sessionStorage.setItem("PersonalAIz.Access", true);
                         window.sessionStorage.setItem("PersonalAIz.Username", username);
+                        window.sessionStorage.setItem("PersonalAIz.Password", password);
                         window.location.replace("dashboard.html");
                     }
                 });
@@ -69,6 +69,7 @@ function dashboardLoad() {
 function logout() {
     window.sessionStorage.setItem("PersonalAIz.Access", false);
     window.sessionStorage.setItem("PersonalAIz.Username", "");
+    window.sessionStorage.setItem("PersonalAIz.Password", "");
     window.location.replace("index.html");
 }
 
@@ -77,7 +78,9 @@ function addClient() {
     var ClientName = $("#inputClientName").val();
     var Password = $("#inputClientPassword").val();
     var RePassword = $("#inputClientRPassword").val();
-
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+            + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
+    
     if (Password === RePassword &&
             (ClientName !== "" &&
                     Password !== "")) {
@@ -99,6 +102,9 @@ function addClient() {
 }
 
 function getClients() {
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+            + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
+    
     var url = host + "PersonalAIz/api/pserver/" + userAuthe + "/admin/clients";
     $.get(url).done(function (data) {
         $("#clientsTable").html("");
@@ -119,6 +125,8 @@ function getClients() {
 }
 
 function deleteClient(clientname) {
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+            + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
 
     var url = host + "PersonalAIz/api/pserver/" + userAuthe +
             "/admin/client/delete/" + clientname;
@@ -131,6 +139,8 @@ function deleteClient(clientname) {
 
 
 function getSettings() {
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+            + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
 
     var url = host + "PersonalAIz/api/pserver/" + userAuthe + "/admin/settings";
     $.get(url).done(function (data) {
@@ -149,6 +159,9 @@ function getSettings() {
 }
 
 function setSetting() {
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+            + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
+    
     var url = host + "PersonalAIz/api/pserver/" + userAuthe + "/admin/setting";
 
     var settingName = $("#inputSettingName").val();

@@ -5,6 +5,7 @@
  */
 package gr.demokritos.iit.security.authorization;
 
+import static gr.demokritos.iit.security.SecurityLayer.LOGGER;
 import gr.demokritos.iit.security.interfaces.IAuthorization;
 import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 import gr.demokritos.iit.security.ontologies.SystemUser;
@@ -35,6 +36,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public boolean hasReadAccess(SystemUser u, Action a) {
+        LOGGER.debug("#Authorizer | hasReadAccess: $SystemUser "+u.toString()
+                +" $Action "+a.toString() );
         //check permission form storage
         return securityDB.checkAccess(u, a, READ);
     }
@@ -48,6 +51,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public boolean hasWriteAccess(SystemUser u, Action a) {
+        LOGGER.debug("#Authorizer | hasWriteAccess: $SystemUser "+u.toString()
+                +" $Action "+a.toString() );
         //check permission form storage
         return securityDB.checkAccess(u, a, WRITE);
     }
@@ -61,6 +66,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public boolean hasExecuteAccess(SystemUser u, Action a) {
+        LOGGER.debug("#Authorizer | hasExecuteAccess: $SystemUser "+u.toString()
+                +" $Action "+a.toString() );
         //check permission form storage
         return securityDB.checkAccess(u, a, EXECUTE);
     }
@@ -74,6 +81,8 @@ public class Authorizer implements IAuthorization {
      */
     @Override
     public Map<String, Boolean> getAccessRights(SystemUser u, Action a) {
+        LOGGER.debug("#Authorizer | getAccessRights: $SystemUser "+u.toString()
+                +" $Action "+a.toString() );
         HashMap<String, Boolean> hmRes = new HashMap<>();
 
         if (u.username.equals("root")) {

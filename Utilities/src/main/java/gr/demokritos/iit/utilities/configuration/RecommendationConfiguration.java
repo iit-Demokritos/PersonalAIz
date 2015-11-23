@@ -14,14 +14,11 @@ import java.util.Map;
  */
 public class RecommendationConfiguration extends Configuration {
 
-    public static String RECOMMENDATIon_PROPERTIES = "Recommendation.properties";
-
     public RecommendationConfiguration(String configurationFileName) {
-        super(configurationFileName);
+        CONFIGURATION_FILE_NAME=configurationFileName;
     }
     
     public RecommendationConfiguration(){
-        super(RECOMMENDATIon_PROPERTIES);
     }
     
     

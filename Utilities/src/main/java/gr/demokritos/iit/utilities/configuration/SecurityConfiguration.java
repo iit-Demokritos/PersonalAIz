@@ -9,14 +9,15 @@ package gr.demokritos.iit.utilities.configuration;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-public class PServerConfiguration extends Configuration {
+public class SecurityConfiguration extends Configuration {
 
-    public PServerConfiguration(String configurationFileName) {
-       CONFIGURATION_FILE_NAME=configurationFileName;
+    public SecurityConfiguration(String configurationFileName) {
+        CONFIGURATION_FILE_NAME=configurationFileName;
     }
-    public PServerConfiguration() {
+    
+    public SecurityConfiguration(){
     }
-
+    
     /**
      * Get logging level
      *
@@ -27,9 +28,5 @@ public class PServerConfiguration extends Configuration {
         //Return the logging level
         return properties.getProperty("LogLevel", "info");
     }
-
-//    public String getPropertyName() {
-//        return properties.getProperty("PropertyName");
-//    }
 
 }

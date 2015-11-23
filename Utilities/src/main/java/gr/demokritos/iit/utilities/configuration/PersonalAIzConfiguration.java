@@ -11,13 +11,10 @@ package gr.demokritos.iit.utilities.configuration;
  */
 public class PersonalAIzConfiguration extends Configuration {
 
-    public static String PERSONALAIZ_PROPERTIES = "PersonalAIz.properties";
-
     public PersonalAIzConfiguration(String configurationFileName) {
-        super(configurationFileName);
+         CONFIGURATION_FILE_NAME=configurationFileName;
     }
     public PersonalAIzConfiguration() {
-        super(PERSONALAIZ_PROPERTIES);
     }
 
     
@@ -28,15 +25,7 @@ public class PersonalAIzConfiguration extends Configuration {
      */
     public String getLogLevel() {
         //Default logging level is Info
-        String logLevel="info";
-        
-        //If debug mode is true
-        if(Boolean.parseBoolean(super.properties.getProperty("LogLevel"))){
-            //set logging level as debug
-            logLevel="debug";
-        }
-        
         //Return the logging level
-        return logLevel;
+        return properties.getProperty("LogLevel", "info");
     }
 }

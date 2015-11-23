@@ -85,4 +85,18 @@ public class SystemUser {
         return password.equals(givenPassword);
     }
 
+    
+    /**
+     * 
+     * @return 
+     */
+    //TODO: javadoc
+    @Override
+    public String toString() {
+        return "SystemUser{" + "info=" + info + ", roles=" + roles 
+                + ", username=" + username 
+                + ", authenticatedTimestamp=" + authenticatedTimestamp 
+                + ", password=" + password + '}';
+    }
+
 }

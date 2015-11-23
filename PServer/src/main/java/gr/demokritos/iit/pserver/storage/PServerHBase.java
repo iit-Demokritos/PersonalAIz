@@ -11,6 +11,7 @@ import gr.demokritos.iit.pserver.storage.interfaces.IAdminStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.ICommunityStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IPersonalStorage;
 import gr.demokritos.iit.pserver.storage.interfaces.IStereotypeStorage;
+import gr.demokritos.iit.utilities.configuration.PersonalAIzHBaseConfiguration;
 import gr.demokritos.iit.utilities.utils.Utilities;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -22,7 +23,6 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
@@ -79,11 +79,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      */
     public PServerHBase() {
         //Create new HBase configuration
-        config = HBaseConfiguration.create();
-        //FIXME: enable remote HBase before deployed build
-//        config.set("hbase.master", "master:60000");
-//        config.set("hbase.zookeeper.quorum", "master"); 
-//        config.set("hbase.zookeeper.property.clientPort", "2181");
+        config = new PersonalAIzHBaseConfiguration().getHBaseConfig();
     }
 
     //=================== Personal Mode =======================================
@@ -297,6 +293,14 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         HTable clientsTable = null;
         HashMap<String, String> usersForDelete;
 
+        //get all users basic on pattern
+        usersForDelete = new HashMap<>(getUsers(pattern, null, clientName));
+
+        if (usersForDelete.isEmpty()) {
+            LOGGER.error("#deleteUses | no users to delete");
+            return false;
+        }
+
         try {
 
             // Create an hbase users table object
@@ -308,9 +312,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             LOGGER.error("Can't load usersTable or clientsTable", ex);
             return false;
         }
-
-        //get all users basic on pattern
-        usersForDelete = new HashMap<>(getUsers(pattern, null, clientName));
 
         // Delete users form the client table
         Delete clientUsersDelete = new Delete(
@@ -332,7 +333,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             }
 
             //add delete column record for the current user
-            clientUsersDelete.deleteColumn(family_ClientUsers, 
+            clientUsersDelete.deleteColumn(family_ClientUsers,
                     Bytes.toBytes(cUserName));
         }
 
@@ -974,9 +975,8 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             }
 
             //add delete column record for the current stereotype
-            clientStereotypesDelete.deleteColumn(family_Stereotypes, 
+            clientStereotypesDelete.deleteColumn(family_Stereotypes,
                     Bytes.toBytes(cSterName));
-
 
             for (String cUser : users) {
 
@@ -1496,7 +1496,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
      */
     @Override
     public boolean deleteStereotypeFeatures(String stereotypeName, String pattern, String clientName) {
-  
 
         //Get stereotype UID
         String stereotypeUID = getStereotypeUID(stereotypeName, clientName);
@@ -1505,7 +1504,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             LOGGER.error("Stereotype name:" + stereotypeName + " not exists");
             return false;
         }
-        
+
         boolean status = true;
         HTable stereotypeTable = null;
         HashMap<String, String> featuresForDelete;

@@ -5,18 +5,18 @@
  */
 package gr.demokritos.iit.security.storage;
 
+import static gr.demokritos.iit.security.SecurityLayer.LOGGER;
 import gr.demokritos.iit.security.authorization.Action;
 import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 import gr.demokritos.iit.security.ontologies.SystemUser;
+import gr.demokritos.iit.utilities.configuration.PersonalAIzHBaseConfiguration;
 import java.io.IOException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class implement the Security Apache HBase storage system.
@@ -43,18 +43,13 @@ public class SecurityHBase implements ISecurityStorage {
     //=================== HBase Qualifiers ====================================
 
     private final Configuration config;
-    public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SecurityHBase.class);
 
     /**
      * The constructor of Security HBase storage system.
      */
     public SecurityHBase() {
         //Create new HBase configuration
-        config = HBaseConfiguration.create();
-        //FIXME: enable remote HBase before deployed build
-//        config.set("hbase.master", "master:60000");
-//        config.set("hbase.zookeeper.quorum", "master"); 
-//        config.set("hbase.zookeeper.property.clientPort", "2181");
+        config = new PersonalAIzHBaseConfiguration().getHBaseConfig();
     }
 
     //========================== Authentication ================================
@@ -98,7 +93,8 @@ public class SecurityHBase implements ISecurityStorage {
                 }
             }
         } catch (IOException ex) {
-            LOGGER.error("Error on checkCredentials", ex);
+            LOGGER.error("#SecurityHBase | checkCredentials: "
+                    + "Error on checkCredentials un: " + username + " pw: " + password, ex);
         }
         return access;
     }
@@ -137,7 +133,8 @@ public class SecurityHBase implements ISecurityStorage {
                 }
             }
         } catch (IOException ex) {
-            LOGGER.error("Error on checkCredentials", ex);
+            LOGGER.error("#SecurityHBase | checkCredentials: "
+                    + "Error on checkCredentials APIKey: " + apikey, ex);
         }
 
         return access;
@@ -155,8 +152,10 @@ public class SecurityHBase implements ISecurityStorage {
     @Override
     public boolean checkAccess(SystemUser u, Action a, String Access) {
 
-        //FIXME: checkAccess Implement read from HBase and return the status
-        return true;
+        LOGGER.debug("#SecurityHBase | checkAccess: $systemUser"
+                + u.toString() + " $Action " + a.toString() + " $Access " + Access);
+        //TODO: checkAccess Implement read from HBase and return the status
+        return false;
     }
 
 }

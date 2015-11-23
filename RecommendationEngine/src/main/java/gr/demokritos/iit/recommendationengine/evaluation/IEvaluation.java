@@ -11,6 +11,7 @@ package gr.demokritos.iit.recommendationengine.evaluation;
  */
 public interface IEvaluation {
 
-    void storeEntry(String username, String objectId, boolean recommended, long timestamp);
+    
+    void storeEntry(String username, String objectId, boolean recommended, long timestamp, String clientName);
 
 }
