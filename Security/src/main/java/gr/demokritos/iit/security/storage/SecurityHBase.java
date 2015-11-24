@@ -11,6 +11,9 @@ import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 import gr.demokritos.iit.security.ontologies.SystemUser;
 import gr.demokritos.iit.utilities.configuration.PersonalAIzHBaseConfiguration;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.HTable;
@@ -155,7 +158,15 @@ public class SecurityHBase implements ISecurityStorage {
         LOGGER.debug("#SecurityHBase | checkAccess: $systemUser"
                 + u.toString() + " $Action " + a.toString() + " $Access " + Access);
         //TODO: Implement access read from HBase and return the status. Now return false
-        return false;
+
+        Set<String> adminActions = new HashSet<>();
+        adminActions.add("Admin.AddClient");
+        adminActions.add("Admin.DeleteClient");
+        adminActions.add("Admin.GetClients");
+        adminActions.add("Admin.setClientRoles");
+        adminActions.add("Admin.GetSettings");
+        adminActions.add("Admin.SetSettings");
+        return !adminActions.contains(a.getName());
     }
 
 }

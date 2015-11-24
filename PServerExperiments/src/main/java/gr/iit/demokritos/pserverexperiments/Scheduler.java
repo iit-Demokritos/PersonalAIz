@@ -11,7 +11,6 @@ import gr.iit.demokritos.pserverexperiments.warehouse.CSVStoreResults;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,13 +73,17 @@ public class Scheduler {
         this.warehouseScenario1 = new CSVStoreResults("scenario1_"
                 + requestPerMinute + "_" + batch);
         this.warehouseScenario2 = new CSVStoreResults("scenario2_"
-                + requestPerMinute + "_" + batch+ "_" +getPointer+ "-" +fromPointer);
+                + requestPerMinute + "_" + batch + "_" + getPointer + "-" + fromPointer);
     }
 
     /**
      * Scenario 1: Add users, Modify Users Profile, Get users profile.
      */
     public void executeScenario1() {
+
+        long startAddUsers, endAddUsers,
+                startModifyUsers, endModifyUsers,
+                startGetUserProfiles, endGetUserProfiles;
 
         //Create executor service with a thread pool with all available processors
         ExecutorService addUsersEx = Executors.newFixedThreadPool(
@@ -103,9 +106,10 @@ public class Scheduler {
                         new ArrayList<String>());
 
         //Add users 
+        startAddUsers = System.currentTimeMillis();
         LOGGER.info("#Start Add Users: "
-                + dateFormat.format(System.currentTimeMillis()));
-        addUserResultTimes.add("#Start Add Users:" + System.currentTimeMillis());
+                + dateFormat.format(startAddUsers));
+        addUserResultTimes.add("#Start Add Users:" + startAddUsers);
 
         int requestCounter = 1;
         int batchCounter = 0;
@@ -136,15 +140,17 @@ public class Scheduler {
                         } catch (Exception ex) {
                             LOGGER.error("Add Users Failed", ex);
                         }
-                        System.out.println("scenario1::"
-                                + "adduser::"
-                                + startTime + "::"
-                                + endTime);
+//                        System.out.println("scenario1::"
+//                                + "adduser::"
+//                                + startTime + "::"
+//                                + endTime + "::"
+//                                + ((endTime - startTime) / 1000));
                         synchronized (addUserResultTimes) {
                             addUserResultTimes.add("scenario1::"
                                     + "adduser::"
                                     + startTime + "::"
-                                    + endTime);
+                                    + endTime + "::"
+                                    + ((endTime - startTime) / 1000));
                         }
 
                     }
@@ -173,7 +179,7 @@ public class Scheduler {
             requestCounter++;
 
 //            //DEBUG LINES
-//            if (addUsersCount == 25) {
+//            if (requestCounter > 100) {
 //                break;
 //            }
         }
@@ -193,7 +199,8 @@ public class Scheduler {
             addUserResultTimes.add("scenario1::"
                     + "adduser::"
                     + startTime + "::"
-                    + endTime);
+                    + endTime + "::"
+                    + ((endTime - startTime) / 1000));
         }
 
         //Shutdown threads
@@ -205,18 +212,24 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        endAddUsers = System.currentTimeMillis();
         LOGGER.info("#End Add Users: "
-                + dateFormat.format(System.currentTimeMillis()));
+                + dateFormat.format(endAddUsers));
         //Add End time of this phase
-        addUserResultTimes.add("#End Add Users:" + System.currentTimeMillis());
+        addUserResultTimes.add("#End Add Users:" + endAddUsers);
+        addUserResultTimes.add("#Duration Add Users:"
+                + ((endAddUsers - startAddUsers) / 1000)+" sec");
+        System.out.println("#Duration Add Users:"
+                + ((endAddUsers - startAddUsers) / 1000)+" sec");
         //Store results for add user
         warehouseScenario1.storeData(addUserResultTimes);
 
         //----------------------------------------------------------------------
         //Modify users profile
+        startModifyUsers = System.currentTimeMillis();
         LOGGER.info("#Start Modify Users Profile: "
-                + dateFormat.format(System.currentTimeMillis()));
-        modifyUserResultTimes.add("#Start Modify Users Profile:" + System.currentTimeMillis());
+                + dateFormat.format(startModifyUsers));
+        modifyUserResultTimes.add("#Start Modify Users Profile:" + startModifyUsers);
 
         requestCounter = 1;
         while (dataset.userModificationHasNext()) {
@@ -243,15 +256,17 @@ public class Scheduler {
                         LOGGER.error("Modify Users Failed", ex);
                     }
 
-                    System.out.println("scenario1::"
-                            + "modifyuser::"
-                            + startTime + "::"
-                            + endTime);
+//                    System.out.println("scenario1::"
+//                            + "modifyuser::"
+//                            + startTime + "::"
+//                            + endTime + "::"
+//                            + ((endTime - startTime) / 1000));
                     synchronized (modifyUserResultTimes) {
                         modifyUserResultTimes.add("scenario1::"
                                 + "modifyuser::"
                                 + startTime + "::"
-                                + endTime);
+                                + endTime + "::"
+                                + ((endTime - startTime) / 1000));
                     }
                 }
             });
@@ -270,7 +285,7 @@ public class Scheduler {
             requestCounter++;
 
 //            //DEBUG LINES
-//            if (userMofificationsCounter > 50) {
+//            if (requestCounter > 300) {
 //                break;
 //            }
         }
@@ -284,17 +299,23 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        endModifyUsers = System.currentTimeMillis();
         LOGGER.info("#End Modify Users Profile: "
-                + dateFormat.format(System.currentTimeMillis()));
+                + dateFormat.format(endModifyUsers));
         //Add end time of Modify users and store times
-        modifyUserResultTimes.add("#End Modify Users Profile:" + System.currentTimeMillis());
+        modifyUserResultTimes.add("#End Modify Users Profile:" + endModifyUsers);
+        modifyUserResultTimes.add("#Duration Modify Users Profile:"
+                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
+        System.out.println("#Duration Modify Users Profile:"
+                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
         warehouseScenario1.storeData(modifyUserResultTimes);
 
         //----------------------------------------------------------------------
         //Get users profile
+        startGetUserProfiles = System.currentTimeMillis();
         LOGGER.info("#Start Get Users Profile: "
-                + dateFormat.format(System.currentTimeMillis()));
-        getUserResultTimes.add("#Start Get Users Profile: " + System.currentTimeMillis());
+                + dateFormat.format(startGetUserProfiles));
+        getUserResultTimes.add("#Start Get Users Profile: " + startGetUserProfiles);
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
@@ -320,15 +341,17 @@ public class Scheduler {
                         LOGGER.error("Get Users Failed", ex);
                     }
 
-                    System.out.println("scenario1::"
-                            + "getuser::"
-                            + startTime + "::"
-                            + endTime);
+//                    System.out.println("scenario1::"
+//                            + "getuser::"
+//                            + startTime + "::"
+//                            + endTime + "::"
+//                            + ((endTime - startTime) / 1000));
                     synchronized (getUserResultTimes) {
                         getUserResultTimes.add("scenario1::"
                                 + "getuser::"
                                 + startTime + "::"
-                                + endTime);
+                                + endTime + "::"
+                                + ((endTime - startTime) / 1000));
                     }
                 }
             });
@@ -354,7 +377,7 @@ public class Scheduler {
             requestCounter++;
 
 //            //DEBUG LINES
-//            if (getUsersCounter > 25) {
+//            if (requestCounter > 300) {
 //                break;
 //            }
         }
@@ -368,10 +391,15 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        endGetUserProfiles = System.currentTimeMillis();
         LOGGER.info("#End Get Users Profile: "
-                + dateFormat.format(System.currentTimeMillis()));
+                + dateFormat.format(endGetUserProfiles));
         //Add end time of get users profile and store times
-        getUserResultTimes.add("#End Get Users Profile:" + System.currentTimeMillis());
+        getUserResultTimes.add("#End Get Users Profile:" + endGetUserProfiles);
+        getUserResultTimes.add("#Duration Get Users Profile:"
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
+        System.out.println("#Duration Get Users Profile:"
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
         warehouseScenario1.storeData(getUserResultTimes);
 
     }
@@ -381,6 +409,10 @@ public class Scheduler {
      * possibility, Get Users profile.
      */
     public void executeScenario2() {
+
+        long startAddUsers, endAddUsers,
+                startModifyUsers, endModifyUsers,
+                startGetUserProfiles, endGetUserProfiles;
 
         //Create executor service with a thread pool with all available processors
         ExecutorService addUsersEx = Executors.newFixedThreadPool(
@@ -403,9 +435,10 @@ public class Scheduler {
                         new ArrayList<String>());
 
         //Add users 
+        startAddUsers = System.currentTimeMillis();
         LOGGER.info("#Start Add Users: "
-                + dateFormat.format(System.currentTimeMillis()));
-        addUserResultTimes.add("#Start Add Users:" + System.currentTimeMillis());
+                + dateFormat.format(startAddUsers));
+        addUserResultTimes.add("#Start Add Users:" + startAddUsers);
 
         int requestCounter = 1;
         int batchCounter = 0;
@@ -437,15 +470,17 @@ public class Scheduler {
                         } catch (Exception ex) {
                             LOGGER.error("Add Users Failed", ex);
                         }
-                        System.out.println("scenario2::"
-                                + "adduser::"
-                                + startTime + "::"
-                                + endTime);
+//                        System.out.println("scenario2::"
+//                                + "adduser::"
+//                                + startTime + "::"
+//                                + endTime + "::"
+//                                + ((endTime - startTime) / 1000));
                         synchronized (addUserResultTimes) {
                             addUserResultTimes.add("scenario2::"
                                     + "adduser::"
                                     + startTime + "::"
-                                    + endTime);
+                                    + endTime + "::"
+                                    + ((endTime - startTime) / 1000));
                         }
 
                     }
@@ -475,7 +510,7 @@ public class Scheduler {
             requestCounter++;
 
 //            //DEBUG LINES
-//            if (addUsersCount == 25) {
+//            if (requestCounter > 50) {
 //                break;
 //            }
         }
@@ -495,7 +530,8 @@ public class Scheduler {
             addUserResultTimes.add("scenario2::"
                     + "adduser::"
                     + startTime + "::"
-                    + endTime);
+                    + endTime + "::"
+                    + ((endTime - startTime) / 1000));
         }
 
         //Shutdown threads
@@ -507,18 +543,24 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        endAddUsers = System.currentTimeMillis();
         LOGGER.info("#End Add Users: "
-                + dateFormat.format(System.currentTimeMillis()));
+                + dateFormat.format(endAddUsers));
         //Add End time of this phase
-        addUserResultTimes.add("#End Add Users:" + System.currentTimeMillis());
+        addUserResultTimes.add("#End Add Users:" + endAddUsers);
+        addUserResultTimes.add("#Duration Add Users:"
+                + ((endAddUsers - startAddUsers) / 1000)+" sec");
+        System.out.println("#Duration Add Users:"
+                + ((endAddUsers - startAddUsers) / 1000)+" sec");
         //Store results for add user
         warehouseScenario2.storeData(addUserResultTimes);
 
         //----------------------------------------------------------------------
         //Modify users profile
+        startModifyUsers = System.currentTimeMillis();
         LOGGER.info("#Start Modify Users Profile with probability to get user: "
-                + dateFormat.format(System.currentTimeMillis()));
-        modifyUserResultTimes.add("#Start Modify Users Profile:" + System.currentTimeMillis());
+                + dateFormat.format(startModifyUsers));
+        modifyUserResultTimes.add("#Start Modify Users Profile:" + startModifyUsers);
 
         requestCounter = 1;
 
@@ -548,15 +590,17 @@ public class Scheduler {
                         } catch (Exception ex) {
                             LOGGER.error("Get Users Failed", ex);
                         }
-                        System.out.println("scenario2::"
-                                + "getuseronmodify::"
-                                + startTime + "::"
-                                + endTime);
+//                        System.out.println("scenario2::"
+//                                + "getuseronmodify::"
+//                                + startTime + "::"
+//                                + endTime + "::"
+//                                + ((endTime - startTime) / 1000));
                         synchronized (modifyUserResultTimes) {
                             modifyUserResultTimes.add("scenario2::"
                                     + "getuseronmodify::"
                                     + startTime + "::"
-                                    + endTime);
+                                    + endTime + "::"
+                                    + ((endTime - startTime) / 1000));
                         }
                     }
                 });
@@ -581,15 +625,17 @@ public class Scheduler {
                     } catch (Exception ex) {
                         LOGGER.error("Add Users Failed", ex);
                     }
-                    System.out.println("scenario2::"
-                            + "modifyuser::"
-                            + startTime + "::"
-                            + endTime);
+//                    System.out.println("scenario2::"
+//                            + "modifyuser::"
+//                            + startTime + "::"
+//                            + endTime + "::"
+//                            + ((endTime - startTime) / 1000));
                     synchronized (modifyUserResultTimes) {
                         modifyUserResultTimes.add("scenario2::"
                                 + "modifyuser::"
                                 + startTime + "::"
-                                + endTime);
+                                + endTime + "::"
+                                + ((endTime - startTime) / 1000));
                     }
                 }
             });
@@ -609,7 +655,7 @@ public class Scheduler {
             requestCounter++;
 
 //            //DEBUG LINES
-//            if (userMofificationsCounter > 50) {
+//            if (requestCounter > 50) {
 //                break;
 //            }
         }
@@ -623,16 +669,22 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        endModifyUsers = System.currentTimeMillis();
         LOGGER.info("#End Modify Users Profile: "
-                + dateFormat.format(System.currentTimeMillis()));
+                + dateFormat.format(endModifyUsers));
         //Add end time of Modify users and store times
-        modifyUserResultTimes.add("#End Modify Users Profile:" + System.currentTimeMillis());
+        modifyUserResultTimes.add("#End Modify Users Profile:" + endModifyUsers);
+        modifyUserResultTimes.add("#Duration Modify Users Profile:"
+                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
+        System.out.println("#Duration Modify Users Profile:"
+                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
         warehouseScenario2.storeData(modifyUserResultTimes);
         //----------------------------------------------------------------------
         //Get users profile
+        startGetUserProfiles = System.currentTimeMillis();
         LOGGER.info("#Start Get Users Profile: "
-                + dateFormat.format(System.currentTimeMillis()));
-        getUserResultTimes.add("#Start Get Users Profile: " + System.currentTimeMillis());
+                + dateFormat.format(startGetUserProfiles));
+        getUserResultTimes.add("#Start Get Users Profile: " + startGetUserProfiles);
 
         ArrayList<String> users = new ArrayList<>(dataset.getUsernamesList());
 
@@ -656,15 +708,17 @@ public class Scheduler {
                     } catch (Exception ex) {
                         LOGGER.error("Get Users Failed", ex);
                     }
-                    System.out.println("scenario2::"
-                            + "getuser::"
-                            + startTime + "::"
-                            + endTime);
+//                    System.out.println("scenario2::"
+//                            + "getuser::"
+//                            + startTime + "::"
+//                            + endTime + "::"
+//                            + ((endTime - startTime) / 1000));
                     synchronized (getUserResultTimes) {
                         getUserResultTimes.add("scenario2::"
                                 + "getuser::"
                                 + startTime + "::"
-                                + endTime);
+                                + endTime + "::"
+                                + ((endTime - startTime) / 1000));
                     }
                 }
             });
@@ -690,7 +744,7 @@ public class Scheduler {
             requestCounter++;
 
 //            //DEBUG LINES
-//            if (getUsersCounter > 25) {
+//            if (requestCounter > 50) {
 //                break;
 //            }
         }
@@ -704,10 +758,15 @@ public class Scheduler {
             LOGGER.error("Error on awaiting thread", ex1);
         }
 
+        endGetUserProfiles = System.currentTimeMillis();
         LOGGER.info("#End Get Users Profile: "
-                + dateFormat.format(System.currentTimeMillis()));
+                + dateFormat.format(endGetUserProfiles));
         //Add end time of get users profile and store times
-        getUserResultTimes.add("#End Get Users Profile:" + System.currentTimeMillis());
+        getUserResultTimes.add("#End Get Users Profile:" + endGetUserProfiles);
+        getUserResultTimes.add("#Duration Get Users Profile:"
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
+        System.out.println("#Duration Get Users Profile:"
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
         warehouseScenario2.storeData(getUserResultTimes);
     }
 

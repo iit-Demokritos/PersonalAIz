@@ -5,7 +5,6 @@
  */
 package gr.iit.demokritos.pserverexperiments;
 
-import gr.iit.demokritos.pserverexperiments.warehouse.CSVStoreResults;
 import gr.iit.demokritos.pserverexperiments.datasets.MovieLens1M;
 import gr.iit.demokritos.pserverexperiments.interfaces.ILoadDataset;
 import gr.iit.demokritos.pserverexperiments.interfaces.IStroreResults;
@@ -37,16 +36,16 @@ public class BenchmarkTest {
         LOGGER.info("#Create scheduler with 2 request/min: "
                 + dateFormat.format(date.getTime()));
 
-        scheduler = new Scheduler(dataset,0, scenario2GetPropability, LOGGER, 40);
+        scheduler = new Scheduler(dataset, 0, scenario2GetPropability, LOGGER, 10);
         //execute senario 1
         LOGGER.info("#Execute Scenario 1: "
                 + dateFormat.format(date.getTime()));
         scheduler.executeScenario1();
         //execute senario 2
-        LOGGER.info("#Execute Scenario 2: "
-                + dateFormat.format(date.getTime()));
+//        LOGGER.info("#Execute Scenario 2: "
+//                + dateFormat.format(date.getTime()));
 //        scheduler.executeScenario2();
-        
+
 //        //----------------------------------------------------------------------
 //        //Create scheduler 2 request / min
 //        LOGGER.info("#Create scheduler with 2 request/min: "
@@ -62,7 +61,6 @@ public class BenchmarkTest {
 //        LOGGER.info("#Execute Scenario 2: "
 //                + dateFormat.format(date.getTime()));
 //        scheduler.executeScenario2();
-
 //        //----------------------------------------------------------------------
 //        //Create scheduler 4 request / min
 //        LOGGER.info("#Create scheduler with 4 request/min: "

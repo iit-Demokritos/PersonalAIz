@@ -349,17 +349,8 @@ public class Personal {
      * @return A true or false if the permission granted
      */
     public boolean getPermissionFor(Action a, String sAccessType) {
-        Date dt = new Date();
-        //10 minute before
-        long frame = 600;
-
         return ((security != null)
                 && (security.autho.getAccessRights(psClient, a).get(sAccessType))
                 && (psClient.authenticatedTimestamp != 0));
-        //If security is not null and access granted and frame is < 10minutes
-        //then return true
-//        return ((security != null) && (security.autho.getAccessRights(psClient, a)
-//                .get(sAccessType)) && (psClient.authenticatedTimestamp != 0)
-//                && ((dt.getTime() - psClient.authenticatedTimestamp) < frame));
     }
 }

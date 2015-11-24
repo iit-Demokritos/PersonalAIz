@@ -298,7 +298,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         if (usersForDelete.isEmpty()) {
             LOGGER.error("#deleteUses | no users to delete");
-            return false;
+            return true;
         }
 
         try {
