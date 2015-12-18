@@ -213,70 +213,70 @@ public class AdminTest {
 
     }
 
-    /**
-     * Test of getSettings and setSettings method, of class Admin.
-     */
-    @Test
-    public void testSetGetSettings() {
-        Admin instance;
-        Client cl;
-
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: setSettings() method");
-        //set settings | test-1
-        HashMap<String, String> settings = new HashMap<>();
-        boolean expResult = true;
-        settings.put("LogLevel", "debug");
-        settings.put("test", "info");
-
-        cl = new Client("root", "root");
-        cl.setAuthenticatedTimestamp(new Date().getTime());
-        instance = new Admin(new PServerHBase(), cl);
-        System.out.println("-- test-1 | setSettings: " + settings);
-        boolean result = instance.setSettings(settings);
-
-        assertEquals(expResult, result);
-
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: getSettings() method");
-        //get settings | test-1
-        cl = new Client("root", "root");
-        cl.setAuthenticatedTimestamp(new Date().getTime());
-        instance = new Admin(new PServerHBase(), cl);
-        System.out.println("-- test-1 | getSettings: ");
-        System.out.println("|expect| " + settings);
-        System.out.println("|result| " + instance.getSettings());
-        assertEquals(settings, instance.getSettings());
-
-        
-        
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: setSettings() method");
-        //set settings | test-2
-        expResult = true;
-        settings = new HashMap<>();
-        settings.put("LogLevel", "info");
-
-        cl = new Client("root", "root");
-        cl.setAuthenticatedTimestamp(new Date().getTime());
-        instance = new Admin(new PServerHBase(), cl);
-        System.out.println("-- test-2 | setSettings: " + settings);
-        result = instance.setSettings(settings);
-
-        assertEquals(expResult, result);
-
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: getSettings() method");
-        //get settings | test-2
-        cl = new Client("root", "root");
-        cl.setAuthenticatedTimestamp(new Date().getTime());
-        instance = new Admin(new PServerHBase(), cl);
-        System.out.println("-- test-2 | getSettings: ");
-        System.out.println("|expect| " + settings);
-        System.out.println("|result| " + instance.getSettings());
-        assertEquals(settings, instance.getSettings());
-
-    }
+//    /**
+//     * Test of getSettings and setSettings method, of class Admin.
+//     */
+//    @Test
+//    public void testSetGetSettings() {
+//        Admin instance;
+//        Client cl;
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: setSettings() method");
+//        //set settings | test-1
+//        HashMap<String, String> settings = new HashMap<>();
+//        boolean expResult = true;
+//        settings.put("LogLevel", "debug");
+//        settings.put("test", "info");
+//
+//        cl = new Client("root", "root");
+//        cl.setAuthenticatedTimestamp(new Date().getTime());
+//        instance = new Admin(new PServerHBase(), cl);
+//        System.out.println("-- test-1 | setSettings: " + settings);
+//        boolean result = instance.setSettings(settings);
+//
+//        assertEquals(expResult, result);
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: getSettings() method");
+//        //get settings | test-1
+//        cl = new Client("root", "root");
+//        cl.setAuthenticatedTimestamp(new Date().getTime());
+//        instance = new Admin(new PServerHBase(), cl);
+//        System.out.println("-- test-1 | getSettings: ");
+//        System.out.println("|expect| " + settings);
+//        System.out.println("|result| " + instance.getSettings());
+//        assertEquals(settings, instance.getSettings());
+//
+//        
+//        
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: setSettings() method");
+//        //set settings | test-2
+//        expResult = true;
+//        settings = new HashMap<>();
+//        settings.put("LogLevel", "info");
+//
+//        cl = new Client("root", "root");
+//        cl.setAuthenticatedTimestamp(new Date().getTime());
+//        instance = new Admin(new PServerHBase(), cl);
+//        System.out.println("-- test-2 | setSettings: " + settings);
+//        result = instance.setSettings(settings);
+//
+//        assertEquals(expResult, result);
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: getSettings() method");
+//        //get settings | test-2
+//        cl = new Client("root", "root");
+//        cl.setAuthenticatedTimestamp(new Date().getTime());
+//        instance = new Admin(new PServerHBase(), cl);
+//        System.out.println("-- test-2 | getSettings: ");
+//        System.out.println("|expect| " + settings);
+//        System.out.println("|result| " + instance.getSettings());
+//        assertEquals(settings, instance.getSettings());
+//
+//    }
     
     
     
