@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+//var host = "http://personalaiz.cloudapp.net:8085/";
 var host = "http://localhost:8080/";
 //var host = "http://gsoft.gr:8080/";
 

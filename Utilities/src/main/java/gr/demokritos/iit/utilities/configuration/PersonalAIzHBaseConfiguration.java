@@ -46,10 +46,8 @@ public class PersonalAIzHBaseConfiguration
     public Configuration getHBaseConfig() {
         Configuration hbaseConfig = HBaseConfiguration.create();
 
-        hbaseConfig.set("hbase.master",
-                properties.getProperty("hbase.host", "localhost") + ":60000");
         hbaseConfig.set("hbase.zookeeper.quorum",
-                properties.getProperty("hbase.host", "localhost"));
+                properties.getProperty("zookeeper.host", "localhost"));
         hbaseConfig.set("hbase.zookeeper.property.clientPort",
                 properties.getProperty("hbase.zookeeper.property.clientPort", "2181"));
 
