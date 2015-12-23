@@ -239,7 +239,11 @@ public class ResultExtracor {
             .concat(" median: ")
             .concat(Long.toString(median))
             .concat(" upperHalf: ")
-            .concat(Long.toString(Median(upperHalf)));
+            .concat(Long.toString(Median(upperHalf)))
+            .concat(" Min: ")
+            .concat(Long.toString(Collections.min(values)))
+            .concat(" Max: ")
+            .concat(Long.toString(Collections.max(values)));
 }
  
 public static ArrayList GetValuesGreaterThan(List<Long> values, Long limit, boolean orEqualTo)
