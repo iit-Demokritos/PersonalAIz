@@ -10,6 +10,7 @@ import gr.iit.demokritos.pserverexperiments.interfaces.ILoadDataset;
 import gr.iit.demokritos.pserverexperiments.interfaces.IStroreResults;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,102 +24,65 @@ public class BenchmarkTest {
 
     public static void main(String[] args) {
 
+        //get properties
+        Properties properties = configuration(args);
+
         //initialize variables
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         ILoadDataset dataset = new MovieLens1M(LOGGER);
         IStroreResults warehouse;
         Scheduler scheduler;
-        String scenario2GetPropability = "8/10";
+        String scenario2GetPropability = properties.getProperty("scenario2GetPropability", "8/10");
+        String scenario = properties.getProperty("scenario", "1");
+        int requestPerMin = Integer.parseInt(properties.getProperty("rpm", "0"));
+        int batch = Integer.parseInt(properties.getProperty("batch", "10"));
+
+        //print arguments
+        System.out.println("#====== Experiment settings ======#");
+        System.out.println("Scenario: " + scenario);
+        System.out.println("Request/Min: " + requestPerMin);
+        System.out.println("Batch: " + batch);
+        System.out.println("scenario2GetPropability: " + scenario2GetPropability);
+        System.out.println("#====== Experiment settings ======#");
 
         //----------------------------------------------------------------------
         //Create scheduler no limit on request / min
-        LOGGER.info("#Create scheduler with 2 request/min: "
+        LOGGER.info("#Create scheduler with " + requestPerMin + " request/min: "
                 + dateFormat.format(date.getTime()));
 
-        scheduler = new Scheduler(dataset, 0, scenario2GetPropability, LOGGER, 10);
-        //execute senario 1
-        LOGGER.info("#Execute Scenario 1: "
-                + dateFormat.format(date.getTime()));
-        scheduler.executeScenario1();
-        //execute senario 2
-//        LOGGER.info("#Execute Scenario 2: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario2();
+        scheduler = new Scheduler(dataset, requestPerMin, scenario2GetPropability, LOGGER, batch);
 
-//        //----------------------------------------------------------------------
-//        //Create scheduler 2 request / min
-//        LOGGER.info("#Create scheduler with 2 request/min: "
-//                + dateFormat.format(date.getTime()));
-//
-//        scheduler = new Scheduler(dataset, warehouse,
-//                2, scenario2GetPropability, LOGGER, 20);
-//        //execute senario 1
-//        LOGGER.info("#Execute Scenario 1: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario1();
-//        //execute senario 2
-//        LOGGER.info("#Execute Scenario 2: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario2();
-//        //----------------------------------------------------------------------
-//        //Create scheduler 4 request / min
-//        LOGGER.info("#Create scheduler with 4 request/min: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler = new Scheduler(dataset, warehouse,
-//                4, scenario2GetPropability, LOGGER);
-//        //execute senario 1
-//        LOGGER.info("#Execute Scenario 1: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario1();
-//        //execute senario 2
-//        LOGGER.info("#Execute Scenario 2: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario2();
-//
-//        //----------------------------------------------------------------------
-//        //Create scheduler 8 request / min
-//        LOGGER.info("#Create scheduler with 8 request/min: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler = new Scheduler(dataset, warehouse,
-//                8, scenario2GetPropability, LOGGER);
-//        //execute senario 1
-//        LOGGER.info("#Execute Scenario 1: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario1();
-//        //execute senario 2
-//        LOGGER.info("#Execute Scenario 2: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario2();
-//
-//        //----------------------------------------------------------------------
-//        //Create scheduler 16 request / min
-//        LOGGER.info("#Create scheduler with 16 request/min: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler = new Scheduler(dataset, warehouse,
-//                16, scenario2GetPropability, LOGGER);
-//        //execute senario 1
-//        LOGGER.info("#Execute Scenario 1: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario1();
-//        //execute senario 2
-//        LOGGER.info("#Execute Scenario 2: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario2();
-//
-//        //----------------------------------------------------------------------
-//        //Create scheduler 32 request / min
-//        LOGGER.info("#Create scheduler with 32 request/min: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler = new Scheduler(dataset, warehouse,
-//                32, scenario2GetPropability, LOGGER);
-//        //execute senario 1
-//        LOGGER.info("#Execute Scenario 1: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario1();
-//        //execute senario 2
-//        LOGGER.info("#Execute Scenario 2: "
-//                + dateFormat.format(date.getTime()));
-//        scheduler.executeScenario2();
+        //check and run the scenario
+        switch (scenario) {
+            case "1":
+                //execute senario 1
+                LOGGER.info("#Execute Scenario 1: "
+                        + dateFormat.format(date.getTime()));
+                scheduler.executeScenario1();
+                break;
+            case "2":
+                //execute senario 2
+                LOGGER.info("#Execute Scenario 2: "
+                        + dateFormat.format(date.getTime()));
+                scheduler.executeScenario2();
+                break;
+        }
+
     }
+
+    public static Properties configuration(String[] args) {
+        LOGGER.info("#Start export configuration");
+        Properties properties = new Properties();
+
+        for (String cArgument : args) {
+            String[] tmpArg = cArgument.split("=");
+            if (tmpArg.length > 1) {
+                properties.setProperty(tmpArg[0], tmpArg[1]);
+            }
+        }
+        LOGGER.info("#End export configuration");
+        return properties;
+    }
+
 }

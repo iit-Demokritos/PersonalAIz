@@ -46,7 +46,7 @@ public class Scheduler {
     private final Logger LOGGER;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final String host = "http://localhost:8080";
-    private final String clientAuth = "root2%7Croot2";
+    private final String clientAuth = "testUser%7Ctest";
 //    private final String host = "http://gsoft.gr:8080";
 //    private final String clientAuth = "CrashTestClient%7CqbwGoUOB14p";
     private final String mode = "personal";

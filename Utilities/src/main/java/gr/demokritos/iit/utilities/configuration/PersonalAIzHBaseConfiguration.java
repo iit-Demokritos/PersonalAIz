@@ -39,7 +39,6 @@ public class PersonalAIzHBaseConfiguration
      * Get HBase configuration based on stored settings.
      *
      * @return The HBase Configuration. The default values are 
-     * hbase.master= localhost:60000 
      * hbase.zookeeper.quorum= localhost
      * hbase.zookeeper.property.clientPort= 2181
      */

@@ -12,16 +12,9 @@ package gr.iit.demokritos.pserverexperiments;
 public class test {
     
     public static void main(String[] args) {
-        
-        int n=3;
-        for(int i=0; i<10; i++){
-            
-        if((i%n)==0){
-            System.out.println(i);
-        }
-        }
-        
-        
+       
+        String arg="test=ok";
+        System.out.println(arg.split("=")[1]);
     }
     
 }
