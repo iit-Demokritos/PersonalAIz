@@ -33,7 +33,7 @@ public class BenchmarkTest {
         ILoadDataset dataset = new MovieLens1M(LOGGER);
         IStroreResults warehouse;
         Scheduler scheduler;
-        String scenario2GetPropability = properties.getProperty("scenario2GetPropability", "8/10");
+        String scenario2GetPropability = properties.getProperty("scenario2GetPropability", "30/100");
         String scenario = properties.getProperty("scenario", "1");
         int requestPerMin = Integer.parseInt(properties.getProperty("rpm", "0"));
         int batch = Integer.parseInt(properties.getProperty("batch", "10"));

@@ -43,6 +43,7 @@ public class Scheduler {
     private final Random r = new Random();
     private final int fromPointer;
     private final int getPointer;
+    private double getProb;
     private final Logger LOGGER;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final String host = "http://localhost:8080";
@@ -68,6 +69,7 @@ public class Scheduler {
         String[] tmp = scenario2GetPropability.split("/");
         this.getPointer = Integer.parseInt(tmp[0]);
         this.fromPointer = Integer.parseInt(tmp[1]);
+        this.getProb = (double) this.getPointer / (double) this.fromPointer;
         this.LOGGER = LOGGER;
 
         this.warehouseScenario1 = new CSVStoreResults("scenario1_"
@@ -218,9 +220,9 @@ public class Scheduler {
         //Add End time of this phase
         addUserResultTimes.add("#End Add Users:" + endAddUsers);
         addUserResultTimes.add("#Duration Add Users:"
-                + ((endAddUsers - startAddUsers) / 1000)+" sec");
+                + ((endAddUsers - startAddUsers) / 1000) + " sec");
         System.out.println("#Duration Add Users:"
-                + ((endAddUsers - startAddUsers) / 1000)+" sec");
+                + ((endAddUsers - startAddUsers) / 1000) + " sec");
         //Store results for add user
         warehouseScenario1.storeData(addUserResultTimes);
 
@@ -305,9 +307,9 @@ public class Scheduler {
         //Add end time of Modify users and store times
         modifyUserResultTimes.add("#End Modify Users Profile:" + endModifyUsers);
         modifyUserResultTimes.add("#Duration Modify Users Profile:"
-                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
+                + ((endModifyUsers - startModifyUsers) / 1000) + " sec");
         System.out.println("#Duration Modify Users Profile:"
-                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
+                + ((endModifyUsers - startModifyUsers) / 1000) + " sec");
         warehouseScenario1.storeData(modifyUserResultTimes);
 
         //----------------------------------------------------------------------
@@ -397,9 +399,9 @@ public class Scheduler {
         //Add end time of get users profile and store times
         getUserResultTimes.add("#End Get Users Profile:" + endGetUserProfiles);
         getUserResultTimes.add("#Duration Get Users Profile:"
-                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000) + " sec");
         System.out.println("#Duration Get Users Profile:"
-                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000) + " sec");
         warehouseScenario1.storeData(getUserResultTimes);
 
     }
@@ -495,7 +497,6 @@ public class Scheduler {
             }
 
             if (requestPerMinute != 0) {
-
                 if ((requestCounter % requestPerMinute) == 0) {
                     try {
                         //sleep for 10 sec
@@ -549,9 +550,9 @@ public class Scheduler {
         //Add End time of this phase
         addUserResultTimes.add("#End Add Users:" + endAddUsers);
         addUserResultTimes.add("#Duration Add Users:"
-                + ((endAddUsers - startAddUsers) / 1000)+" sec");
+                + ((endAddUsers - startAddUsers) / 1000) + " sec");
         System.out.println("#Duration Add Users:"
-                + ((endAddUsers - startAddUsers) / 1000)+" sec");
+                + ((endAddUsers - startAddUsers) / 1000) + " sec");
         //Store results for add user
         warehouseScenario2.storeData(addUserResultTimes);
 
@@ -570,7 +571,8 @@ public class Scheduler {
             final String finalRecord = modificationRedord;
 
             //if Propability execute get user
-            if (r.nextInt(fromPointer) <= getPointer) {
+//            if (r.nextInt(fromPointer) <= getPointer) {
+            if (r.nextDouble() <= getProb) {
                 requestCounter++;
 
                 final String finalGetUser = dataset.getRandomUsername();
@@ -641,7 +643,6 @@ public class Scheduler {
             });
 
             if (requestPerMinute != 0) {
-
                 if ((requestCounter % requestPerMinute) == 0) {
                     try {
                         //sleep for 10 sec
@@ -675,9 +676,9 @@ public class Scheduler {
         //Add end time of Modify users and store times
         modifyUserResultTimes.add("#End Modify Users Profile:" + endModifyUsers);
         modifyUserResultTimes.add("#Duration Modify Users Profile:"
-                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
+                + ((endModifyUsers - startModifyUsers) / 1000) + " sec");
         System.out.println("#Duration Modify Users Profile:"
-                + ((endModifyUsers - startModifyUsers) / 1000)+" sec");
+                + ((endModifyUsers - startModifyUsers) / 1000) + " sec");
         warehouseScenario2.storeData(modifyUserResultTimes);
         //----------------------------------------------------------------------
         //Get users profile
@@ -764,9 +765,9 @@ public class Scheduler {
         //Add end time of get users profile and store times
         getUserResultTimes.add("#End Get Users Profile:" + endGetUserProfiles);
         getUserResultTimes.add("#Duration Get Users Profile:"
-                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000) + " sec");
         System.out.println("#Duration Get Users Profile:"
-                + ((endGetUserProfiles - startGetUserProfiles) / 1000)+" sec");
+                + ((endGetUserProfiles - startGetUserProfiles) / 1000) + " sec");
         warehouseScenario2.storeData(getUserResultTimes);
     }
 
