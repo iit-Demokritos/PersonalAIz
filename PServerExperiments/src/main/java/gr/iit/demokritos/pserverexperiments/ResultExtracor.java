@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,13 +28,13 @@ public class ResultExtracor {
 
         ArrayList<String> resultList = new ArrayList<>();
         resultList.add("1_scenario2_0_10_30-100.csv");
-        resultList.add("1_scenario2_0_10_50-100.csv");
-        resultList.add("2_scenario2_0_10_30-100.csv");
-        resultList.add("2_scenario2_0_10_50-100.csv");
-        resultList.add("4_scenario2_0_10_30-100.csv");
-        resultList.add("4_scenario2_0_10_50-100.csv");
-        resultList.add("8_scenario2_0_10_30-100.csv");
-        resultList.add("8_scenario2_0_10_50-100.csv");
+//        resultList.add("1_scenario2_0_10_50-100.csv");
+//        resultList.add("2_scenario2_0_10_30-100.csv");
+//        resultList.add("2_scenario2_0_10_50-100.csv");
+//        resultList.add("4_scenario2_0_10_30-100.csv");
+//        resultList.add("4_scenario2_0_10_50-100.csv");
+//        resultList.add("8_scenario2_0_10_30-100.csv");
+//        resultList.add("8_scenario2_0_10_50-100.csv");
 
         for (String cResultName : resultList) {
 
@@ -136,11 +137,12 @@ public class ResultExtracor {
             Long getUserProfileDuration = TimeUnit.MILLISECONDS.toSeconds(
                     Long.parseLong(endGetUsersProfile) - Long.parseLong(startGetUsersProfile));
             
+            DecimalFormat df = new DecimalFormat("#.00"); 
             //calculate Standard Deviation 
-            long addUserAverage = addUserCallsDuration / addUserCallCounter;
-            long modifyUserAverage = modifyUserCallsDuration / modifyUserCallCounter;
-            long getUserOnModifyAverage = getUserOnModifyCallsDuration / getUserOnModifyCallCounter;
-            long getUserProfileAverage = getUserProfileCallsDuration / getUserProfileCallCounter;
+            double addUserAverage = (double)addUserCallsDuration / (double)addUserCallCounter;
+            double modifyUserAverage = (double)modifyUserCallsDuration / (double)modifyUserCallCounter;
+            double getUserOnModifyAverage = (double)getUserOnModifyCallsDuration / (double)getUserOnModifyCallCounter;
+            double getUserProfileAverage = (double)getUserProfileCallsDuration / (double)getUserProfileCallCounter;
             double addUserDevination = calculateDevination(addUserCallsList, addUserAverage);
             double modifyUserDevination = calculateDevination(modifyUserCallsList, modifyUserAverage);
             double getUserOnModifyDevination = calculateDevination(getUserOnModifyCallsList, getUserOnModifyAverage);
@@ -151,9 +153,9 @@ public class ResultExtracor {
                         .concat(Long.toString(addUserCallCounter / addUserDuration)));
             }
             storeList.add("AddUser average call time in milliseconds: "
-                    .concat(Long.toString(addUserAverage)));
+                    .concat(df.format(addUserAverage)));
             storeList.add("AddUser devination call time in milliseconds: "
-                    .concat(Double.toString(addUserDevination)));
+                    .concat(df.format(addUserDevination)));
             storeList.add("AddUser Quartiles in milliseconds: "
                     .concat(Quartiles(addUserCallsList)));
 
@@ -162,9 +164,9 @@ public class ResultExtracor {
                         .concat(Long.toString(modifyUserCallCounter / modifyUserDuration)));
             }
             storeList.add("ModifyUser average call time in milliseconds: "
-                    .concat(Long.toString(modifyUserAverage)));
+                    .concat(df.format(modifyUserAverage)));
             storeList.add("ModifyUser devination call time in milliseconds: "
-                    .concat(Double.toString(modifyUserDevination)));
+                    .concat(df.format(modifyUserDevination)));
             storeList.add("ModifyUser Quartiles in milliseconds: "
                     .concat(Quartiles(modifyUserCallsList)));
           
@@ -173,9 +175,9 @@ public class ResultExtracor {
                         .concat(Long.toString(getUserOnModifyCallCounter / getUserOnModifyDuration)));
             }
             storeList.add("GetUserOnModify average call time in milliseconds: "
-                    .concat(Long.toString(getUserOnModifyAverage)));
+                    .concat(df.format(getUserOnModifyAverage)));
             storeList.add("GetUserOnModify devination call time in milliseconds: "
-                    .concat(Double.toString(getUserOnModifyDevination)));
+                    .concat(df.format(getUserOnModifyDevination)));
             storeList.add("GetUserOnModify Quartiles in milliseconds: "
                     .concat(Quartiles(getUserOnModifyCallsList)));
 
@@ -184,9 +186,9 @@ public class ResultExtracor {
                         .concat(Long.toString(getUserProfileCallCounter / getUserProfileDuration)));
             }
             storeList.add("GetUserProfile average call time in milliseconds: "
-                    .concat(Long.toString(getUserProfileAverage)));
+                    .concat(df.format(getUserProfileAverage)));
             storeList.add("GetUserProfile devination call time in milliseconds: "
-                    .concat(Double.toString(getUserProfileDevination)));
+                    .concat(df.format(getUserProfileDevination)));
             storeList.add("GetUserProfile Quartiles in milliseconds: "
                     .concat(Quartiles(getUserProfileCallsList)));
 
@@ -198,12 +200,12 @@ public class ResultExtracor {
         }
     }
 
-    private static double calculateDevination(List<Long> callsList, long average) {
+    private static double calculateDevination(List<Long> callsList, Double average) {
         long sum = 0;
 
         for (long cCall : callsList) {
 
-            long difference = cCall - average;
+            long difference = (long) (cCall - average);
             long square = difference * difference;
             sum = sum + square;
         }

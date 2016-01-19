@@ -46,12 +46,12 @@ public class Scheduler {
     private double getProb;
     private final Logger LOGGER;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private final String host = "http://localhost:8080";
-    private final String clientAuth = "testUser%7Ctest";
+    private final String host;
+    private final String clientAuth;
 //    private final String host = "http://gsoft.gr:8080";
 //    private final String clientAuth = "CrashTestClient%7CqbwGoUOB14p";
     private final String mode = "personal";
-    private final String URL = host + "/PersonalAIz/api/pserver/" + clientAuth + "/" + mode + "/";
+    private final String URL;
     private HashMap<String, String> postParams;
     private HashMap<String, String> putParams;
     private HashMap<String, String> getParams;
@@ -60,9 +60,13 @@ public class Scheduler {
 
     //Constructor
     public Scheduler(ILoadDataset dataset, int requestPerMinute,
-            String scenario2GetPropability, Logger LOGGER, int batch) {
+            String scenario2GetPropability, Logger LOGGER, int batch,
+            String host, String clientName, String clientPass) {
 
         //Set settings
+        this.host = "http://".concat(host).concat(":8080");
+        this.clientAuth = clientName.concat("%7C").concat(clientPass);
+        this.URL = this.host + "/PersonalAIz/api/pserver/" + this.clientAuth + "/" + this.mode + "/";
         this.batch = batch;
         this.dataset = dataset;
         this.requestPerMinute = requestPerMinute;
@@ -72,9 +76,9 @@ public class Scheduler {
         this.getProb = (double) this.getPointer / (double) this.fromPointer;
         this.LOGGER = LOGGER;
 
-        this.warehouseScenario1 = new CSVStoreResults("scenario1_"
+        this.warehouseScenario1 = new CSVStoreResults(clientName + "_scenario1_"
                 + requestPerMinute + "_" + batch);
-        this.warehouseScenario2 = new CSVStoreResults("scenario2_"
+        this.warehouseScenario2 = new CSVStoreResults(clientName + "_scenario2_"
                 + requestPerMinute + "_" + batch + "_" + getPointer + "-" + fromPointer);
     }
 
@@ -573,7 +577,6 @@ public class Scheduler {
             //if Propability execute get user
 //            if (r.nextInt(fromPointer) <= getPointer) {
             if (r.nextDouble() <= getProb) {
-                requestCounter++;
 
                 final String finalGetUser = dataset.getRandomUsername();
                 modifyUsersEx.submit(new Runnable() {
@@ -606,41 +609,43 @@ public class Scheduler {
                         }
                     }
                 });
-            }
+            } else {
 
-            modifyUsersEx.submit(new Runnable() {
+                modifyUsersEx.submit(new Runnable() {
 
-                String modificationRedord;
+                    String modificationRedord;
 
-                @Override
-                public void run() {
-                    this.modificationRedord = finalRecord;
-                    long startTime = 0, endTime = 0;
-                    String[] splitedRecord = modificationRedord.split("\\|");
-                    try {
-                        String modifyURL = URL + "users/" + splitedRecord[0] + "/features/modify";
-                        putParams = new HashMap<>();
-                        putParams.put("JSONUserFeatures", splitedRecord[1]);
-                        startTime = System.currentTimeMillis();
-                        execPut(modifyURL, putParams);
-                        endTime = System.currentTimeMillis();
-                    } catch (Exception ex) {
-                        LOGGER.error("Add Users Failed", ex);
-                    }
+                    @Override
+                    public void run() {
+                        this.modificationRedord = finalRecord;
+                        long startTime = 0, endTime = 0;
+                        String[] splitedRecord = modificationRedord.split("\\|");
+                        try {
+                            String modifyURL = URL + "users/" + splitedRecord[0] + "/features/modify";
+                            putParams = new HashMap<>();
+                            putParams.put("JSONUserFeatures", splitedRecord[1]);
+                            startTime = System.currentTimeMillis();
+                            execPut(modifyURL, putParams);
+                            endTime = System.currentTimeMillis();
+                        } catch (Exception ex) {
+                            LOGGER.error("Add Users Failed", ex);
+                        }
 //                    System.out.println("scenario2::"
 //                            + "modifyuser::"
 //                            + startTime + "::"
 //                            + endTime + "::"
 //                            + ((endTime - startTime) / 1000));
-                    synchronized (modifyUserResultTimes) {
-                        modifyUserResultTimes.add("scenario2::"
-                                + "modifyuser::"
-                                + startTime + "::"
-                                + endTime + "::"
-                                + ((endTime - startTime) / 1000));
+                        synchronized (modifyUserResultTimes) {
+                            modifyUserResultTimes.add("scenario2::"
+                                    + "modifyuser::"
+                                    + startTime + "::"
+                                    + endTime + "::"
+                                    + ((endTime - startTime) / 1000));
+                        }
                     }
-                }
-            });
+                });
+
+            }
 
             if (requestPerMinute != 0) {
                 if ((requestCounter % requestPerMinute) == 0) {

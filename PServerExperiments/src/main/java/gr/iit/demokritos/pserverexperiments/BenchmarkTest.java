@@ -35,11 +35,16 @@ public class BenchmarkTest {
         Scheduler scheduler;
         String scenario2GetPropability = properties.getProperty("scenario2GetPropability", "30/100");
         String scenario = properties.getProperty("scenario", "1");
+        String host = properties.getProperty("host", "192.168.0.1");
+        String clientName = properties.getProperty("clientName", "root");
+        String clientPass = properties.getProperty("clientPass", "root");
         int requestPerMin = Integer.parseInt(properties.getProperty("rpm", "0"));
         int batch = Integer.parseInt(properties.getProperty("batch", "10"));
 
         //print arguments
         System.out.println("#====== Experiment settings ======#");
+        System.out.println("Host: " + host);
+        System.out.println("Client credencials: " + clientName+"/"+clientPass);
         System.out.println("Scenario: " + scenario);
         System.out.println("Request/Min: " + requestPerMin);
         System.out.println("Batch: " + batch);
@@ -51,7 +56,8 @@ public class BenchmarkTest {
         LOGGER.info("#Create scheduler with " + requestPerMin + " request/min: "
                 + dateFormat.format(date.getTime()));
 
-        scheduler = new Scheduler(dataset, requestPerMin, scenario2GetPropability, LOGGER, batch);
+        scheduler = new Scheduler(dataset, requestPerMin, scenario2GetPropability, 
+                LOGGER, batch, host, clientName, clientPass);
 
         //check and run the scenario
         switch (scenario) {
