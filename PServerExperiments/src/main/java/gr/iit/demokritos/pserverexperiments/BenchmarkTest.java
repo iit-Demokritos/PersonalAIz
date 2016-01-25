@@ -30,16 +30,17 @@ public class BenchmarkTest {
         //initialize variables
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        ILoadDataset dataset = new MovieLens1M(LOGGER);
         IStroreResults warehouse;
         Scheduler scheduler;
         String scenario2GetPropability = properties.getProperty("scenario2GetPropability", "30/100");
-        String scenario = properties.getProperty("scenario", "1");
+        String scenario = properties.getProperty("scenario", "2");
         String host = properties.getProperty("host", "192.168.0.1");
         String clientName = properties.getProperty("clientName", "root");
         String clientPass = properties.getProperty("clientPass", "root");
         int requestPerMin = Integer.parseInt(properties.getProperty("rpm", "0"));
+        int loadedUsers = Integer.parseInt(properties.getProperty("loadedUsers", "0"));
         int batch = Integer.parseInt(properties.getProperty("batch", "10"));
+        ILoadDataset dataset = new MovieLens1M(LOGGER,loadedUsers);
 
         //print arguments
         System.out.println("#====== Experiment settings ======#");
@@ -49,6 +50,7 @@ public class BenchmarkTest {
         System.out.println("Request/Min: " + requestPerMin);
         System.out.println("Batch: " + batch);
         System.out.println("scenario2GetPropability: " + scenario2GetPropability);
+        System.out.println("number of users: " + scenario2GetPropability);
         System.out.println("#====== Experiment settings ======#");
 
         //----------------------------------------------------------------------

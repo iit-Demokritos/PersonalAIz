@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 
 /**
@@ -30,6 +30,7 @@ public class MovieLens1M implements ILoadDataset {
     private LinkedList<String> users = new LinkedList<>();
     private final LinkedList<String> userModifications = new LinkedList<>();
     private final Random r = new Random();
+    private final int loadedUsers;
     private BufferedReader usersDat;
     private String usersStrLine;
     private BufferedReader ratingsDat;
@@ -38,14 +39,14 @@ public class MovieLens1M implements ILoadDataset {
     private HashMap<String, String> occupation = new HashMap<>();
     private int frameSize = 500000;
     private HashMap<String, List<String>> movies = new HashMap<>();
-    private boolean initUsersFlag=true;
-    private boolean initUsersModificationFlag=true;
-    
-    private final String datUsers="datasets/ml-1m/users.dat";
-    private final String datRatings="datasets/ml-1m/ratings.dat";
-    private final String datMovies="datasets/ml-1m/movies.dat";
+    private boolean initUsersFlag = true;
+    private boolean initUsersModificationFlag = true;
 
-    public MovieLens1M(Logger LOGGER) {
+    private final String datUsers = "datasets/ml-1m/users.dat";
+    private final String datRatings = "datasets/ml-1m/ratings.dat";
+    private final String datMovies = "datasets/ml-1m/movies.dat";
+
+    public MovieLens1M(Logger LOGGER, int loadedUsers) {
 
         //init vars
         gender.put("M", "male");
@@ -72,6 +73,7 @@ public class MovieLens1M implements ILoadDataset {
         occupation.put("19", "unemployed");
         occupation.put("20", "writer");
         this.LOGGER = LOGGER;
+        this.loadedUsers = loadedUsers;
 
         try {
             //Get BufferedReaders
@@ -85,7 +87,7 @@ public class MovieLens1M implements ILoadDataset {
             userHasNext();
             //Fill userModifications first frame
             userModificationHasNext();
-            
+
         } catch (IOException ex) {
             LOGGER.error("Error on Dataset: ", ex);
         }
@@ -94,11 +96,20 @@ public class MovieLens1M implements ILoadDataset {
     private void loadUsernames() throws IOException {
         BufferedReader usernamesDat = lodDataSet(datUsers);
         String moviesStrLine;
+        HashSet<String> tmpUsers = new HashSet<>();
         while ((moviesStrLine = usernamesDat.readLine()) != null) {
             String[] splitedRecord = moviesStrLine.split("::");
-            usernames.add(splitedRecord[0]);
+            if (loadedUsers == 0 && !tmpUsers.contains(splitedRecord[0])) {
+                tmpUsers.add(splitedRecord[0]);
+                usernames.add(splitedRecord[0]);
+            } else if (tmpUsers.size() < loadedUsers && !tmpUsers.contains(splitedRecord[0])) {
+                tmpUsers.add(splitedRecord[0]);
+                usernames.add(splitedRecord[0]);
+            }
         }
+        LOGGER.info("Loaded users: " + usernames.size());
     }
+
     private void loadMovies() throws IOException {
 
         BufferedReader moviesDat = lodDataSet(datMovies);
@@ -137,19 +148,21 @@ public class MovieLens1M implements ILoadDataset {
             if (users.isEmpty()) {
                 //if there is any users to load
                 if (usersStrLine != null || initUsersFlag) {
-                    initUsersFlag=false;
+                    initUsersFlag = false;
                     while (((usersStrLine = usersDat.readLine()) != null) && users.size() < frameSize) {
 //                    1::F::1::10::48067
                         String[] splitedRecord = usersStrLine.split("::");
-                        String userRecord
-                                = "\"" + splitedRecord[0] + "\":{"
-                                + "\"attributes\":{"
-                                + "\"gender\": \"" + gender.get(splitedRecord[1]) + "\","
-                                + "\"age\": \"" + splitedRecord[2] + "\","
-                                + "\"occupation\": \"" + occupation.get(splitedRecord[3]) + "\""
-                                + "}"
-                                + "}";
-                        users.add(userRecord);
+                        if (usernames.contains(splitedRecord[0])) {
+                            String userRecord
+                                    = "\"" + splitedRecord[0] + "\":{"
+                                    + "\"attributes\":{"
+                                    + "\"gender\": \"" + gender.get(splitedRecord[1]) + "\","
+                                    + "\"age\": \"" + splitedRecord[2] + "\","
+                                    + "\"occupation\": \"" + occupation.get(splitedRecord[3]) + "\""
+                                    + "}"
+                                    + "}";
+                            users.add(userRecord);
+                        }
                     }
                     return true;
                 } else {
@@ -163,7 +176,7 @@ public class MovieLens1M implements ILoadDataset {
         } catch (IOException ex) {
             LOGGER.error("Error on user has next:", ex);
             return false;
-        } 
+        }
     }
 
     /**
@@ -190,24 +203,27 @@ public class MovieLens1M implements ILoadDataset {
 
                 //if there is any users to load
                 if (ratingsStrLine != null || initUsersModificationFlag) {
-                    initUsersModificationFlag=false;
+                    initUsersModificationFlag = false;
                     while (((ratingsStrLine = ratingsDat.readLine()) != null) && userModifications.size() < frameSize) {
                         //1::1193::5::978300760
                         String[] splitedRecord = ratingsStrLine.split("::");
-                        String userModificationRecord
-                                = splitedRecord[0] + "|"
-                                + "{";
 
-                        for (String cFeature : movies.get(splitedRecord[2])) {
+                        if (usernames.contains(splitedRecord[0])) {
+                            String userModificationRecord
+                                    = splitedRecord[0] + "|"
+                                    + "{";
+
+                            for (String cFeature : movies.get(splitedRecord[2])) {
+                                userModificationRecord = userModificationRecord
+                                        + "\"" + cFeature + "\": \"" + splitedRecord[2] + "\",";
+                            }
+
                             userModificationRecord = userModificationRecord
-                                    + "\"" + cFeature + "\": \"" + splitedRecord[2] + "\",";
+                                    + "\"movie." + splitedRecord[1] + "\": \"" + splitedRecord[2] + "\""
+                                    + "}";
+
+                            userModifications.add(userModificationRecord);
                         }
-                        
-                        userModificationRecord = userModificationRecord
-                                + "\"movie." + splitedRecord[1] + "\": \"" + splitedRecord[2] + "\""
-                                + "}";
-                        
-                        userModifications.add(userModificationRecord);
                     }
                     return true;
                 } else {

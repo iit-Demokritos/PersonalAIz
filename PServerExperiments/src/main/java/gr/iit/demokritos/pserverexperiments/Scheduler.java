@@ -57,6 +57,7 @@ public class Scheduler {
     private HashMap<String, String> getParams;
     private final int batch;
     private final long timeSleep = 60000;
+    private final long timeToThreadWaitInDays=5;
 
     //Constructor
     public Scheduler(ILoadDataset dataset, int requestPerMinute,
@@ -213,7 +214,7 @@ public class Scheduler {
         addUsersEx.shutdown();
         try {
             //Await an hour until terminates all threads if not complete executable
-            addUsersEx.awaitTermination((long) 1.0, TimeUnit.DAYS);
+            addUsersEx.awaitTermination(timeToThreadWaitInDays, TimeUnit.DAYS);
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
@@ -300,7 +301,7 @@ public class Scheduler {
         modifyUsersEx.shutdown();
         try {
             //Await an hour until terminates all threads if not complete executable
-            modifyUsersEx.awaitTermination((long) 1.0, TimeUnit.DAYS);
+            modifyUsersEx.awaitTermination(timeToThreadWaitInDays, TimeUnit.DAYS);
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
@@ -392,7 +393,7 @@ public class Scheduler {
         getUsersEx.shutdown();
         try {
             //Await an hour until terminates all threads if not complete executable
-            getUsersEx.awaitTermination((long) 1.0, TimeUnit.DAYS);
+            getUsersEx.awaitTermination(timeToThreadWaitInDays, TimeUnit.DAYS);
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
@@ -543,7 +544,7 @@ public class Scheduler {
         addUsersEx.shutdown();
         try {
             //Await an hour until terminates all threads if not complete executable
-            addUsersEx.awaitTermination((long) 1.0, TimeUnit.DAYS);
+            addUsersEx.awaitTermination(timeToThreadWaitInDays, TimeUnit.DAYS);
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
@@ -670,7 +671,7 @@ public class Scheduler {
         modifyUsersEx.shutdown();
         try {
             //Await an hour until terminates all threads if not complete executable
-            modifyUsersEx.awaitTermination((long) 1.0, TimeUnit.DAYS);
+            modifyUsersEx.awaitTermination(timeToThreadWaitInDays, TimeUnit.DAYS);
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
@@ -759,7 +760,7 @@ public class Scheduler {
         getUsersEx.shutdown();
         try {
             //Await an hour until terminates all threads if not complete executable
-            getUsersEx.awaitTermination((long) 1.0, TimeUnit.DAYS);
+            getUsersEx.awaitTermination(timeToThreadWaitInDays, TimeUnit.DAYS);
         } catch (InterruptedException ex1) {
             LOGGER.error("Error on awaiting thread", ex1);
         }
