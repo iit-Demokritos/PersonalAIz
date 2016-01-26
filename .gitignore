@@ -6,3 +6,5 @@
 /PServer/target/
 /Utilities/target/
 /PServerExperiments/target/
+*.log # no log files
+
