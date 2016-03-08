@@ -198,129 +198,128 @@ public class AdminRESTTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of setSettings getSettings method, of class AdminREST.
-     */
-    @Test
-    public void testSetGetSettings() {
-
-        String userAuthe, expResult, result, JSONSettings;
-        AdminREST instance;
-
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: getSettings() method");
-
-        instance = new AdminREST();
-        userAuthe = "root|root";
-
-        System.out.println("-- test-1 |  - getSettings:");
-
-        result = instance.getSettings(userAuthe);
-        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
-                + "\"output\":{\"LogLevel\":\"info\"}}";
-        System.out.println("|expect| " + expResult);
-        System.out.println("|result| " + result);
-        assertEquals(expResult, result);
-
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: setSettings() method");
-        instance = new AdminREST();
-        userAuthe = "root|root";
-        JSONSettings = "{\"LogLevel\":\"debug\"}";
-
-        System.out.println("-- test-1 |  - setSettings:"
-                + " JSONSettings: " + JSONSettings);
-
-        result = instance.setSettings(userAuthe, JSONSettings);
-        expResult = "{\"outputMessage\":\"Set PServer settings complete\"}";
-
-        System.out.println("|expect| " + expResult);
-        System.out.println("|result| " + result);
-        assertEquals(expResult, result);
-
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: getSettings() method");
-
-        instance = new AdminREST();
-        userAuthe = "root|root";
-
-        System.out.println("-- test-2 |  - getSettings:");
-
-        result = instance.getSettings(userAuthe);
-        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
-                + "\"output\":{\"LogLevel\":\"debug\"}}";
-        System.out.println("|expect| " + expResult);
-        System.out.println("|result| " + result);
-        assertEquals(expResult, result);
-        
-        
-                //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: setSettings() method");
-        instance = new AdminREST();
-        userAuthe = "root|root";
-        JSONSettings = "{\"LogLevel\":\"info\"}";
-
-        System.out.println("-- test-2 |  - setSettings:"
-                + " JSONSettings: " + JSONSettings);
-
-        result = instance.setSettings(userAuthe, JSONSettings);
-        expResult = "{\"outputMessage\":\"Set PServer settings complete\"}";
-
-        System.out.println("|expect| " + expResult);
-        System.out.println("|result| " + result);
-        assertEquals(expResult, result);
-
-        //----------------------------------------------------------------------
-        System.out.println("* JUnitTest: getSettings() method");
-
-        instance = new AdminREST();
-        userAuthe = "root|root";
-
-        System.out.println("-- test-3 |  - getSettings:");
-
-        result = instance.getSettings(userAuthe);
-        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
-                + "\"output\":{\"LogLevel\":\"info\"}}";
-        System.out.println("|expect| " + expResult);
-        System.out.println("|result| " + result);
-        assertEquals(expResult, result);
-
-    }
-
-    /**
-     * Test of setSettings method, of class AdminREST.
-     */
-    public void testSetSettings() {
-        System.out.println("* JUnitTest: setSettings() method");
-        String userAuthe, JSONSettings, expResult;
-        AdminREST instance = new AdminREST();
-
-        System.out.println("-- test-1 |  - setSettings:");
-        userAuthe = "root|root";
-        JSONSettings = "{\"LogLevel\":\"debug\"}";
-
-        String result = instance.setSettings(userAuthe, JSONSettings);
-        expResult = "{\"outputMessage\":\"Set PServer settings complete\"}";
-
-        System.out.println("|expect| " + expResult);
-        System.out.println("|result| " + result);
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of getSettings method, of class AdminREST.
-     */
-    public void testGetSettings() {
-        System.out.println("* JUnitTest: getSettings() method");
-        String userAuthe, expResult;
-        AdminREST instance = new AdminREST();
-        userAuthe = "root|root";
-        System.out.println("-- test-1 |  - getSettings:");
-        String result = instance.getSettings(userAuthe);
-        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
-                + "\"output\":{\"LogLevel\":\"debug\"}}";
-        System.out.println("|expect| " + expResult);
-        System.out.println("|result| " + result);
-        assertEquals(expResult, result);
-    }
+//    /**
+//     * Test of setSettings getSettings method, of class AdminREST.
+//     */
+//    @Test
+//    public void testSetGetSettings() {
+//
+//        String userAuthe, expResult, result, JSONSettings;
+//        AdminREST instance;
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: getSettings() method");
+//
+//        instance = new AdminREST();
+//        userAuthe = "root|root";
+//
+//        System.out.println("-- test-1 |  - getSettings:");
+//
+//        result = instance.getSettings(userAuthe);
+//        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
+//                + "\"output\":{\"LogLevel\":\"info\"}}";
+//        System.out.println("|expect| " + expResult);
+//        System.out.println("|result| " + result);
+//        assertEquals(expResult, result);
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: setSettings() method");
+//        instance = new AdminREST();
+//        userAuthe = "root|root";
+//        JSONSettings = "{\"LogLevel\":\"debug\"}";
+//
+//        System.out.println("-- test-1 |  - setSettings:"
+//                + " JSONSettings: " + JSONSettings);
+//
+//        result = instance.setSettings(userAuthe, JSONSettings);
+//        expResult = "{\"outputMessage\":\"Set PServer settings complete\"}";
+//
+//        System.out.println("|expect| " + expResult);
+//        System.out.println("|result| " + result);
+//        assertEquals(expResult, result);
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: getSettings() method");
+//
+//        instance = new AdminREST();
+//        userAuthe = "root|root";
+//
+//        System.out.println("-- test-2 |  - getSettings:");
+//
+//        result = instance.getSettings(userAuthe);
+//        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
+//                + "\"output\":{\"LogLevel\":\"debug\"}}";
+//        System.out.println("|expect| " + expResult);
+//        System.out.println("|result| " + result);
+//        assertEquals(expResult, result);
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: setSettings() method");
+//        instance = new AdminREST();
+//        userAuthe = "root|root";
+//        JSONSettings = "{\"LogLevel\":\"info\"}";
+//
+//        System.out.println("-- test-2 |  - setSettings:"
+//                + " JSONSettings: " + JSONSettings);
+//
+//        result = instance.setSettings(userAuthe, JSONSettings);
+//        expResult = "{\"outputMessage\":\"Set PServer settings complete\"}";
+//
+//        System.out.println("|expect| " + expResult);
+//        System.out.println("|result| " + result);
+//        assertEquals(expResult, result);
+//
+//        //----------------------------------------------------------------------
+//        System.out.println("* JUnitTest: getSettings() method");
+//
+//        instance = new AdminREST();
+//        userAuthe = "root|root";
+//
+//        System.out.println("-- test-3 |  - getSettings:");
+//
+//        result = instance.getSettings(userAuthe);
+//        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
+//                + "\"output\":{\"LogLevel\":\"info\"}}";
+//        System.out.println("|expect| " + expResult);
+//        System.out.println("|result| " + result);
+//        assertEquals(expResult, result);
+//
+//    }
+//
+//    /**
+//     * Test of setSettings method, of class AdminREST.
+//     */
+//    public void testSetSettings() {
+//        System.out.println("* JUnitTest: setSettings() method");
+//        String userAuthe, JSONSettings, expResult;
+//        AdminREST instance = new AdminREST();
+//
+//        System.out.println("-- test-1 |  - setSettings:");
+//        userAuthe = "root|root";
+//        JSONSettings = "{\"LogLevel\":\"debug\"}";
+//
+//        String result = instance.setSettings(userAuthe, JSONSettings);
+//        expResult = "{\"outputMessage\":\"Set PServer settings complete\"}";
+//
+//        System.out.println("|expect| " + expResult);
+//        System.out.println("|result| " + result);
+//        assertEquals(expResult, result);
+//    }
+//
+//    /**
+//     * Test of getSettings method, of class AdminREST.
+//     */
+//    public void testGetSettings() {
+//        System.out.println("* JUnitTest: getSettings() method");
+//        String userAuthe, expResult;
+//        AdminREST instance = new AdminREST();
+//        userAuthe = "root|root";
+//        System.out.println("-- test-1 |  - getSettings:");
+//        String result = instance.getSettings(userAuthe);
+//        expResult = "{\"outputMessage\":\"Get PServer settings complete\","
+//                + "\"output\":{\"LogLevel\":\"debug\"}}";
+//        System.out.println("|expect| " + expResult);
+//        System.out.println("|result| " + result);
+//        assertEquals(expResult, result);
+//    }
 }

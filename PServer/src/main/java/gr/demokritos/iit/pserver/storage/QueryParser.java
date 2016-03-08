@@ -143,42 +143,34 @@ public class QueryParser implements IQueryParser<FilterList> {
                     // continue
                     continue;
                 }
-            } else {
-                // If the token is a variable name or literal
-                // If we are in a comparison
-                if (fComparison) {
-                    // Use the name as a second operand
-                    operant2 = cToken;
-                    SingleColumnValueFilter filter;
-//                    filter = new SingleColumnValueFilter(
-//                            Bytes.toBytes("Attributes"),
-//                            Bytes.toBytes(operant1),
-//                            operator,
-//                            Bytes.toBytes(operant2)
-//                    );
-                    filter = new SingleColumnValueFilter(
-                            Bytes.toBytes("Attributes"),
-                            Bytes.toBytes(operant1),
-                            operator,
-                            new BinaryComparator(Bytes.toBytes(operant2))
-                    );
+            } else // If the token is a variable name or literal
+            // If we are in a comparison
+            if (fComparison) {
+                // Use the name as a second operand
+                operant2 = cToken;
+                SingleColumnValueFilter filter;
+                filter = new SingleColumnValueFilter(
+                        Bytes.toBytes("Attributes"),
+                        Bytes.toBytes(operant1),
+                        operator,
+                        new BinaryComparator(Bytes.toBytes(operant2))
+                );
 
-                    // Push to current filter list
-                    currentState.getList().addFilter(filter);
-                    // If in an OR
-                    if (fOROperator) {
-                        // Pop current list from parent stack
-                        parentStack.pop();
-                        // Add current filter list to parent stack
-                        parentStack.push(currentState);
-                    }
-                    fComparison = false;
-                } else {
-                    // else
-                    // Use the name as the first operand
-                    // Keep the name
-                    operant1 = cToken;
+                // Push to current filter list
+                currentState.getList().addFilter(filter);
+                // If in an OR
+                if (fOROperator) {
+                    // Pop current list from parent stack
+                    parentStack.pop();
+                    // Add current filter list to parent stack
+                    parentStack.push(currentState);
                 }
+                fComparison = false;
+            } else {
+                // else
+                // Use the name as the first operand
+                // Keep the name
+                operant1 = cToken;
             }
         }
 

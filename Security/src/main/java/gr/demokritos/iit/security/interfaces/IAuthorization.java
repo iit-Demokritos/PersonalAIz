@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * The interface of the Authorization System
+ *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IAuthorization {

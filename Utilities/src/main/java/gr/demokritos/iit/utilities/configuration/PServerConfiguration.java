@@ -38,8 +38,4 @@ public class PServerConfiguration extends Configuration {
         //Return the logging level
         return properties.getProperty("LogLevel", "info");
     }
-
-//    public String getPropertyName() {
-//        return properties.getProperty("PropertyName");
-//    }
 }

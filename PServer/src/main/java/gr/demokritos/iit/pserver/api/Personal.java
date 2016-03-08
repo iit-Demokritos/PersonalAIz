@@ -14,7 +14,6 @@ import gr.demokritos.iit.security.authorization.Actions;
 import gr.demokritos.iit.utilities.configuration.PServerConfiguration;
 import gr.demokritos.iit.utilities.logging.Logging;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,6 @@ public class Personal {
         this.psConfig = new PServerConfiguration();
         this.dbPersonal = dbPersonal;
         this.psClient = psClient;
-//        security = null;
 
         //Update logging level 
         Logging.updateLoggerLevel(Personal.class, psConfig.getLogLevel());
@@ -157,8 +155,8 @@ public class Personal {
      * (page>=1). The list returned as page with 20 elements. With page
      * parameter you can ask for the first page, the second page... If page is
      * null or page<1 then return all elements in a single page. @return A set
-     * with the usernames. If
-     * return is null then permission denied
+     * with the usernames. If return is null then permission denied
+     * @return 
      */
     public Set<String> getUsers(String pattern, Integer page) {
 

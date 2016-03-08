@@ -7,11 +7,11 @@ package gr.demokritos.iit.recommendationengine.evaluation;
 
 /**
  * The interface of recommendation platform evaluation
+ *
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */
 public interface IEvaluation {
 
-    
     void storeEntry(String username, String objectId, boolean recommended, long timestamp, String clientName);
 
 }

@@ -252,7 +252,7 @@ public class FeedObject {
 
         return gson.fromJson(json,
                 new TypeToken<List<FeedObject>>() {
-                }.getType());
+        }.getType());
     }
 
     /**

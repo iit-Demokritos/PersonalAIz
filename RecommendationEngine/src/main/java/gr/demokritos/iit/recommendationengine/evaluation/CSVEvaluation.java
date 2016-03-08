@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * NOT WORKING CLASS 
- * Implements the evaluation with csv file storage system
+ * NOT WORKING CLASS Implements the evaluation with csv file storage system
  *
  * @author Panagiotis Giotis <giotis.p@gmail.com>
  */

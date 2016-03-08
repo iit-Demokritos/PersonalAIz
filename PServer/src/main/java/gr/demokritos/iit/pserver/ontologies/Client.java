@@ -20,8 +20,9 @@ public class Client extends SystemUser {
 
     /**
      * Constructor with clients username and password
+     *
      * @param username
-     * @param password 
+     * @param password
      */
     public Client(String username, String password) {
         super.username = username;
@@ -32,7 +33,8 @@ public class Client extends SystemUser {
 
     /**
      * Constructor with clients API key
-     * @param apiKey 
+     *
+     * @param apiKey
      */
     public Client(String apiKey) {
 
@@ -63,7 +65,8 @@ public class Client extends SystemUser {
 
     /**
      * Get client's username
-     * @return 
+     *
+     * @return
      */
     public String getUsername() {
         return username;

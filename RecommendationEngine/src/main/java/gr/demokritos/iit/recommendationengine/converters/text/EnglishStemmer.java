@@ -14,29 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package gr.demokritos.iit.recommendationengine.converters.text;
 
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
 
-
-
 /**
  *
  */
 public class EnglishStemmer implements IStemmer {
+
     SnowballStemmer stemmer;
-    
+
     public EnglishStemmer() {
         this.stemmer = new englishStemmer();
     }
 
     @Override
     public String stem(String sToStem) {
-      stemmer.setCurrent(sToStem);
-      stemmer.stem();
-      return stemmer.getCurrent();          
+        stemmer.setCurrent(sToStem);
+        stemmer.stem();
+        return stemmer.getCurrent();
     }
-    
+
 }

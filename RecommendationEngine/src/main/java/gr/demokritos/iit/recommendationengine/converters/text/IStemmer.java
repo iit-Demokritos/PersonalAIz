@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package gr.demokritos.iit.recommendationengine.converters.text;
 
-/** The basic interface for a stemmer.
+/**
+ * The basic interface for a stemmer.
  *
  */
 public interface IStemmer {
-      public String stem(String sToStem);
+
+    public String stem(String sToStem);
 }

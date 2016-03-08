@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements a converter. 
- * The converter get a list with row texts and create a feature list
+ * This class implements a converter. The converter get a list with row texts
+ * and create a feature list
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */

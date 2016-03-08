@@ -79,9 +79,9 @@ function addClient() {
     var ClientName = $("#inputClientName").val();
     var Password = $("#inputClientPassword").val();
     var RePassword = $("#inputClientRPassword").val();
-    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username")
             + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
-    
+
     if (Password === RePassword &&
             (ClientName !== "" &&
                     Password !== "")) {
@@ -103,9 +103,9 @@ function addClient() {
 }
 
 function getClients() {
-    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username")
             + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
-    
+
     var url = host + "PersonalAIz/api/pserver/" + userAuthe + "/admin/clients";
     $.get(url).done(function (data) {
         $("#clientsTable").html("");
@@ -126,7 +126,7 @@ function getClients() {
 }
 
 function deleteClient(clientname) {
-    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username")
             + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
 
     var url = host + "PersonalAIz/api/pserver/" + userAuthe +
@@ -140,7 +140,7 @@ function deleteClient(clientname) {
 
 
 function getSettings() {
-    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username")
             + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
 
     var url = host + "PersonalAIz/api/pserver/" + userAuthe + "/admin/settings";
@@ -160,9 +160,9 @@ function getSettings() {
 }
 
 function setSetting() {
-    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username") 
+    var userAuthe = window.sessionStorage.getItem("PersonalAIz.Username")
             + "%7C" + window.sessionStorage.getItem("PersonalAIz.Password");
-    
+
     var url = host + "PersonalAIz/api/pserver/" + userAuthe + "/admin/setting";
 
     var settingName = $("#inputSettingName").val();

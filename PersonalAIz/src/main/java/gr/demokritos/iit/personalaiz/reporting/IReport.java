@@ -10,5 +10,5 @@ package gr.demokritos.iit.personalaiz.reporting;
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IReport {
-    
+
 }

@@ -6,13 +6,13 @@
 package gr.demokritos.iit.pserver.storage.interfaces;
 
 /**
- * Represents a parser that reads a query and returns an object
- * which can be used in a Storage class to filter records.
- * The template type T should indicate the return type
- * of the parsing process.
+ * Represents a parser that reads a query and returns an object which can be
+ * used in a Storage class to filter records. The template type T should
+ * indicate the return type of the parsing process.
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IQueryParser<T> {
+
     public T getParsedQuery(String sExpression);
 }

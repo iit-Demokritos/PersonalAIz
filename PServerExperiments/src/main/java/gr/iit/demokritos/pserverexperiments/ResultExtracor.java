@@ -39,8 +39,8 @@ public class ResultExtracor {
         for (String cResultName : resultList) {
 
             String filename = cResultName;
-            String filenamfeToExtrectResults = "results/export_" + filename;
-            String resultsFilename = "results/" + filename;
+            String filenamfeToExtrectResults = "/home/pgiotis/NetBeansProjects/DemokritosProjects/PersonalAIzResults/4C-4C/resultExport/export_" + filename;
+            String resultsFilename = "/home/pgiotis/NetBeansProjects/DemokritosProjects/PersonalAIzResults/4C-4C/" + filename;
             String startAddUsers = "";
             String endAddUsers = "";
             String startModifyUsers = "";
@@ -136,13 +136,13 @@ public class ResultExtracor {
                     Long.parseLong(endModifyUsers) - Long.parseLong(startModifyUsers));
             Long getUserProfileDuration = TimeUnit.MILLISECONDS.toSeconds(
                     Long.parseLong(endGetUsersProfile) - Long.parseLong(startGetUsersProfile));
-            
-            DecimalFormat df = new DecimalFormat("#.00"); 
+
+            DecimalFormat df = new DecimalFormat("#.00");
             //calculate Standard Deviation 
-            double addUserAverage = (double)addUserCallsDuration / (double)addUserCallCounter;
-            double modifyUserAverage = (double)modifyUserCallsDuration / (double)modifyUserCallCounter;
-            double getUserOnModifyAverage = (double)getUserOnModifyCallsDuration / (double)getUserOnModifyCallCounter;
-            double getUserProfileAverage = (double)getUserProfileCallsDuration / (double)getUserProfileCallCounter;
+            double addUserAverage = (double) addUserCallsDuration / (double) addUserCallCounter;
+            double modifyUserAverage = (double) modifyUserCallsDuration / (double) modifyUserCallCounter;
+            double getUserOnModifyAverage = (double) getUserOnModifyCallsDuration / (double) getUserOnModifyCallCounter;
+            double getUserProfileAverage = (double) getUserProfileCallsDuration / (double) getUserProfileCallCounter;
             double addUserDevination = calculateDevination(addUserCallsList, addUserAverage);
             double modifyUserDevination = calculateDevination(modifyUserCallsList, modifyUserAverage);
             double getUserOnModifyDevination = calculateDevination(getUserOnModifyCallsList, getUserOnModifyAverage);
@@ -169,7 +169,7 @@ public class ResultExtracor {
                     .concat(df.format(modifyUserDevination)));
             storeList.add("ModifyUser Quartiles in milliseconds: "
                     .concat(Quartiles(modifyUserCallsList)));
-          
+
             if (getUserOnModifyDuration != 0) {
                 storeList.add("GetUserOnModify calls per second: "
                         .concat(Long.toString(getUserOnModifyCallCounter / getUserOnModifyDuration)));
@@ -235,7 +235,7 @@ public class ResultExtracor {
     }
 
     public static void storeData(List<String> storeList, String filename) {
-        System.out.println("=== "+filename+" ===");
+        System.out.println("=== " + filename + " ===");
         PrintWriter pw = null;
 
         try {

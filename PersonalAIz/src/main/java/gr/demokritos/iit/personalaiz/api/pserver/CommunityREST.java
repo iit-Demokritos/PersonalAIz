@@ -19,8 +19,6 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
-
-
 /**
  * Root resource (exposed at ":credentials/Community" path)
  */
@@ -28,16 +26,12 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class CommunityREST {
 
-
     /**
      * Method handling HTTP GET requests. The returned object will be sent to
      * the client as "text/plain" media type.
      *
      * @return String that will be returned as a text/plain response.
      */
-    
-
-    
 //  Implement Add new user community
 // POST /user/:communityName/:communityUsersObject | Add new user custom community on the platform
     @Path("user/{communityName}/{communityUsersObject}")
@@ -48,9 +42,9 @@ public class CommunityREST {
             @PathParam("communityUsersObject") String communityUsersObject
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Add user association
 // POST /user/:user1/and/:user2/associate/:weight | Add the weight of user’s association between two users
     @Path("user/{user1}/and/{user2}/associate/{weight}")
@@ -62,9 +56,9 @@ public class CommunityREST {
             @PathParam("weight") String weight
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Calculate User association
 // POST /user/:metricAlgorithm/association | Calculates the association distance for all users in the platform
     @Path("user/{metricAlgorithm}/association")
@@ -75,9 +69,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Make user communities
 // POST /user/:clusterAlgorithm/with/:associationType | Make clustering to users and find user communities
     @Path("user/{clusterAlgorithm}/with/{associationType}")
@@ -89,9 +83,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Delete user communities
 // DELETE /user | Make clustering to users and find user communities
     @Path("user")
@@ -101,9 +95,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Get user communities
 // GET /user | Get a list with user communities on the platform
     @Path("user")
@@ -114,9 +108,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("page") String page
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Get user community profile
 // GET /user/:communityName | Get user’s community profile
     @Path("user/{communityName}")
@@ -128,9 +122,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("page") String page
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Get user community users
 // GET /user/:communityName/users | Get users that belongs to  given community user
     @Path("user/{communityName}/users")
@@ -142,9 +136,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("page") String page
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Get users communities
 // GET /user/:username/communities | Get the communities that user contained
     @Path("user/{username}/communities")
@@ -156,12 +150,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("page") String page
     ) {
 
-     return null;
+        return null;
     }
-    
-    
-    
-    
+
 // ===========================================   
 //  Implement  Add new feature community
 // POST /feature/:communityName/:communityFeatureObject | Add new custom feature community on the platform
@@ -173,9 +164,9 @@ public class CommunityREST {
             @PathParam("communityFeatureObject") String communityFeatureObject
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Calculate Feature association
 // POST /feature/:metricAlgorithm/association | Calculates the association distance for all features in the platform
     @Path("feature/{metricAlgorithm}/association")
@@ -186,9 +177,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Make feature communities
 // POST /feature/:clusterAlgorithm/with/:associationType | Make clustering to features and find feature communities
     @Path("feature/{clusterAlgorithm}/with/{associationType}")
@@ -200,9 +191,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("properties") String properties
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Delete feature communities
 // DELETE /feature | Delete feature communities from the platform
     @Path("feature")
@@ -212,9 +203,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("pattern") String pattern
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Get feature communities
 // GET /feature | Get a list with feature communities on the platform
     @Path("feature")
@@ -225,9 +216,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("page") String page
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Get feature community features
 // GET /feature/:communityName/features | Get features that belongs to  given feature community
     @Path("feature/{communityName}/features")
@@ -239,9 +230,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("page") String page
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Implement  Get feature’s  feature communities
 // GET /feature/:featurename/communities | Get the communities that feature contained
     @Path("feature/{featurename}/communities")
@@ -253,12 +244,9 @@ public class CommunityREST {
             @DefaultValue("*") @QueryParam("page") String page
     ) {
 
-     return null;
+        return null;
     }
-    
-    
-    
-    
+
 // ===========================================   
 //  Get Metric algorithms
 // GET /metrics | Get list with metric algorithms and their parameter description
@@ -268,9 +256,9 @@ public class CommunityREST {
             @PathParam("clientKey") String clientKey
     ) {
 
-     return null;
+        return null;
     }
-    
+
 //  Get Clustering algorithms
 // GET /clusters | Get list with cluster algorithms and their parameter description
     @Path("clusters")
@@ -279,9 +267,7 @@ public class CommunityREST {
             @PathParam("clientKey") String clientKey
     ) {
 
-     return null;
+        return null;
     }
-    
-    
-    
+
 }

@@ -38,9 +38,9 @@ public class PersonalAIzHBaseConfiguration
     /**
      * Get HBase configuration based on stored settings.
      *
-     * @return The HBase Configuration. The default values are 
-     * hbase.zookeeper.quorum= localhost
-     * hbase.zookeeper.property.clientPort= 2181
+     * @return The HBase Configuration. The default values are
+     * hbase.zookeeper.quorum= localhost hbase.zookeeper.property.clientPort=
+     * 2181
      */
     public Configuration getHBaseConfig() {
         Configuration hbaseConfig = HBaseConfiguration.create();

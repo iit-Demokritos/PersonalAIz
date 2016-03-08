@@ -412,24 +412,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         }
         //if page not null then set the offset of the page 
         if (page != null) {
-//
-//            int totalItems = 0;
-//
-//            try {
-//
-//                totalItems = table.get(get).size();
-//
-//            } catch (IOException ex) {
-//                LOGGER.error("Error on table get", ex);
-//                return null;
-//            }
-//
-//            if ((totalItems % pageSize) != 0) {
-//                paging = page + "/" + (totalItems / pageSize + 1);
-//            } else {
-//                paging = page + "/" + (totalItems / pageSize);
-//            }
-
             //add page filter of the result
             get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
         }
@@ -474,7 +456,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         List<User> usersList = new ArrayList<>();
         usersList.add(user);
         return updateUsers(usersList, clientName);
-//        return addUsers(usersList, clientName);
     }
 
     /**
@@ -585,7 +566,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         ArrayList<User> usersList = new ArrayList<>();
         usersList.add(user);
         return updateUsers(usersList, clientName);
-//        return addUsers(usersList, clientName);
     }
 
     /**
@@ -650,7 +630,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
         //if page not null then set the offset of the page 
         if (page != null) {
-
             //add page filter of the result
             get.setFilter((new ColumnPaginationFilter(pageSize, pageSize * (page - 1))));
         }
@@ -683,7 +662,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                         Long.toString(Bytes.toLong(familyMap.descendingMap().get(cQ))));
 
             } catch (Exception e) {
-
                 //if feature is not long
                 ftrMap.put(
                         Bytes.toString(cQ),
@@ -762,11 +740,6 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
             UUID = Bytes.toString(
                     result.getValue(family_ClientUsers, Bytes.toBytes(username))
             );
-
-//            if (UUID == null) {
-//                //Create new UUID
-//                UUID = Util.getUUID(clientUID + "-" + username).toString();
-//            }
         } catch (IOException ex) {
             LOGGER.error("IOException", ex);
         }
@@ -2026,6 +1999,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
 
     //=================== Stereotype Mode =====================================
     //=================== Community Mode ======================================
+    //TODO: Implement community mode functions
     //=================== Community Mode ======================================
     //=================== Administration ======================================
     /**
@@ -2251,7 +2225,7 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
     }
 
     //=================== Administration ======================================
-    //=================== Generic functions ======================================
+    //=================== Generic functions ===================================
     private Map<String, String> createFeatureCentroid(
             List<String> users, String clientName) {
 
@@ -2280,26 +2254,24 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
                         //add feature to list
                         numericFeatures.put(cFeature, userFeatures.get(cFeature));
                     }
-                } else {
-                    //if feature contains to alphastereotype list
-                    if (alphaFeatures.containsKey(cFeature)) {
-                        HashMap<String, Integer> alphaFeature = new HashMap<>();
-                        alphaFeature.putAll(alphaFeatures.get(cFeature));
+                } else //if feature contains to alphastereotype list
+                if (alphaFeatures.containsKey(cFeature)) {
+                    HashMap<String, Integer> alphaFeature = new HashMap<>();
+                    alphaFeature.putAll(alphaFeatures.get(cFeature));
 
-                        //check if value contains on map
-                        if (alphaFeature.containsKey(userFeatures.get(cFeature))) {
-                            int oldValue = alphaFeature.get(userFeatures.get(cFeature));
-                            alphaFeature.put(userFeatures.get(cFeature), oldValue++);
-                        } else {
-                            //if not add new value on map
-                            alphaFeature.put(userFeatures.get(cFeature), 1);
-                        }
+                    //check if value contains on map
+                    if (alphaFeature.containsKey(userFeatures.get(cFeature))) {
+                        int oldValue = alphaFeature.get(userFeatures.get(cFeature));
+                        alphaFeature.put(userFeatures.get(cFeature), oldValue++);
                     } else {
-                        HashMap<String, Integer> newAlphaFeature = new HashMap<>();
-                        newAlphaFeature.put(userFeatures.get(cFeature), 1);
-                        //add to list and counter map
-                        alphaFeatures.put(cFeature, newAlphaFeature);
+                        //if not add new value on map
+                        alphaFeature.put(userFeatures.get(cFeature), 1);
                     }
+                } else {
+                    HashMap<String, Integer> newAlphaFeature = new HashMap<>();
+                    newAlphaFeature.put(userFeatures.get(cFeature), 1);
+                    //add to list and counter map
+                    alphaFeatures.put(cFeature, newAlphaFeature);
                 }
             }
         }
@@ -2332,6 +2304,5 @@ public class PServerHBase implements IPersonalStorage, IStereotypeStorage, IComm
         return stereotypeFeatures;
     }
 
-    //=================== Generic functions ======================================
-    //=================== Test functions ======================================
+    //=================== Generic functions ===================================
 }

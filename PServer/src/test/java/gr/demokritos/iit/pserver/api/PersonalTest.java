@@ -8,13 +8,10 @@ package gr.demokritos.iit.pserver.api;
 import gr.demokritos.iit.pserver.ontologies.Client;
 import gr.demokritos.iit.pserver.ontologies.User;
 import gr.demokritos.iit.pserver.storage.PServerHBase;
-import gr.demokritos.iit.security.SecurityLayer;
-import gr.demokritos.iit.security.authorization.Action;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.After;
@@ -300,9 +297,9 @@ public class PersonalTest {
         System.out.println("|expect| " + getExpResult);
         System.out.println("|result| " + result);
         assertEquals(getExpResult, result);
-        
-        
+
     }
+
     /**
      * Test of setUserAttributes and getUserAttributes method, of class
      * Personal.
@@ -379,7 +376,6 @@ public class PersonalTest {
         System.out.println("|result| " + result);
         assertEquals(getExpResult, result);
 
-        
         //----------------------------------------------------------------------
         System.out.println("* JUnitTest: setUserAttributes() method");
         //Set User Attributes | test-2
@@ -464,6 +460,7 @@ public class PersonalTest {
 
         System.out.println(instance.getUsers(pattern, page));
     }
+
     /**
      * Test of setUserFeatures, modifyUserFeatures and getUserFeatures method,
      * of class Personal.
@@ -611,7 +608,7 @@ public class PersonalTest {
                 + " ,clientKey: root");
 
         assertEquals(expResult, instance.modifyUserFeatures(username, features));
-        
+
         //Modify User features | test-2
         //Crete new client
         cl = new Client("root", "root");

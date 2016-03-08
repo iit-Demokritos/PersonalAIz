@@ -25,50 +25,10 @@ public class PersonalRESTTest {
 
     @BeforeClass
     public static void setUpClass() {
-//        System.out.println("* JUnitTest ~ BeforeClass: addClient() method");
-//        String userAuthe, clientName, clientPass, clientInfo, expResult;
-//        //Create Admin Instance
-//        AdminREST instance = new AdminREST();
-//
-//        userAuthe = "root|root";
-//        clientName = "client1";
-//        clientPass = "12345";
-//        clientInfo = "{'mail':'info@mail.com'}";
-//
-//        System.out.println("-- AddClient:"
-//                + "clientName: " + clientName
-//                + " clientPass: " + clientPass
-//                + " clientInfo: " + clientInfo);
-//
-//        String result = instance.addClient(
-//                userAuthe,
-//                clientName,
-//                clientPass,
-//                clientInfo);
-//        expResult = "{\"outputMessage\":\"Add Client Complete\"}";
-//        System.out.println("|expect| " + expResult);
-//        System.out.println("|result| " + result);
-//        assertEquals(expResult, result);
     }
 
     @AfterClass
     public static void tearDownClass() {
-//        String userAuthe, clientName, expResult, result;
-//        //----------------------------------------------------------------------
-//        System.out.println("* JUnitTest ~ AfterClass: DeleteClient() method");
-//        AdminREST instance = new AdminREST();
-//        userAuthe = "root|root";
-//        clientName = "client1";
-//
-//        System.out.println("-- deletClient:"
-//                + " clientName: " + clientName);
-//
-//        result = instance.deleteClient(userAuthe, clientName);
-//
-//        expResult = "{\"outputMessage\":\"Delete Client Complete\"}";
-//        System.out.println("|expect| " + expResult);
-//        System.out.println("|result| " + result);
-//        assertEquals(expResult, result);
     }
 
     @Before
@@ -494,7 +454,7 @@ public class PersonalRESTTest {
         System.out.println("|expect| " + expResult);
         System.out.println("|result| " + result);
         assertEquals(expResult, result);
-        
+
         //----------------------------------------------------------------------
         System.out.println("* JUnitTest: getUserProfile() method");
         instance = new PersonalREST();

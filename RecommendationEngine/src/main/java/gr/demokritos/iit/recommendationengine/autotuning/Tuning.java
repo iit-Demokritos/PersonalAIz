@@ -10,5 +10,5 @@ package gr.demokritos.iit.recommendationengine.autotuning;
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public class Tuning {
-    
+
 }

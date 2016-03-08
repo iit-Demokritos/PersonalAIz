@@ -265,16 +265,10 @@ public class Admin {
      */
     private boolean getPermissionFor(Action a, String sAccessType) {
         Date dt = new Date();
-        //10 minute before
-        long frame = 600;
-
-        //If security is not null and access granted and frame is < 10minutes
+        //If security is not null and access granted
         //then return true
         return ((security != null) && (security.autho.getAccessRights(adminClient, a)
                 .get(sAccessType)) && (adminClient.authenticatedTimestamp != 0));
-//        return ((security != null) && (security.autho.getAccessRights(adminClient, a)
-//                .get(sAccessType)) && (adminClient.authenticatedTimestamp != 0)
-//                && (new Date(dt.getTime() - frame).after(new Date(adminClient.authenticatedTimestamp))));
     }
 
 }

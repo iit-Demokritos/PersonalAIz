@@ -11,7 +11,6 @@ import gr.demokritos.iit.security.interfaces.ISecurityStorage;
 import gr.demokritos.iit.security.ontologies.SystemUser;
 import gr.demokritos.iit.utilities.configuration.PersonalAIzHBaseConfiguration;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.codec.digest.DigestUtils;

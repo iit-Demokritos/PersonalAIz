@@ -7,14 +7,17 @@ package gr.demokritos.iit.security.authorization;
 
 /**
  * The Action object
+ *
  * @author ggianna
  */
 public class Action {
+
     private final String name;
+
     public Action(String sName) {
         this.name = sName;
     }
-    
+
     @Override
     public String toString() {
         return name;
@@ -23,7 +26,5 @@ public class Action {
     public String getName() {
         return name;
     }
-    
-    
-    
+
 }

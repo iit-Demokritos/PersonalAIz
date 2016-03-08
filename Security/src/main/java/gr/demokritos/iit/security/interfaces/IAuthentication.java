@@ -7,6 +7,7 @@ package gr.demokritos.iit.security.interfaces;
 
 /**
  * The interface of the Authentication system
+ *
  * @author Giotis Panagiotis <giotis.p@gmail.com>
  */
 public interface IAuthentication {

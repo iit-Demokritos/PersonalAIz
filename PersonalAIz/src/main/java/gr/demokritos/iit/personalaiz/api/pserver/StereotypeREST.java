@@ -164,14 +164,12 @@ public class StereotypeREST {
             output.setCustomOutputMessage("AddStereotype Failed: No Rule");
 
             return JSon.jsonize(output, Output.class);
+        } else if (stereotype.addStereotype(stereotypeName, rule)) {
+            LOGGER.info("Complete Add stereotype: " + stereotypeName);
+            output.setCustomOutputMessage("Add Stereotype Complete");
         } else {
-            if (stereotype.addStereotype(stereotypeName, rule)) {
-                LOGGER.info("Complete Add stereotype: " + stereotypeName);
-                output.setCustomOutputMessage("Add Stereotype Complete");
-            } else {
-                LOGGER.info("Failed Add Stereotype: " + stereotypeName);
-                output.setCustomOutputMessage("Add Stereotype Failed");
-            }
+            LOGGER.info("Failed Add Stereotype: " + stereotypeName);
+            output.setCustomOutputMessage("Add Stereotype Failed");
         }
 
         return JSon.jsonize(output, Output.class);
